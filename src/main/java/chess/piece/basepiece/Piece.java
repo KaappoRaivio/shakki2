@@ -7,6 +7,7 @@ import chess.move.Move;
 
 import java.awt.*;
 import java.io.Serializable;
+import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -88,13 +89,44 @@ abstract public class Piece implements Serializable {
         }
     }
 
-    protected Set<Position> getStraightPath (Board baord, Position position) {
-        return getStraightPath(baord, position.getX(), position.getY());
+    private Set<Position> getStraightPath (Board board, Position position, int deltaX, int deltaY) {
+        return getStraightPath(board, position.getX(), position.getY(), deltaX, deltaY);
     }
 
-    protected Set<Position> getStraightPath (Board board, int x, int y) {
+    private Set<Position> getStraightPath (Board board, int x, int y, int deltaX, int deltaY) {
+        Set<Position> moves = new LinkedHashSet<>();
+
         PieceColor ownColor = board.getPieceInSquare(x, y).getColor();
 
-        
+        x += deltaX;
+        y += deltaY;
+
+        while (x >= 0 && x < 8 && y >= 0 && y < 8) {
+
+            PieceColor currentPieceColor = board.getPieceInSquare(x, y).getColor();
+            if (currentPieceColor == ownColor) {
+                break;
+            } else if (currentPieceColor == ownColor.invert()) {
+                moves.add(new Position(x, y));
+                break;
+            } else {
+                moves.add(new Position(x, y));
+            }
+
+            x += deltaX;
+            y += deltaY;
+        }
+
+        return moves;
+    }
+
+    protected Set<Move> getStraightPathMoves (Board board, Position position, int deltaX, int deltaY) {
+        Set<Move> moves = new LinkedHashSet<>();
+
+        for (Position destination : getStraightPath(board, position, deltaX, deltaY)) {
+            moves.add(Move.parseMove(position.toString() + destination.toString(), board.getPieceInSquare(position).getColor(), board));
+        }
+
+        return  moves;
     }
 }

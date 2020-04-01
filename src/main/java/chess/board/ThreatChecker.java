@@ -225,26 +225,30 @@ public class ThreatChecker {
         Piece piece = board.getPieceInSquare(square);
 
 
+        try {
+            Position offset = square.offset(1, -piece.getForwardDirection(), false);
+            Piece right;
+            if (offset.verify()) {
+                right = board.getPieceInSquare(offset);
+            } else {
+                right = null;
+            }
 
-        Position offset = square.offset(1, -piece.getForwardDirection(), false);
-        Piece right;
-        if (offset.verify()) {
-            right = board.getPieceInSquare(offset);
-        } else {
-            right = null;
+            offset = square.offset(-1, -piece.getForwardDirection(), false);
+            Piece left;
+            if (offset.verify()) {
+                left = board.getPieceInSquare(offset);
+            } else {
+                left = null;
+            }
+
+
+            return right != null && right.getType() == PieceType.PAWN && right.getColor() == piece.getColor().invert()
+                ||  left != null && left.getType() == PieceType.PAWN &&  left.getColor() == piece.getColor().invert();
+
+        } catch (ChessException e) {
+            throw new ChessException("Not applicable " + board + square + board.getStateHistory().getCurrentState().getWhiteKingPosition() + board.getMoveHistoryPretty());
         }
-
-        offset = square.offset(-1, -piece.getForwardDirection(), false);
-        Piece left;
-        if (offset.verify()) {
-            left = board.getPieceInSquare(offset);
-        } else {
-            left = null;
-        }
-
-
-        return right != null && right.getType() == PieceType.PAWN && right.getColor() == piece.getColor().invert()
-            ||  left != null && left.getType() == PieceType.PAWN &&  left.getColor() == piece.getColor().invert();
     }
 
     public static void main(String[] args) {
