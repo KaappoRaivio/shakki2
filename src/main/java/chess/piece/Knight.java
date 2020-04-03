@@ -10,11 +10,13 @@ import chess.piece.basepiece.PieceColor;
 import chess.piece.basepiece.PieceType;
 
 import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class Knight extends Piece {
-    public static final Position[] offsets = {
+    public static final List<Position> offsets = Arrays.asList(
             new Position(1, 2),
             new Position(2, 1),
             new Position(2, -1, false),
@@ -22,8 +24,8 @@ public class Knight extends Piece {
             new Position(-1, -2, false),
             new Position(-2, -1, false),
             new Position(-2, 1, false),
-            new Position(-1, 2, false),
-    };
+            new Position(-1, 2, false)
+        );
 
 
     public Knight (PieceColor color) {
@@ -32,18 +34,16 @@ public class Knight extends Piece {
 
     @Override
     public Set<Move> getPossibleMoves (Board board, Position position, Move lastMove) {
-        return Arrays.stream(offsets).map(item -> {
+        Set<Move> moves = new LinkedHashSet<>();
 
-                Position offset = position.offset(item, false);
-                if (offset.verify()) {
-                    return new NormalMove(position, offset, board);
-                } else {
-                    return new NormalMove(position, position, board);  // Mark all positions outside the board temporarily...
-                }
-            })
-                .filter(item -> !new NormalMove(position, position, board).equals(item))  // ... and remove them here
-                .filter(item -> board.getPieceInSquare(item.getDestination()).getColor() != color)
-                .collect(Collectors.toSet());
+        for (Position offset : offsets) {
+            Position destination = position.offset(offset, false);
+            if (destination.verify() && board.getPieceInSquare(destination).getColor() != color) {
+                moves.add(new NormalMove(position, destination, board));
+            }
+        }
+
+        return moves;
     }
 
     @Override

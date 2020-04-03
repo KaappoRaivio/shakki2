@@ -1,7 +1,4 @@
 import chess.board.Board;
-import chess.misc.Position;
-import chess.move.Move;
-import chess.move.NoMove;
 import chess.piece.basepiece.PieceColor;
 
 public class Main {
@@ -25,6 +22,7 @@ public class Main {
             }
 
             board.makeMove(moves.stream().findFirst().orElseThrow());
+            System.out.println(board.getStateHistory().getCurrentState());
             turn = turn.invert();
 //            System.out.println(board);
 

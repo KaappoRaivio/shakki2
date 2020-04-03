@@ -4,6 +4,7 @@ import chess.board.Board;
 import chess.misc.Position;
 import chess.misc.exceptions.ChessException;
 import chess.move.Move;
+import chess.move.NormalMove;
 
 import java.awt.*;
 import java.io.Serializable;
@@ -124,7 +125,8 @@ abstract public class Piece implements Serializable {
         Set<Move> moves = new LinkedHashSet<>();
 
         for (Position destination : getStraightPath(board, position, deltaX, deltaY)) {
-            moves.add(Move.parseMove(position.toString() + destination.toString(), board.getPieceInSquare(position).getColor(), board));
+//            moves.add(Move.parseMove(position.toString() + destination.toString(), board.getPieceInSquare(position).getColor(), board));
+            moves.add(new NormalMove(position, destination, board));
         }
 
         return  moves;

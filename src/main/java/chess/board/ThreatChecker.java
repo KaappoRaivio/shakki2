@@ -4,182 +4,47 @@ import chess.misc.exceptions.ChessException;
 import chess.misc.Position;
 import chess.piece.King;
 import chess.piece.Knight;
+import chess.piece.NoPiece;
 import chess.piece.basepiece.Piece;
 import chess.piece.basepiece.PieceColor;
 import chess.piece.basepiece.PieceType;
 
 public class ThreatChecker {
     static boolean isUnderThreat (Position square, Board board) {
-        boolean pawns = checkForPawns(square, board);
-        boolean kings = checkForKings(square, board);
-        boolean knights = checkForKnights(square, board);
-        boolean bishopsAndQueens = checkForBishopsAndQueens(square, board);
-        boolean rooksAndQueens = checkForRooksAndQueens(square, board);
-
-        return pawns
-            || kings
-            || knights
-            || bishopsAndQueens
-            || rooksAndQueens;
+        return checkForPawns           (square, board)
+            || checkForKings           (square, board)
+            || checkForKnights         (square, board)
+            || checkForBishopsAndQueens(square, board)
+            || checkForRooksAndQueens  (square, board);
     }
 
     private static boolean checkForRooksAndQueens (Position square, Board board) {
+        PieceColor opponentColor = board.getPieceInSquare(square).getColor().invert();
 
+        Piece left = makeRayCast(board, square, 1, 0);
+        Piece right =makeRayCast(board, square, -1, 0);
+        Piece up = makeRayCast(board, square, 0, -1);
+        Piece down = makeRayCast(board, square, 0, 1);
 
-        Piece piece = board.getPieceInSquare(square);
-
-        int x = square.getX();
-        int y = square.getY();
-
-        for (int checkY = y + 1; checkY < board.getDimY(); checkY++) {
-            Piece currentPiece = board.getPieceInSquare(new Position(x, checkY));
-
-            if (currentPiece.getColor() == piece.getColor().invert()) {
-                if (currentPiece.getType() == PieceType.ROOK || currentPiece.getType() == PieceType.QUEEN) {
-                    return true;
-                } else {
-                    break;
-                }
-            } else if (currentPiece.getColor() == piece.getColor()) {
-                break;
-            }
-        }
-
-        for (int checkY = y - 1; checkY >= 0; checkY--) {
-            Piece currentPiece = board.getPieceInSquare(new Position(x, checkY));
-
-            if (currentPiece.getColor() == piece.getColor().invert()) {
-                if (currentPiece.getType() == PieceType.ROOK || currentPiece.getType() == PieceType.QUEEN) {
-                    return true;
-                } else {
-                    break;
-                }
-            } else if (currentPiece.getColor() == piece.getColor()) {
-                break;
-            }
-        }
-
-        for (int checkX = x + 1; checkX < board.getDimX(); checkX++) {
-            Piece currentPiece = board.getPieceInSquare(new Position(checkX, y));
-
-            if (currentPiece.getColor() == piece.getColor().invert()) {
-                if (currentPiece.getType() == PieceType.ROOK || currentPiece.getType() == PieceType.QUEEN) {
-                    return true;
-                } else {
-                    break;
-                }
-            } else if (currentPiece.getColor() == piece.getColor()) {
-                break;
-            }
-        }
-
-        for (int checkX = x - 1; checkX >= 0; checkX--) {
-            Piece currentPiece = board.getPieceInSquare(new Position(checkX, y));
-
-            if (currentPiece.getColor() == piece.getColor().invert()) {
-                if (currentPiece.getType() == PieceType.ROOK || currentPiece.getType() == PieceType.QUEEN) {
-                    return true;
-                } else {
-                    break;
-                }
-            } else if (currentPiece.getColor() == piece.getColor()) {
-                break;
-            }
-        }
-
-        return false;
+        return     (left.getType()   == PieceType.QUEEN || left.getType()   == PieceType.ROOK) && left.getColor()  == opponentColor
+                || (right.getType()  == PieceType.QUEEN || right.getType()  == PieceType.ROOK) && right.getColor() == opponentColor
+                || (up.getType()     == PieceType.QUEEN || up.getType()     == PieceType.ROOK) && up.getColor()    == opponentColor
+                || (down.getType()   == PieceType.QUEEN || down.getType()   == PieceType.ROOK) && down.getColor()  == opponentColor;
     }
 
     private static boolean checkForBishopsAndQueens (Position square, Board board) {
-        Piece piece = board.getPieceInSquare(square);
+        PieceColor opponentColor = board.getPieceInSquare(square).getColor().invert();
 
-        int x = square.getX();
-        int y = square.getY();
+        Piece upLeft = makeRayCast(board, square, -1, -1);
+        Piece upRight =makeRayCast(board, square, 1, -1);
+        Piece downLeft = makeRayCast(board, square, -1, 1);
+        Piece downRight = makeRayCast(board, square, 1, 1);
 
-        int checkX = x + 1;
-        int checkY = y + 1;
-
-        while (checkX < board.getDimX() && checkY < board.getDimY()) {
-            Piece currentPiece = board.getPieceInSquare(checkX, checkY);
-
-            if (currentPiece.getColor() == piece.getColor().invert()) {
-                if (currentPiece.getType() == PieceType.BISHOP || currentPiece.getType() == PieceType.QUEEN) {
-                    return true;
-                } else {
-                    break;
-                }
-            } else if (currentPiece.getColor() == piece.getColor()) {
-                break;
-            }
-
-            checkX += 1;
-            checkY += 1;
-        }
-
-        checkX = x + 1;
-        checkY = y - 1;
-
-        while (checkX < board.getDimX() && checkY >= 0) {
-            Piece currentPiece = board.getPieceInSquare(checkX, checkY);
-
-            if (currentPiece.getColor() == piece.getColor().invert()) {
-                if (currentPiece.getType() == PieceType.BISHOP || currentPiece.getType() == PieceType.QUEEN) {
-                    return true;
-                } else {
-                    break;
-                }
-            } else if (currentPiece.getColor() == piece.getColor()) {
-                break;
-            }
-
-            checkX += 1;
-            checkY -= 1;
-        }
-
-        checkX = x - 1;
-        checkY = y - 1;
-
-        while (checkX >= 0 && checkY >= 0) {
-            Piece currentPiece = board.getPieceInSquare(checkX, checkY);
-
-            if (currentPiece.getColor() == piece.getColor().invert()) {
-                if (currentPiece.getType() == PieceType.BISHOP || currentPiece.getType() == PieceType.QUEEN) {
-                    return true;
-                } else {
-                    break;
-                }
-            } else if (currentPiece.getColor() == piece.getColor()) {
-                break;
-            }
-
-            checkX -= 1;
-            checkY -= 1;
-        }
-
-        checkX = x - 1;
-        checkY = y + 1;
-
-        while (checkX >= 0 && checkY < board.getDimY()) {
-            Piece currentPiece = board.getPieceInSquare(checkX, checkY);
-
-            if (currentPiece.getColor() == piece.getColor().invert()) {
-                if (currentPiece.getType() == PieceType.BISHOP || currentPiece.getType() == PieceType.QUEEN) {
-                    return true;
-                } else {
-                    break;
-                }
-            } else if (currentPiece.getColor() == piece.getColor()) {
-                break;
-            }
-
-            checkX -= 1;
-            checkY += 1;
-        }
-
-        return false;
+        return     (upLeft.getType()       == PieceType.QUEEN || upLeft.getType()       == PieceType.BISHOP) && upLeft.getColor()    == opponentColor
+                || (upRight.getType()      == PieceType.QUEEN || upRight.getType()      == PieceType.BISHOP) && upRight.getColor()   == opponentColor
+                || (downLeft.getType()     == PieceType.QUEEN || downLeft.getType()     == PieceType.BISHOP) && downLeft.getColor()  == opponentColor
+                || (downRight.getType()    == PieceType.QUEEN || downRight.getType()    == PieceType.BISHOP) && downRight.getColor() == opponentColor;
     }
-
-
 
     private static boolean checkForKnights (Position square, Board board) {
         PieceColor color = board.getPieceInSquare(square).getColor();
@@ -224,7 +89,6 @@ public class ThreatChecker {
     private static boolean checkForPawns (Position square, Board board) {
         Piece piece = board.getPieceInSquare(square);
 
-
         try {
             Position offset = square.offset(1, -piece.getForwardDirection(), false);
             Piece right;
@@ -242,7 +106,6 @@ public class ThreatChecker {
                 left = null;
             }
 
-
             return right != null && right.getType() == PieceType.PAWN && right.getColor() == piece.getColor().invert()
                 ||  left != null && left.getType() == PieceType.PAWN &&  left.getColor() == piece.getColor().invert();
 
@@ -251,10 +114,29 @@ public class ThreatChecker {
         }
     }
 
+    private static Piece makeRayCast (Board board, Position position, int deltaX, int deltaY) {
+        int x = position.getX();
+        int y = position.getY();
+
+        x += deltaX;
+        y += deltaY;
+
+        while (x >= 0 && x < 8 && y >= 0 && y < 8) {
+            Piece current = board.getPieceInSquare(x, y);
+            if (current.getColor() != PieceColor.NO_COLOR) {
+                return current;
+            }
+
+            x += deltaX;
+            y += deltaY;
+        }
+
+        return new NoPiece();
+    }
+
     public static void main(String[] args) {
         Board board = Board.fromFile("/home/kaappo/git/chess/src/main/resources/boards/1564930703584.out");
 
         System.out.println(board.isCheck(PieceColor.BLACK));
     }
-
 }

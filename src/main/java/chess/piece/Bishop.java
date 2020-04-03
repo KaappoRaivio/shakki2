@@ -18,14 +18,18 @@ public class Bishop extends Piece {
 
     @Override
     public Set<Move> getPossibleMoves (Board board, Position position, Move lastMove) {
-        Set<Move> mvoes = new LinkedHashSet<>();
+        Set<Move> moves = new LinkedHashSet<>();
 
-        mvoes.addAll(handleUpRight(board, position));
-        mvoes.addAll(handleUpLeft(board, position));
-        mvoes.addAll(handleDownLeft(board, position));
-        mvoes.addAll(handleDownRight(board, position));
+//        moves.addAll(handleUpRight(board, position));
+//        moves.addAll(handleUpLeft(board, position));
+//        moves.addAll(handleDownLeft(board, position));
+//        moves.addAll(handleDownRight(board, position));
+        moves.addAll(getStraightPathMoves(board, position, 1, 1));
+        moves.addAll(getStraightPathMoves(board, position, -1, 1));
+        moves.addAll(getStraightPathMoves(board, position, -1, -1));
+        moves.addAll(getStraightPathMoves(board, position, 1, -1));
 
-        return mvoes;
+        return moves;
     }
 
     @Override
