@@ -57,4 +57,9 @@ public class PromotionMove extends NormalMove {
     public int hashCode() {
         return Objects.hash(super.hashCode(), promoted);
     }
+
+    @Override
+    public String toString() {
+        return super.toString() + "=" + MoveHashMap.moveHashMap.get(promoted.getType()).toUpperCase();
+    }
 }

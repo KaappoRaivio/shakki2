@@ -90,7 +90,7 @@ public class ThreatChecker {
         Piece piece = board.getPieceInSquare(square);
 
         try {
-            Position offset = square.offset(1, -piece.getForwardDirection(), false);
+            Position offset = square.offset(1, piece.getForwardDirection(), false);
             Piece right;
             if (offset.verify()) {
                 right = board.getPieceInSquare(offset);
@@ -98,7 +98,7 @@ public class ThreatChecker {
                 right = null;
             }
 
-            offset = square.offset(-1, -piece.getForwardDirection(), false);
+            offset = square.offset(-1, piece.getForwardDirection(), false);
             Piece left;
             if (offset.verify()) {
                 left = board.getPieceInSquare(offset);

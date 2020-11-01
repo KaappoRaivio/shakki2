@@ -10,6 +10,7 @@ import chess.piece.basepiece.PieceType;
 import misc.Pair;
 
 ;import java.awt.*;
+import java.util.Map;
 import java.util.Objects;
 
 public class NormalMove implements Move {
@@ -72,7 +73,21 @@ public class NormalMove implements Move {
 
     @Override
     public String toString () {
-        return origin + "" + destination;
+        switch (pieceInOrigin.getType()) {
+            case PAWN:
+                if (pieceInDestination.getType() != PieceType.NO_PIECE) {
+                    return origin.toString().substring(0, 1).toLowerCase() + "x" + destination.toString().toLowerCase();
+                } else {
+                    return destination.toString().toLowerCase();
+                }
+            default:
+                if (pieceInDestination.getType() != PieceType.NO_PIECE) {
+                    return MoveHashMap.moveHashMap.get(pieceInOrigin.getType()).toUpperCase() + "x" + destination.toString().toLowerCase();
+                } else {
+                    return MoveHashMap.moveHashMap.get(pieceInOrigin.getType()).toUpperCase() + destination.toString().toLowerCase();
+                }
+        }
+
     }
 
     @Override
@@ -95,4 +110,15 @@ public class NormalMove implements Move {
     public Position getDestination () {
         return destination;
     }
+}
+
+class MoveHashMap {
+    static final Map<PieceType, String> moveHashMap = Map.ofEntries(
+            Map.entry(PieceType.KING, "k"),
+            Map.entry(PieceType.ROOK, "r"),
+            Map.entry(PieceType.KNIGHT, "n"),
+            Map.entry(PieceType.QUEEN, "q"),
+            Map.entry(PieceType.PAWN, "p"),
+            Map.entry(PieceType.BISHOP, "b")
+    );
 }

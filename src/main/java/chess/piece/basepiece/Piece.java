@@ -18,7 +18,7 @@ abstract public class Piece implements Serializable {
     final private String symbol;
     final private int value;
 
-    public Piece (PieceType type, PieceColor color, String symbol, int value) {
+    protected Piece (PieceType type, PieceColor color, String symbol, int value) {
         if (color == PieceColor.NO_COLOR ^ type == PieceType.NO_PIECE) {
             throw new ChessException("The combination " + type + " with color " + color + " is not valid. NO_PIECE and NO_COLOR must be used together!");
         }

@@ -22,9 +22,9 @@ public class Board implements Serializable{
     private final int dimX;
     private final int dimY;
 
-    private RepetitionTracker repetitionTracker = new RepetitionTracker();
+    private final RepetitionTracker repetitionTracker = new RepetitionTracker();
 
-    private BoardStateHistory stateHistory;
+    private final BoardStateHistory stateHistory;
 
 
     private Board (Piece[][] board) {
@@ -268,9 +268,10 @@ public class Board implements Serializable{
         return isCheck(color) && getAllPossibleMoves(color).size() == 0;
     }
 
-    public boolean isDraw (PieceColor turn) {
+    public boolean isDraw () {
         // 100 half moves equal 50 whole moves
-        return repetitionTracker.isDraw() || stateHistory.getCurrentState().getMovesSinceFiftyMoveReset() >= 100 || (!isCheck(turn) && getAllPossibleMoves(turn).size() == 0);
+        return repetitionTracker.isDraw() || stateHistory.getCurrentState().getMovesSinceFiftyMoveReset() >= 100
+                || (!isCheck(getTurn()) && getAllPossibleMoves(getTurn()).size() == 0);
     }
 
     public boolean isDrawNoStalemateCheck (PieceColor turn) {

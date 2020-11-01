@@ -3,7 +3,7 @@ import chess.piece.basepiece.PieceColor;
 
 public class Main {
     public static void main (String[] args) {
-        Board orig = Board.fromFile("/home/kaappo/git/shakki/src/main/resources/boards/starting_position.txt");
+        Board orig = Board.fromFile("/home/kaappo/git/shakki2/src/main/resources/boards/starting_position.txt");
         Board board = orig.deepCopy();
 
 //        System.out.println(board.getPieceInSquare(Position.fromString("B1")).getPossibleMoves(board, Position.fromString("B1"), new NoMove()));
