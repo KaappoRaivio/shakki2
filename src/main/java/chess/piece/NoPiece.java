@@ -12,7 +12,7 @@ import java.util.Set;
 
 public class NoPiece extends Piece {
     public NoPiece () {
-        super(PieceType.NO_PIECE, PieceColor.NO_COLOR, ".", 0);
+        super(PieceType.NO_PIECE, PieceColor.NO_COLOR, "·", 0);
     }
 
     @Override
@@ -34,8 +34,4 @@ public class NoPiece extends Piece {
         }
     }
 
-    @Override
-    public int getIndex (Board board, Position position, Move lastMove) {
-        return 0;
-    }
 }

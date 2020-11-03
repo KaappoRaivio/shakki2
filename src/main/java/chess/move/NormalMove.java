@@ -53,6 +53,11 @@ public class NormalMove implements Move {
     }
 
     @Override
+    public boolean capturesKing() {
+        return pieceInDestination.getType() == PieceType.KING;
+    }
+
+    @Override
     public Pair<PieceColor, Position> getNewKingPosition () {
         if (affectsKingPosition()) {
             return new Pair<>(color, destination);

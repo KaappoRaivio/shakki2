@@ -1,1 +1,1 @@
-[B1C3, B1A3, G1H3, G1F3, A2A3, A2A4, B2B3, B2B4, C2C3, C2C4, D2D3, D2D4, E2E3, E2E4, F2F3, F2F4, G2G3, G2G4, H2H3, H2H4]
+Nc3, Na3, Nh3, Nf3, a4, a3, b3, b4, c3, c4, d3, d4, e3, e4, f3, f4, g3, g4, h3, h4

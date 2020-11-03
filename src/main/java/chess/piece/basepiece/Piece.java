@@ -8,7 +8,7 @@ import chess.move.NormalMove;
 
 import java.awt.*;
 import java.io.Serializable;
-import java.util.LinkedHashSet;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -53,9 +53,9 @@ abstract public class Piece implements Serializable {
         return Objects.hash(type, color);
     }
 
-    public int getIndex (Board board, Position position, Move lastMove) {
-        return getColor() == PieceColor.WHITE ? getType().ordinal(): getType().ordinal() + 1;
-    }
+//    public int getIndex (Board board, Position position, Move lastMove) {
+//        return getColor() == PieceColor.WHITE ? getType().ordinal(): getType().ordinal() + 1;
+//    }
 
     public double getValue (Position position) {
         switch (color) {
@@ -95,7 +95,7 @@ abstract public class Piece implements Serializable {
     }
 
     private Set<Position> getStraightPath (Board board, int x, int y, int deltaX, int deltaY) {
-        Set<Position> moves = new LinkedHashSet<>();
+        Set<Position> moves = new HashSet<>();
 
         PieceColor ownColor = board.getPieceInSquare(x, y).getColor();
 
@@ -122,7 +122,7 @@ abstract public class Piece implements Serializable {
     }
 
     protected Set<Move> getStraightPathMoves (Board board, Position position, int deltaX, int deltaY) {
-        Set<Move> moves = new LinkedHashSet<>();
+        Set<Move> moves = new HashSet<>();
 
         for (Position destination : getStraightPath(board, position, deltaX, deltaY)) {
 //            moves.add(Move.parseMove(position.toString() + destination.toString(), board.getPieceInSquare(position).getColor(), board));

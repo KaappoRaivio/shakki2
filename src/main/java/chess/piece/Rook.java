@@ -8,7 +8,7 @@ import chess.piece.basepiece.Piece;
 import chess.piece.basepiece.PieceColor;
 import chess.piece.basepiece.PieceType;
 
-import java.util.LinkedHashSet;
+import java.util.HashSet;
 import java.util.Set;
 
 public class Rook extends Piece {
@@ -22,7 +22,7 @@ public class Rook extends Piece {
 
     @Override
     public Set<Move> getPossibleMoves (Board board, Position position, Move lastMove) {
-        Set<Move> moves = new LinkedHashSet<>();
+        Set<Move> moves = new HashSet<>();
         
         moves.addAll(getStraightPathMoves(board, position, 0, 1));
         moves.addAll(getStraightPathMoves(board, position, 0, -1));

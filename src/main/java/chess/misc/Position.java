@@ -23,7 +23,7 @@ public class Position implements Serializable {
     }
 
     public static Position fromString (String position) {
-        if (! stringPattern.matcher(position).matches()) {
+        if (!stringPattern.matcher(position).matches()) {
             throw new ChessException("String " + position + " is not a valid notation for a board position!");
         }
 

@@ -28,6 +28,11 @@ public class NoMove implements Move {
     }
 
     @Override
+    public boolean capturesKing() {
+        return false;
+    }
+
+    @Override
     public Pair<PieceColor, Position> getNewKingPosition () {
         throw new ChessException("Not applicable for NoMove");
     }

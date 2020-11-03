@@ -10,7 +10,7 @@ import chess.piece.basepiece.PieceColor;
 import chess.piece.basepiece.PieceType;
 
 import java.util.Arrays;
-import java.util.LinkedHashSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -37,7 +37,7 @@ public class King extends Piece {
 
     @Override
     public Set<Move> getPossibleMoves (Board board, Position position, Move lastMove) {
-        Set<Move> moves = new LinkedHashSet<>();
+        Set<Move> moves = new HashSet<>();
 
         for (Position offset : offsets) {
             Position destination = position.offset(offset, false);
@@ -69,11 +69,11 @@ public class King extends Piece {
         return this instanceof CastlingKing;
     }
 
-    @Override
-    public int getIndex (Board board, Position position, Move lastMove) {
-        if (canCastle(board, position)) {
-            return getColor() == PieceColor.WHITE ? 14 : 15;
-        }
-        return super.getIndex(board, position, lastMove);
-    }
+//    @Override
+//    public int getIndex (Board board, Position position, Move lastMove) {
+//        if (canCastle(board, position)) {
+//            return getColor() == PieceColor.WHITE ? 14 : 15;
+//        }
+//        return super.getIndex(board, position, lastMove);
+//    }
 }

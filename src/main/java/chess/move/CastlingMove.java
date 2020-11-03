@@ -88,6 +88,11 @@ public class CastlingMove implements Move {
     }
 
     @Override
+    public boolean capturesKing() {
+        return castlingKingMove.capturesKing() || castlingRookMove.capturesKing();
+    }
+
+    @Override
     public Pair<PieceColor, Position> getNewKingPosition () {
 
         return new Pair<>(color, castlingKingMove.getDestination());

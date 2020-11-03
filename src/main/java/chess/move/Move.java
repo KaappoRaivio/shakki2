@@ -40,8 +40,9 @@ public interface Move extends Serializable {
     void unmakeMove (Piece[][] buffer);
 
     boolean resetsFiftyMoveRule ();
-
     boolean affectsKingPosition ();
+    boolean capturesKing ();
+
     Pair<PieceColor, Position> getNewKingPosition ();
 
     Position getOrigin ();

@@ -12,8 +12,10 @@ import chess.piece.basepiece.PieceColor;
 import chess.piece.basepiece.PieceType;
 
 import java.util.Collections;
-import java.util.LinkedHashSet;
+import java.util.HashSet;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class Pawn extends Piece {
     public Pawn (PieceColor color) {
@@ -22,7 +24,7 @@ public class Pawn extends Piece {
 
     @Override
     public Set<Move> getPossibleMoves (Board board, Position position, Move lastMove) {
-        Set<Move> moves = new LinkedHashSet<>();
+        Set<Move> moves = new HashSet<>();
 
         moves.addAll(handleStraightAhead(board, position));
         moves.addAll(handleCapture(board, position));
@@ -49,18 +51,26 @@ public class Pawn extends Piece {
 
     private Set<Move> handlePromotion (Board board, Position position) {
         if (position.getY() == getEndFlank() - getForwardDirection() && board.isSquareEmpty(position.offsetY(getForwardDirection()))) {
-            return Set.of(new PromotionMove(position, position.offsetY(getForwardDirection()), board, PieceType.QUEEN),
-                    new PromotionMove(position, position.offsetY(getForwardDirection()), board, PieceType.ROOK),
-                    new PromotionMove(position, position.offsetY(getForwardDirection()), board, PieceType.BISHOP),
-                    new PromotionMove(position, position.offsetY(getForwardDirection()), board, PieceType.KNIGHT)
-            );
+            return getPromotablePieces()
+                    .stream()
+                    .map(pieceType -> new PromotionMove(position, position.offsetY(getForwardDirection()), board, pieceType))
+                    .collect(Collectors.toSet());
         } else {
             return Collections.emptySet();
         }
     }
 
+    private Set<PieceType> getPromotablePieces () {
+        return new HashSet<>(Set.of(
+                PieceType.QUEEN,
+                PieceType.ROOK,
+                PieceType.BISHOP,
+                PieceType.KNIGHT
+        ));
+    }
+
     private Set<Move> handleStraightAhead (Board board, Position position) {
-        Set<Move> moves = new LinkedHashSet<>();
+        Set<Move> moves = new HashSet<>();
         if (position.getY() == getEndFlank() - getForwardDirection()) {
             return moves;
         }
@@ -72,7 +82,6 @@ public class Pawn extends Piece {
             if (!hasMoved(position) && board.isSquareEmpty(position.offsetY(getForwardDirection() * 2))) {
                 moves.add(new NormalMove(position, position.offsetY(getForwardDirection() * 2), board));
             }
-
         }
 
 
@@ -84,33 +93,40 @@ public class Pawn extends Piece {
     }
 
     private Set<Move> handleCapture (Board board, Position position) {
-        Set<Move> moves = new LinkedHashSet<>();
+        Set<Move> moves = new HashSet<>();
 
+        moves.addAll(getSuitableCaptureMoves(board, position, position.offset(1, getForwardDirection(), false)));
+        moves.addAll(getSuitableCaptureMoves(board, position, position.offset(-1, getForwardDirection(), false)));
 
-        Position offset = position.offset(1, getForwardDirection(), false);
-        if (offset.verify()) {
-            if (board.getPieceInSquare(offset).getColor() == color.invert()) {
-                moves.add(new NormalMove(position, offset, board));
-            }
-        }
-
-        offset = position.offset(-1, getForwardDirection(), false);
-        if (offset.verify()) {
-            if (board.getPieceInSquare(offset).getColor() == color.invert()) {
-                moves.add(new NormalMove(position, offset, board));
-            }
-        }
 
         return moves;
     }
 
+    private Set<Move> getSuitableCaptureMoves (Board board, Position position, Position offset) {
+        Set<Move> moves = new HashSet<>();
+        if (offset.verify()) {
+            if (board.getPieceInSquare(offset).getColor() == color.invert()) {
+                if (offset.getY() == getEndFlank()) {
+                    moves.addAll(getPromotablePieces()
+                            .stream()
+                            .map(type -> new PromotionMove(position, offset, board, type))
+                            .collect(Collectors.toSet())
+                    );
+                } else {
+                    moves.add(new NormalMove(position, offset, board));
+                }
+            }
+        }
+        return moves;
+    }
+
     private Set<Move> handleEnPassant (Board board, Position position, Move lastMove) {
-        Set<Move> moves = new LinkedHashSet<>();
+        Set<Move> moves = new HashSet<>();
 
         Position offset = position.offsetX(1, false);
         if (offset.verify()) {
             Piece piece = board.getPieceInSquare(offset);
-            if (piece instanceof Pawn && isEnPassantLegal(lastMove) && piece.getColor() == color.invert()) {
+            if (piece instanceof Pawn && isEnPassantPossible(lastMove) && piece.getColor() == color.invert()) {
                 if (board.isSquareEmpty(position.offset(1, getForwardDirection()))) {
                     moves.add(new EnPassantMove(position, position.offset(1, getForwardDirection()), board));
                 }
@@ -120,7 +136,7 @@ public class Pawn extends Piece {
         offset = position.offsetX(-1, false);
         if (offset.verify()) {
             Piece piece = board.getPieceInSquare(offset);
-            if (piece instanceof Pawn && isEnPassantLegal(lastMove) && piece.getColor() == color.invert()) {
+            if (piece instanceof Pawn && isEnPassantPossible(lastMove) && piece.getColor() == color.invert()) {
                 if (board.isSquareEmpty(position.offset(-1, getForwardDirection()))) {
                     moves.add(new EnPassantMove(position, position.offset(-1, getForwardDirection()), board));
                 }
@@ -130,7 +146,7 @@ public class Pawn extends Piece {
         return moves;
     }
 
-    private static boolean isEnPassantLegal (Move lastMove) {
+    private static boolean isEnPassantPossible(Move lastMove) {
         if (lastMove instanceof NormalMove) {
             NormalMove move = (NormalMove) lastMove;
             return Math.abs(move.getOrigin().getY() - move.getDestination().getY()) == 2;
@@ -140,14 +156,14 @@ public class Pawn extends Piece {
         }
     }
 
-    @Override
-    public int getIndex (Board board, Position position, Move lastMove) {
-        if (handleEnPassant(board, position, lastMove).size() > 0) {
-            return getColor() == PieceColor.WHITE ? 12 : 13;
-        } else {
-            return super.getIndex(board, position, lastMove);
-        }
-    }
+//    @Override
+//    public int getIndex (Board board, Position position, Move lastMove) {
+//        if (handleEnPassant(board, position, lastMove).size() > 0) {
+//            return getColor() == PieceColor.WHITE ? 12 : 13;
+//        } else {
+//            return super.getIndex(board, position, lastMove);
+//        }
+//    }
 
     private int getEndFlank () {
         switch (color) {
