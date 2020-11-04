@@ -1,18 +1,11 @@
 package chess.misc;
 
-import chess.board.Board;
-import chess.board.BoardParser;
-import chess.move.CastlingType;
-import chess.piece.basepiece.PieceColor;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class ReadWriter {

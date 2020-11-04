@@ -58,17 +58,17 @@ abstract public class Piece implements Serializable {
 //    }
 
     public double getValue (Position position) {
-        switch (color) {
-            case NO_COLOR:
-            case WHITE:
-                return value + value * (getPieceSquareTable()[position.getY()][position.getX()]);
-            case BLACK:
-                return value + value * (getPieceSquareTable()[7 - position.getY()][position.getX()]);
-            default:
-                throw new ChessException("");
+//        switch (color) {
+//            case NO_COLOR:
+//            case WHITE:
+//                return value + value * (getPieceSquareTable()[position.getY()][position.getX()]);
+//            case BLACK:
+//                return value + value * (getPieceSquareTable()[7 - position.getY()][position.getX()]);
+//            default:
+//                throw new ChessException("");
 
-//        return value;
-        }
+//        }
+        return value;
     }
 
     public PieceType getType () {

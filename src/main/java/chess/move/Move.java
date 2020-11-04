@@ -14,7 +14,7 @@ import java.io.Serializable;
 public interface Move extends Serializable {
     static Move parseMove (String text, PieceColor color, Board board) {
         if (text.equals("") || text.equals("NoMove")) {
-            return new NoMove();
+            return NoMove.NO_MOVE;
         } else if (text.toUpperCase().equals("O-O")) {
             return new CastlingMove(CastlingType.KING_SIDE, color, board);
         } else if (text.toUpperCase().equals("O-O-O")) {

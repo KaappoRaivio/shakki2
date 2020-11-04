@@ -39,17 +39,25 @@ public class Board implements Serializable{
         this.board = board;
 
         Pair<Position, Position> kingPositions = findKings();
-        stateHistory = new BoardStateHistory(new BoardState(kingPositions.getFirst(), kingPositions.getSecond(), fiftyMoveReset, Move.parseMove(lastMoveString, turn.invert(), this), turn, moveCount));
+        PieceColor newTurn = turn.invert();
+        stateHistory = new BoardStateHistory(new BoardState(kingPositions.getFirst(), kingPositions.getSecond(), fiftyMoveReset, Move.parseMove(lastMoveString, newTurn, this), turn, moveCount));
+//        stateHistory.getCurrentState().setCheck(isCheck());
+//        stateHistory.getCurrentState().setCheckmate(isCheckMate());
+//        stateHistory.getCurrentState().setPossibleMoves(getAllPossibleMoves());
         repetitionTracker.add(this);
     }
 
 
     public static Board fromFile (String path) {
-        return BoardParser.fromFile(path, BoardNotation.DEFAULT_NOTATION);
+        return BoardIO.fromFile(path, BoardNotation.DEFAULT_NOTATION);
+    }
+
+    public static Board getStartingPosition () {
+        return fromFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
     }
 
     public static Board fromFEN (String FEN) {
-        return BoardParser.fromFEN(FEN);
+        return BoardIO.fromFEN(FEN);
     }
 
     private Pair<Position, Position> findKings () {
@@ -131,16 +139,31 @@ public class Board implements Serializable{
     }
 
 
-    public Set<Move> getAllPossibleMoves() {
+//    public Set<Move> getAllPossibleMoves() {
+//        return getAllPossibleMoves(getTurn());
+//    }
+
+    public Set<Move> getAllPossibleMoves () {
         return getAllPossibleMoves(getTurn());
     }
 
     public Set<Move> getAllPossibleMoves (PieceColor color) {
+        if (stateHistory.getCurrentState().getPossibleMoves(color) != null) {
+            return stateHistory.getCurrentState().getPossibleMoves(color);
+        } else {
+            var moves = calculateAllPossibleMoves(color);
+            stateHistory.getCurrentState().setPossibleMoves(color, moves);
+            return moves;
+        }
+    }
+
+    private Set<Move> calculateAllPossibleMoves (PieceColor color) {
         Set<Move> moves = new HashSet<>();
 
         for (int y = 0; y < dimX; y++) {
             for (int x = 0; x < dimY; x++) {
                 Piece piece = getPieceInSquare(x, y);
+//                Piece piece = getPieceInSquare(new Position(x, y));
                 if (piece.getColor() != color) {
                     continue;
                 }
@@ -153,6 +176,7 @@ public class Board implements Serializable{
             }
         }
 
+//        stateHistory.getCurrentState().setPossibleMoves(moves);
         return moves;
     }
 
@@ -188,9 +212,13 @@ public class Board implements Serializable{
             stateHistory.getCurrentState().setMovesSinceFiftyMoveReset(stateHistory.getCurrentState().getMovesSinceFiftyMoveReset() + 1);
         }
 
+        PieceColor newTurn = stateHistory.getCurrentState().getTurn();
         stateHistory.getCurrentState().setLastMove(move);
-        stateHistory.getCurrentState().setTurn(stateHistory.getCurrentState().getTurn().invert());
+        stateHistory.getCurrentState().setTurn(newTurn.invert());
         stateHistory.getCurrentState().setMoveCount(stateHistory.getCurrentState().getMoveCount() + 1);
+//        stateHistory.getCurrentState().setPossibleMoves(getAllPossibleMoves());
+//        stateHistory.getCurrentState().setCheck(isCheck());
+//        stateHistory.getCurrentState().setCheckmate(isCheckMate());
 
         repetitionTracker.add(this);
 
@@ -209,35 +237,52 @@ public class Board implements Serializable{
         lastMove.unmakeMove(board);
     }
 
-    public boolean isCheck (PieceColor color) {
-        Position position;
+    private boolean calculateCheckmate (PieceColor turn) {
+        return isCheck(turn) && getAllPossibleMoves(turn).size() == 0;
+    }
 
-        switch (color) {
-            case WHITE:
-                position = stateHistory.getCurrentState().getWhiteKingPosition();
-                break;
-            case BLACK:
-                position = stateHistory.getCurrentState().getBlackKingPosition();
-                break;
-            default:
-                throw new ChessException("No NoColor!");
+    private boolean calculateCheck (PieceColor turn) {
+        Position kingPosition = stateHistory.getCurrentState().getKingPosition(turn);
+        return ThreatChecker.isUnderThreat(Optional.ofNullable(kingPosition).orElseThrow(), this);
+    }
+
+
+    public boolean isCheck () {
+        return isCheck(getTurn());
+    }
+
+    public boolean isCheck (PieceColor turn) {
+        if (stateHistory.getCurrentState().isCheck(turn) != null) {
+            return stateHistory.getCurrentState().isCheck(turn);
+        } else {
+            boolean check = calculateCheck(turn);
+            stateHistory.getCurrentState().setCheck(turn, check);
+            return check;
         }
-
-        return ThreatChecker.isUnderThreat(Optional.ofNullable(position).orElseThrow(), this);
     }
 
-    public boolean isCheckMate() {
-        return isCheckMate(getTurn());
+//    public boolean isCheckMate() {
+//        return isCheckMate(getTurn());
+//    }
+
+    public boolean isCheckmate() {
+        return isCheckmate(getTurn());
     }
 
-    public boolean isCheckMate (PieceColor color) {
-        return isCheck(color) && getAllPossibleMoves(color).size() == 0;
+    public boolean isCheckmate(PieceColor turn) {
+        if (stateHistory.getCurrentState().isCheckmate(turn) != null) {
+            return stateHistory.getCurrentState().isCheckmate(turn);
+        } else {
+            boolean checkmate = calculateCheckmate(turn);
+            stateHistory.getCurrentState().setCheckmate(turn, checkmate);
+            return checkmate;
+        }
     }
 
     public boolean isDraw () {
         // 100 half moves equal 50 whole moves
         return repetitionTracker.isDraw() || stateHistory.getCurrentState().getMovesSinceFiftyMoveReset() >= 100
-                || (!isCheck(getTurn()) && getAllPossibleMoves(getTurn()).size() == 0);
+                || (!isCheck() && getAllPossibleMoves().size() == 0);
     }
 
     public RepetitionTracker getRepetitionTracker() {
@@ -314,7 +359,7 @@ public class Board implements Serializable{
     }
 
     private String dumpHumanReadable() {
-        return BoardParser.getHumanReadableDump(board, dimX, dimY, stateHistory, getLastMove());
+        return BoardIO.getHumanReadableDump(board, dimX, dimY, stateHistory, getLastMove());
     }
 
     public void saveHumanReadable (String path) {
@@ -322,11 +367,11 @@ public class Board implements Serializable{
     }
 
     public List<Move> getMoveHistory () {
-        return stateHistory.getPreviousStates().stream().map(BoardState::getLastMove).filter(move -> !new NoMove().equals(move)).collect(Collectors.toList());
+        return stateHistory.getPreviousStates().stream().map(BoardState::getLastMove).filter(move -> !NoMove.NO_MOVE.equals(move)).collect(Collectors.toList());
     }
 
     public String getMoveHistoryPretty () {
-        var states = stateHistory.getPreviousStates().stream().filter(state -> !new NoMove().equals(state.getLastMove())).collect(Collectors.toList());
+        var states = stateHistory.getPreviousStates().stream().filter(state -> !NoMove.NO_MOVE.equals(state.getLastMove())).collect(Collectors.toList());
         Collections.reverse(states);
 
         StringBuilder builder = new StringBuilder();
@@ -347,4 +392,10 @@ public class Board implements Serializable{
         return builder.toString();
     }
 
+    public static void main(String[] args) {
+        Board board = Board.fromFEN("rnb1kbnr/pppppppp/8/1q6/3PP3/8/PPP2PPP/RNBQKBNR b - - 0 1");
+        board.makeMove(Move.parseMove("b5b4", PieceColor.BLACK, board));
+        System.out.println(board);
+        System.out.println(board.isCheck());
+    }
 }

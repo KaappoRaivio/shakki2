@@ -14,7 +14,7 @@ public class RandomAI extends Player {
 
     @Override
     public Move getMove () {
-        var moves = board.getAllPossibleMoves(color);
+        var moves = board.getAllPossibleMoves();
 
         int index = new Random().nextInt(moves.size());
         Iterator<Move> iter = moves.iterator();

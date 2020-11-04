@@ -7,6 +7,10 @@ import chess.piece.basepiece.PieceColor;
 import misc.Pair;
 
 public class NoMove implements Move {
+    public static final NoMove NO_MOVE = new NoMove();
+
+    private NoMove () {}
+
     @Override
     public void makeMove (Piece[][] buffer) {
         throw new ChessException("Not applicable for NoMove!");
@@ -54,6 +58,6 @@ public class NoMove implements Move {
 
     @Override
     public boolean equals(Object obj) {
-        return obj != null && obj.getClass() == getClass();
+        return obj instanceof NoMove;
     }
 }

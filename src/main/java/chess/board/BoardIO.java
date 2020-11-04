@@ -4,16 +4,19 @@ import chess.misc.Position;
 import chess.misc.ReadWriter;
 import chess.move.CastlingType;
 import chess.move.Move;
+import chess.piece.*;
 import chess.piece.basepiece.Piece;
 import chess.piece.basepiece.PieceColor;
+import chess.piece.basepiece.PieceType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class BoardParser {
+public class BoardIO {
     public static final String LAST_MOVE = "last_move";
     public static final String FIFTY_MOVE_RESET = "fifty_move_reset";
     public static final String MOVECOUNT = "movecount";
@@ -99,8 +102,8 @@ public class BoardParser {
         builder.append("\n");
 
         builder.append(stateHistory.getCurrentState().getTurn()).append("\n");
-        builder.append(BoardParser.FIFTY_MOVE_RESET).append(" ").append(stateHistory.getCurrentState().getMovesSinceFiftyMoveReset()).append("\n");
-        builder.append(BoardParser.LAST_MOVE).append(" ").append(lastMove).append("\n");
+        builder.append(BoardIO.FIFTY_MOVE_RESET).append(" ").append(stateHistory.getCurrentState().getMovesSinceFiftyMoveReset()).append("\n");
+        builder.append(BoardIO.LAST_MOVE).append(" ").append(lastMove).append("\n");
 
         return builder.toString();
     }
@@ -120,9 +123,9 @@ public class BoardParser {
         builder.append(parsedBoard).append("\n");
         builder.append(turn.equals("w") ? "white" : "black").append("\n");
 
-        builder.append(BoardParser.MOVECOUNT).append(" ").append(fullMoveClock).append("\n");
-        builder.append(BoardParser.FIFTY_MOVE_RESET).append(" ").append(halfMoveClock).append("\n");
-        builder.append(BoardParser.LAST_MOVE).append(" ").append(convertLastMove(enPassantTarget)).append("\n");
+        builder.append(BoardIO.MOVECOUNT).append(" ").append(fullMoveClock).append("\n");
+        builder.append(BoardIO.FIFTY_MOVE_RESET).append(" ").append(halfMoveClock).append("\n");
+        builder.append(BoardIO.LAST_MOVE).append(" ").append(convertLastMove(enPassantTarget)).append("\n");
 
         return builder.toString();
     }
@@ -211,19 +214,83 @@ public class BoardParser {
         char[] chars = text.toCharArray();
         for (int i = 0; i < chars.length; i++) {
             char c = chars[i];
-            if (Character.isUpperCase(c))
-            {
+            if (Character.isUpperCase(c)) {
                 chars[i] = Character.toLowerCase(c);
-            }
-            else if (Character.isLowerCase(c))
-            {
+            } else if (Character.isLowerCase(c)) {
                 chars[i] = Character.toUpperCase(c);
             }
         }
         return new String(chars);
     }
 
+//    public static String getFENDump (Board board) {
+//
+//    }
+
+    private static Map<Piece, String> magicMap = Map.ofEntries(
+            Map.entry(new King(PieceColor.WHITE), "K"),
+            Map.entry(new King(PieceColor.BLACK), "k"),
+
+            Map.entry(new CastlingKing(PieceColor.WHITE), "K"),
+            Map.entry(new CastlingKing(PieceColor.BLACK), "k"),
+
+            Map.entry(new Queen(PieceColor.WHITE), "Q"),
+            Map.entry(new Queen(PieceColor.BLACK), "q"),
+
+            Map.entry(new Rook(PieceColor.WHITE), "R"),
+            Map.entry(new Rook(PieceColor.BLACK), "r"),
+
+            Map.entry(new CastlingRook(PieceColor.WHITE), "R"),
+            Map.entry(new CastlingRook(PieceColor.BLACK), "r"),
+
+            Map.entry(new Bishop(PieceColor.WHITE), "B"),
+            Map.entry(new Bishop(PieceColor.BLACK), "b"),
+
+            Map.entry(new Knight(PieceColor.WHITE), "N"),
+            Map.entry(new Knight(PieceColor.BLACK), "n"),
+
+            Map.entry(new Pawn(PieceColor.WHITE), "P"),
+            Map.entry(new Pawn(PieceColor.BLACK), "p")
+    );
+
+    private static String getFENBoard (Board board) {
+        StringBuilder builder = new StringBuilder();
+
+        for (int y = 7; y >= 0; y--) {
+            builder.append("/");
+            for (int x = 0; x < 8; x++) {
+                Piece piece = board.getPieceInSquare(x, y);
+                if (piece.getType() == PieceType.NO_PIECE) {
+                    int count = 1;
+                    board.getPieceInSquare(x, y);
+                    while (true) {
+                        x++;
+                        Piece secondPiece = board.getPieceInSquare(x, y);
+                        if (secondPiece.getType() != PieceType.NO_PIECE) {
+                            builder.append(count);
+                            builder.append(magicMap.get(secondPiece));
+//                            x--;
+                            break;
+                        } else if (x >= 7) {
+                            builder.append(count);
+                            x++;
+                            break;
+                        }
+                        count++;
+                    }
+                } else {
+                    builder.append(magicMap.get(piece));
+                }
+            }
+        }
+
+        return builder.toString();
+    }
+
     public static void main(String[] args) {
-        System.out.println(fromFENFile("/home/kaappo/git/shakki2/src/main/resources/boards/test.fen"));
+//        System.out.println(fromFENFile("/home/kaappo/git/shakki2/src/main/resources/boards/test.fen"));
+        Board board = Board.fromFEN("R6R/3Q4/1Q4Q1/4Q3/2Q4Q/Q4Q2/pp1Q4/kBNN1KB1 w - - 1 2");
+        System.out.println(board);
+        System.out.println(getFENBoard(board));
     }
 }

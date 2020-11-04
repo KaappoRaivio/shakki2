@@ -36,7 +36,7 @@ public class Runner {
 
         while (true) {
             CapableOfPlaying currentPlayer = players[(moveCount + 1) % 2];
-            if (board.isCheckMate(currentPlayer.getColor())) {
+            if (board.isCheckmate()) {
                 System.out.println("=== === Checkmate! === ===");
                 System.out.println(board);
                 System.out.println(currentPlayer.getColor().invert() + " wins!");
@@ -75,8 +75,6 @@ public class Runner {
                 player.updateValues(board.deepCopy(), turn, moveCount);
             }
             ui.updateValues(board.deepCopy(), turn, moveCount);
-
-
 
         }
 

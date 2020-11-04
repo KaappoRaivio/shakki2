@@ -1,12 +1,10 @@
 package chess.board;
 
-import chess.misc.ReadWriter;
 import chess.move.Move;
 import chess.piece.basepiece.PieceColor;
 import misc.Pair;
 import org.junit.Test;
 
-import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -58,10 +56,10 @@ public class BoardTest {
     public void testCheck() {
         Board board = Board.fromFEN("1k6/P7/1K6/8/8/8/8/8 b - - 0 1");
         System.out.println(board);
-        assertTrue(board.isCheck(PieceColor.BLACK));
+        assertTrue(board.isCheck());
 
         Board board2 = Board.fromFEN("8/8/8/8/2K5/5k2/3n4/8 w - - 0 1");
-        assertTrue(board2.isCheck(PieceColor.WHITE));
+        assertTrue(board2.isCheck());
     }
 
 
@@ -77,8 +75,8 @@ public class BoardTest {
         for (String FEN : FENs) {
             Board board = Board.fromFEN(FEN);
             System.out.println(board);
-            assertTrue(board.isCheckMate(board.getTurn()));
-            assertFalse(board.isCheckMate(board.getTurn().invert()));
+            assertTrue(board.isCheckmate());
+//            assertFalse(board.isCheckMate(board.getTurn().invert()));
         }
     }
 
@@ -86,7 +84,6 @@ public class BoardTest {
     public void testMoveGeneration() {
         List<Pair<String, String>> FENs = List.of(
                 new Pair<>("8/6K1/3k4/8/5p2/8/4P3/8 w - - 0 1", "e3, e4, Kh8, Kh7, Kh6, Kg6, Kf6, Kf7, Kf8, Kg8"),
-                new Pair<>("1q6/P7/1K4k1/8/5p2/8/8/8 w - - 0 1", "Kc6, Kc5, Ka5, Ka6, axb8=Q, axb8=B, axb8=N, axb8=R"),
                 new Pair<>("1q6/P7/1K4k1/8/5p2/8/8/8 w - - 0 1", "Kc6, Kc5, Ka5, Ka6, axb8=Q, axb8=B, axb8=N, axb8=R"),
                 new Pair<>("1k6/P7/1K6/8/5pq1/8/8/8 w - - 0 1", "Kc6, Kc5, Kb5, Ka5, Ka6, a8=Q, a8=R, a8=B, a8=N"),
                 new Pair<>("8/5p1p/p6r/P4K2/1p1kp1RP/3B2P1/Q7/5N1b w - - 0 1", "Nh2, Nd2, Ne3, Qa3, Qa4, Qa1, Qb2, Qc2, Qd2, Qe2, Qf2, Qg2, Qh2, Qb3, Qc4, Qd5, Qe6, Qxf7, Qb1, Bxe4, Bc4, Bb5, Bxa6, Bc2, Bb1, Be2, Rg5, Rg6, Rg7, Rg8, Rf4, Rxe4, h5, Kg5, Kf4"),
@@ -101,7 +98,7 @@ public class BoardTest {
 
         for (var FENAndMoves : FENs) {
             Board board = Board.fromFEN(FENAndMoves.getFirst());
-            System.out.println(board + ", " + board.getAllPossibleMoves().size() + ", " + board.getAllPossibleMoves());
+            System.out.println(board + ", " + board.getAllPossibleMoves().size() + ", " + board.getAllPossibleMoves() + ", " + FENAndMoves.getSecond());
             assertTrue(
                     movesEqual(
                             board.getAllPossibleMoves(),
@@ -127,5 +124,11 @@ public class BoardTest {
 
     private Set<String> readMoveSequence (String moveSequence) {
         return Arrays.stream(moveSequence.strip().split(", ")).collect(Collectors.toSet());
+    }
+
+    public static void main(String[] args) {
+        Board board = Board.fromFEN("rnb1kbnr/pppppppp/8/1q6/3PP3/8/PPP2PPP/RNBQKBNR b - - 0 1");
+        board.makeMove(Move.parseMove("b5b4", PieceColor.BLACK, board));
+        System.out.println(board);
     }
 }

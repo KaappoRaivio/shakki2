@@ -27,7 +27,7 @@ public class CastlingMove implements Move {
     public CastlingMove (CastlingType castlingType, PieceColor kingColor, Board board) {
         this.castlingType = castlingType;
         this.color = kingColor;
-        this.kingPosition = color == WHITE ? board.getStateHistory().getCurrentState().getWhiteKingPosition() : board.getStateHistory().getCurrentState().getBlackKingPosition();
+        this.kingPosition = board.getStateHistory().getCurrentState().getKingPosition(kingColor);
         this.board = board;
 
         prepareMoves();

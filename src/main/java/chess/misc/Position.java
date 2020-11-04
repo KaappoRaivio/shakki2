@@ -8,8 +8,8 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 
 public class Position implements Serializable {
-    private final int x;
-    private final int y;
+    private int x;
+    private int y;
 
     private static final Pattern stringPattern = Pattern.compile("^[a-hA-H]\\d$");
 
@@ -47,6 +47,19 @@ public class Position implements Serializable {
 
     public Position offset (Position position, boolean check) {
         return offset(position.getX(), position.getY(), check);
+    }
+
+    public void offsetXInPlace (int x) {
+        this.x += x;
+    }
+
+    public void offsetYInPlace (int y) {
+        this.y += y;
+    }
+
+    public void offsetInPlace (Position position) {
+        offsetXInPlace(position.getX());
+        offsetYInPlace(position.getY());
     }
 
     public Position offsetX (int x) {
