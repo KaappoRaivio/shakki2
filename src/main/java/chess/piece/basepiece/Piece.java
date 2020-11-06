@@ -91,6 +91,17 @@ abstract public class Piece implements Serializable {
         }
     }
 
+    public static int getForwardDirection (PieceColor color) {
+        switch (color) {
+            case WHITE:
+                return 1;
+            case BLACK:
+                return -1;
+            default:
+                throw new ChessException("Not applicable to NoColor");
+        }
+    }
+
     private Set<Position> getStraightPath (Board board, Position position, int deltaX, int deltaY) {
         return getStraightPath(board, position.getX(), position.getY(), deltaX, deltaY);
     }

@@ -46,8 +46,8 @@ public class CastlingKing extends King {
             }
 
             if (board.isSquareUnderThreat(position)
-                    || board.isSquareUnderThreat(position.offsetX(1))
-                    || board.isSquareUnderThreat(position.offsetX(2))
+                    || board.isSquareUnderThreat(position.offsetX(1), color)
+                    || board.isSquareUnderThreat(position.offsetX(2), color)
                     || !board.isSquareEmpty(position.offsetX(1))
                     || !board.isSquareEmpty(position.offsetX(2))) {
                 return Collections.emptySet();
@@ -71,11 +71,11 @@ public class CastlingKing extends King {
             }
 
             if (board.isSquareUnderThreat(position)
-                    || board.isSquareUnderThreat(position.offsetX(-1))
-                    || board.isSquareUnderThreat(position.offsetX(-2))
-                    || !board.isSquareUnderThreat(position.offsetX(-1))
-                    || !board.isSquareUnderThreat(position.offsetX(-2))
-                    || !board.isSquareUnderThreat(position.offsetX(-3))) { // Rook's path can be threatened, so no threat check for position.offsetX(-3)
+                    || board.isSquareUnderThreat(position.offsetX(-1), color)
+                    || board.isSquareUnderThreat(position.offsetX(-2), color)
+                    || !board.isSquareEmpty(position.offsetX(-1))
+                    || !board.isSquareEmpty(position.offsetX(-2))
+                    || !board.isSquareEmpty(position.offsetX(-3))) { // Rook's path can be threatened, so no threat check for position.offsetX(-3)
                 return Collections.emptySet();
             }
 

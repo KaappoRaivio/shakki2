@@ -7,11 +7,12 @@ import chess.piece.basepiece.PieceColor;
 
 import java.io.Serializable;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 
 public class BoardHasher implements Serializable {
     private int[][] bitSets;
-    private Random random = new Random(13253453462L);
+    private Random random = new Random(132532453462L);
     private final int length = 32;
 
     private Map<Piece, Integer> keys = Map.ofEntries(
@@ -52,16 +53,25 @@ public class BoardHasher implements Serializable {
         }
     }
 
-    public int getPartHash (Position position, Piece piece) {
-        return bitSets[position.getY() * 8 + position.getY()][keys.getOrDefault(piece, 0)];
+    public int getPartHash(Position position, Piece piece) {
+        return getPartHash(position.getX(), position.getY(), piece);
+    }
+
+    public int getPartHash (int x, int y, Piece piece) {
+        if (piece.getColor() == PieceColor.NO_COLOR) {
+            return 0;
+        } else {
+            return bitSets[y * 8 + x][Optional.of(keys.get(piece)).orElseThrow()];
+        }
     }
 
     public int getFullHash (Board board) {
+        System.out.println("Hashtest " + getPartHash(0, 0, new CastlingRook(PieceColor.WHITE)));
         int hash = 0;
 
         for (int y = 0; y < 8; y++) {
             for (int x = 0; x < 8; x++) {
-                hash ^= bitSets[y * 8 + x][keys.getOrDefault(board.getPieceInSquare(x, y), 0)];
+                hash ^= getPartHash(x, y, board.getPieceInSquare(x, y));
             }
         }
 

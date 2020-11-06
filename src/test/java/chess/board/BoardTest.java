@@ -81,7 +81,44 @@ public class BoardTest {
     }
 
     @Test
-    public void testMoveGeneration() {
+    public void testHashCode1() {
+        Board board1 = Board.getStartingPosition();
+        Board board2 = Board.getStartingPosition();
+
+        assertEquals(board1.hashCode(), board2.hashCode());
+
+        board1.makeMove(Move.parseMove("e2e4", PieceColor.WHITE, board1));
+        board1.unMakeMove(1);
+
+        assertEquals(board1.hashCode(), board2.hashCode());
+    }
+
+    @Test
+    public void testHashCode2() {
+        Board board1 = Board.getStartingPosition();
+        Board board2 = Board.getStartingPosition();
+
+        BoardHelpers.executeSequenceOfMoves(board1, List.of("e2e4", "e7e5", "g1f3", "b7b6"));
+        BoardHelpers.executeSequenceOfMoves(board2, List.of("g1f3", "b7b6", "e2e4", "e7e5"));
+
+        assertEquals("two different boards should have the same hashcode even if they have been achieved through a different path",
+                board1.hashCode(), board2.hashCode());
+    }
+
+    @Test
+    public void testHashCode3() {
+        Board board1 = Board.getStartingPosition();
+//        BoardHelpers.executeSequenceOfMoves(board1, List.of("e2e4"));
+        board1.makeMove(Move.parseMove("e2e4", PieceColor.WHITE, board1));
+        Board board2 = Board.fromFEN("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1");
+
+        System.out.println(board1 + ", " + board1.hashCode() + ", " + new BoardHasher().getFullHash(board1));
+        System.out.println(board2 + ", " + board2.hashCode() + ", " + new BoardHasher().getFullHash(board2));
+        assertEquals("incremental hashcode should equal a full incremental hashcode", board1.hashCode(), board2.hashCode());
+    }
+
+    @Test
+    public void testMoveGeneration1() {
         List<Pair<String, String>> FENs = List.of(
                 new Pair<>("8/6K1/3k4/8/5p2/8/4P3/8 w - - 0 1", "e3, e4, Kh8, Kh7, Kh6, Kg6, Kf6, Kf7, Kf8, Kg8"),
                 new Pair<>("1q6/P7/1K4k1/8/5p2/8/8/8 w - - 0 1", "Kc6, Kc5, Ka5, Ka6, axb8=Q, axb8=B, axb8=N, axb8=R"),
@@ -106,16 +143,36 @@ public class BoardTest {
                     )
             );
         }
+    }
 
-//        Board board2 = Board.fromFile("/home/kaappo/git/shakki2/src/main/resources/boards/test_pos6.txt");
-//        System.out.println(board2);
-//        System.out.println(board2.getAllPossibleMoves(PieceColor.WHITE));
-//        assertTrue(
-//                movesEqual(
-//                        board2.getAllPossibleMoves(PieceColor.WHITE),
-//                        "/home/kaappo/git/shakki2/src/main/resources/moves/test_pos6.txt"
-//                )
-//        );
+    @Test
+    public void testCastling () {
+        Board boardWhite = Board.fromFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1");
+        Board boardBlack = Board.fromFEN("r3k2r/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1");
+        assertTrue("king side castling should be possible",
+                boardWhite.isMoveLegal(Move.parseMove("O-O", PieceColor.WHITE, boardWhite))
+                        && boardBlack.isMoveLegal(Move.parseMove("O-O", PieceColor.BLACK, boardBlack)));
+        assertTrue("queen side castling should be possible",
+                boardWhite.isMoveLegal(Move.parseMove("O-O-O", PieceColor.WHITE, boardWhite))
+                        && boardBlack.isMoveLegal(Move.parseMove("O-O-O", PieceColor.BLACK, boardBlack)));
+
+        boardWhite = Board.fromFEN("rnbqkbn1/pppppppp/8/3r4/8/8/PPP1PPPP/R3K2R w KQkq - 0 1");
+        boardBlack = Board.fromFEN("r3k2r/ppp1pppp/8/8/3R4/8/PPPPPPPP/1NBQKBNR b KqKq - 0 1");
+        assertFalse("castling should not be possible if the king has to move over a checked square",
+                boardWhite.isMoveLegal(Move.parseMove("O-O-O", PieceColor.WHITE, boardWhite))
+                        || boardBlack.isMoveLegal(Move.parseMove("O-O-O", PieceColor.BLACK, boardBlack)));
+
+        boardWhite = Board.fromFEN("rnbqkbn1/pppppppp/8/2r5/8/8/PP2PPPP/R3K2R w KQkq - 0 1");
+        boardBlack = Board.fromFEN("r3k2r/pp2pppp/8/8/2R5/8/PPPPPPPP/1NBQKBNR b KQkq - 0 1");
+        assertFalse("castling should not be possible if the king has to move into a checked square",
+                boardWhite.isMoveLegal(Move.parseMove("O-O-O", PieceColor.WHITE, boardWhite))
+                        || boardBlack.isMoveLegal(Move.parseMove("O-O-O", PieceColor.BLACK, boardBlack)));
+
+        boardWhite = Board.fromFEN("rnbqkbn1/pppppppp/8/1r3B2/8/8/P3PPPP/R3K2R w KQkq - 0 1");
+        boardBlack = Board.fromFEN("r3k2r/p3pppp/8/8/1R6/8/PPPPPPPP/1NBQKBNR, b KQkq - 0 1");
+        assertTrue("castling should be possible, even if the rook moves over threatened square",
+                boardWhite.isMoveLegal(Move.parseMove("O-O-O", PieceColor.WHITE, boardWhite))
+                        && boardBlack.isMoveLegal(Move.parseMove("O-O-O", PieceColor.BLACK, boardBlack)));
     }
 
     private boolean movesEqual(Set<Move> moves, String movesRepresentation) {

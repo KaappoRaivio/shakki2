@@ -139,10 +139,18 @@ public class Board implements Serializable{
         return getPieceInSquare(x, y).getType() == PieceType.NO_PIECE;
     }
 
-    public boolean isSquareUnderThreat (Position position) {
-        return ThreatChecker.isUnderThreat(position, this);
+    public boolean isSquareUnderThreat(Position position) {
+        return isSquareUnderThreat(position, getPieceInSquare(position).getColor());
     }
 
+    public boolean isSquareUnderThreat (Position position, PieceColor color) {
+        return ThreatChecker.isUnderThreat(position, this, color);
+    }
+
+
+    public boolean isMoveLegal(Move move) {
+        return isMoveLegal(move, true);
+    }
 
     public boolean isMoveLegal (Move move, boolean pathCheck) {
 
@@ -267,7 +275,7 @@ public class Board implements Serializable{
 
     private boolean calculateCheck (PieceColor turn) {
         Position kingPosition = stateHistory.getCurrentState().getKingPosition(turn);
-        return ThreatChecker.isUnderThreat(Optional.ofNullable(kingPosition).orElseThrow(), this);
+        return isSquareUnderThreat(Optional.ofNullable(kingPosition).orElseThrow());
     }
 
 
@@ -427,5 +435,9 @@ public class Board implements Serializable{
         board.unMakeMove(1);
         System.out.println(board.hashCode());
         System.out.println(board);
+    }
+
+    public BoardHasher getHasher() {
+        return hasher;
     }
 }
