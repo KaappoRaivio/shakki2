@@ -1,5 +1,6 @@
 package chess.move;
 
+import chess.board.BoardHasher;
 import chess.misc.Position;
 import chess.misc.exceptions.ChessException;
 import chess.piece.basepiece.Piece;
@@ -49,6 +50,16 @@ public class NoMove implements Move {
     @Override
     public PieceColor getColor () {
         throw new ChessException("Not applicable for NoMove");
+    }
+
+    @Override
+    public int getNewHash(int oldHash, BoardHasher hasher) {
+        return oldHash;
+    }
+
+    @Override
+    public int getOldHash(int newHash, BoardHasher hasher) {
+        return newHash;
     }
 
     @Override

@@ -50,7 +50,8 @@ abstract public class Piece implements Serializable {
 
     @Override
     public int hashCode () {
-        return Objects.hash(type, color);
+//        return Objects.hash(type, color);
+        return type.getOrdinal() + color.getOrdinal();
     }
 
 //    public int getIndex (Board board, Position position, Move lastMove) {

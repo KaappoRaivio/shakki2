@@ -25,7 +25,8 @@ public class Board implements Serializable{
     private final RepetitionTracker repetitionTracker = new RepetitionTracker();
 
     private final BoardStateHistory stateHistory;
-
+    private BoardHasher hasher = new BoardHasher();
+    private int hashCode;
 
     private Board (Piece[][] board) {
         this(board, 0, "", PieceColor.WHITE, 0);
@@ -41,6 +42,8 @@ public class Board implements Serializable{
         Pair<Position, Position> kingPositions = findKings();
         PieceColor newTurn = turn.invert();
         stateHistory = new BoardStateHistory(new BoardState(kingPositions.getFirst(), kingPositions.getSecond(), fiftyMoveReset, Move.parseMove(lastMoveString, newTurn, this), turn, moveCount));
+        hashCode = hasher.getFullHash(this);
+
 //        stateHistory.getCurrentState().setCheck(isCheck());
 //        stateHistory.getCurrentState().setCheckmate(isCheckMate());
 //        stateHistory.getCurrentState().setPossibleMoves(getAllPossibleMoves());
@@ -102,6 +105,29 @@ public class Board implements Serializable{
             return board[y][x];
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new ChessException("Position (" + x + ", " + y + ") is invalid!");
+        }
+    }
+
+    public Piece getPieceInSquareRelativeTo(PieceColor color, Position position) {
+        return getPieceInSquareRelativeTo(color, position, false);
+    }
+
+    public Piece getPieceInSquareRelativeTo(PieceColor color, Position position, boolean flip) {
+        int x = position.getX();
+        int y = position.getY();
+        if (flip && color == PieceColor.BLACK) x = 7 - x;
+
+        return getPieceInSquareRelativeTo(color, x, y);
+    }
+
+    public Piece getPieceInSquareRelativeTo (PieceColor color, int x, int y) {
+        switch (color) {
+            case BLACK:
+                return getPieceInSquare(7- x, 7 - y);
+            case WHITE:
+                return getPieceInSquare(x, y);
+            default:
+                return null;
         }
     }
 
@@ -190,6 +216,7 @@ public class Board implements Serializable{
 
     public void executeMoveNoChecks(Move move) {
         move.makeMove(board);
+        hashCode = move.getNewHash(hashCode, hasher);
 
         stateHistory.push();
 
@@ -216,12 +243,8 @@ public class Board implements Serializable{
         stateHistory.getCurrentState().setLastMove(move);
         stateHistory.getCurrentState().setTurn(newTurn.invert());
         stateHistory.getCurrentState().setMoveCount(stateHistory.getCurrentState().getMoveCount() + 1);
-//        stateHistory.getCurrentState().setPossibleMoves(getAllPossibleMoves());
-//        stateHistory.getCurrentState().setCheck(isCheck());
-//        stateHistory.getCurrentState().setCheckmate(isCheckMate());
 
         repetitionTracker.add(this);
-
     }
 
     public void unMakeMove (int level) {
@@ -235,6 +258,7 @@ public class Board implements Serializable{
         repetitionTracker.subtract(this);
         stateHistory.getCurrentState().setTurn(stateHistory.getCurrentState().getTurn().invert());
         lastMove.unmakeMove(board);
+        hashCode = lastMove.getOldHash(hashCode, hasher);
     }
 
     private boolean calculateCheckmate (PieceColor turn) {
@@ -318,7 +342,8 @@ public class Board implements Serializable{
 
     @Override
     public int hashCode() {
-        return Arrays.deepHashCode(board);
+//        return Arrays.deepHashCode(board);
+        return hashCode;
     }
 
     @Override
@@ -394,8 +419,13 @@ public class Board implements Serializable{
 
     public static void main(String[] args) {
         Board board = Board.fromFEN("rnb1kbnr/pppppppp/8/1q6/3PP3/8/PPP2PPP/RNBQKBNR b - - 0 1");
-        board.makeMove(Move.parseMove("b5b4", PieceColor.BLACK, board));
+        System.out.println(board.hashCode());
         System.out.println(board);
-        System.out.println(board.isCheck());
+        board.makeMove(Move.parseMove("b5b4", PieceColor.BLACK, board));
+        System.out.println(board.hashCode());
+        System.out.println(board);
+        board.unMakeMove(1);
+        System.out.println(board.hashCode());
+        System.out.println(board);
     }
 }

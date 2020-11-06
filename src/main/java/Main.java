@@ -13,16 +13,21 @@ public class Main {
     public static void main (String[] args) {
 //        Board orig = Board.fromFile("/home/kaappo/git/shakki2/src/main/resources/boards/starting_position.txt");
         Board board = Board.getStartingPosition();
+//        Board board = Board.fromFEN("r1bq1knr/1pp3pp/p1nb4/4p2Q/4N3/PB6/1PPP1PPP/R1B1K1NR w KQ - 0 1");
+//        Board board = Board.fromFEN("5rk1/6pp/8/4N3/3Q4/8/8/3K4 w - - 0 1");
+//        System.out.println(board.getAllPossibleMoves());
+//        System.out.println(board);
+//        System.exit(0);
 
         UI ui = new TtyUI();
 
         CapableOfPlaying[] players = {
-                new TreeAI(PieceColor.WHITE, board, 3),
+                new TreeAI(PieceColor.WHITE, board, 4),
                 new Player(PieceColor.BLACK, "kaappo", ui),
         };
 
         Runner runner = new Runner(board, players, ui, Collections.emptyList());
-        runner.play(PieceColor.WHITE);
+        runner.play(board.getTurn());
 
 //        Board board = orig.deepCopy();
 

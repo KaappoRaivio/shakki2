@@ -1,6 +1,7 @@
 package chess.move;
 
 import chess.board.Board;
+import chess.board.BoardHasher;
 import chess.misc.Position;
 import chess.misc.exceptions.ChessException;
 import chess.piece.NoPiece;
@@ -9,15 +10,15 @@ import chess.piece.basepiece.PieceColor;
 import chess.piece.basepiece.PieceType;
 import misc.Pair;
 
-;import java.awt.*;
+;
 import java.util.Map;
 import java.util.Objects;
 
 public class NormalMove implements Move {
-    final private Position origin;
-    final private Position destination;
-    final private Piece pieceInOrigin;
-    final private Piece pieceInDestination;
+    final protected Position origin;
+    final protected Position destination;
+    final protected Piece pieceInOrigin;
+    final protected Piece pieceInDestination;
     final protected PieceColor color;
 
     public NormalMove (Position origin, Position destination, Board board) {
@@ -77,6 +78,24 @@ public class NormalMove implements Move {
     }
 
     @Override
+    public int getNewHash (int oldHash, BoardHasher hasher) {
+        oldHash ^= hasher.getPartHash(origin, pieceInOrigin);
+        oldHash ^= hasher.getPartHash(destination, pieceInDestination);
+        oldHash ^= hasher.getPartHash(destination, pieceInOrigin);
+
+        return oldHash;
+    }
+
+    @Override
+    public int getOldHash (int newHash, BoardHasher hasher) {
+        newHash ^= hasher.getPartHash(destination, pieceInOrigin);
+        newHash ^= hasher.getPartHash(destination, pieceInDestination);
+        newHash ^= hasher.getPartHash(origin, pieceInOrigin);
+
+        return newHash;
+    }
+
+    @Override
     public String toString () {
         switch (pieceInOrigin.getType()) {
             case PAWN:
@@ -110,6 +129,7 @@ public class NormalMove implements Move {
     @Override
     public int hashCode () {
         return Objects.hash(getOrigin(), getDestination(), pieceInOrigin, pieceInDestination, getColor());
+//        return getOrigin().hashCode() + getDestination().hashCode() * 64 + 4096 * pieceInOrigin +
     }
 
     public Position getDestination () {

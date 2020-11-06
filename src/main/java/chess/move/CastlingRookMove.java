@@ -1,9 +1,11 @@
 package chess.move;
 
 import chess.board.Board;
+import chess.board.BoardHasher;
 import chess.misc.Position;
 import chess.misc.exceptions.ChessException;
 import chess.piece.CastlingRook;
+import chess.piece.King;
 import chess.piece.Rook;
 import chess.piece.basepiece.Piece;
 
@@ -28,5 +30,23 @@ public class CastlingRookMove extends NormalMove {
         super.unmakeMove(buffer);
 
         buffer[getOrigin().getY()][getOrigin().getX()] = new CastlingRook(color);
+    }
+
+    @Override
+    public int getNewHash(int oldHash, BoardHasher hasher) {
+        oldHash ^= hasher.getPartHash(destination, new King(color));
+        oldHash ^= hasher.getPartHash(destination, pieceInDestination);
+        oldHash ^= hasher.getPartHash(origin, pieceInOrigin);
+
+        return oldHash;
+    }
+
+    @Override
+    public int getOldHash(int newHash, BoardHasher hasher) {
+        newHash ^= hasher.getPartHash(origin, pieceInOrigin);
+        newHash ^= hasher.getPartHash(destination, pieceInDestination);
+        newHash ^= hasher.getPartHash(destination, new King(color));
+
+        return newHash;
     }
 }

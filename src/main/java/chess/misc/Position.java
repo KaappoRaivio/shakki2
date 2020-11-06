@@ -128,6 +128,6 @@ public class Position implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(x, y);
+        return 8 * y + x;
     }
 }

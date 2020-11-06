@@ -1,6 +1,7 @@
 package chess.move;
 
 import chess.board.Board;
+import chess.board.BoardHasher;
 import chess.board.BoardNotation;
 import chess.misc.Position;
 import chess.piece.CastlingKing;
@@ -48,4 +49,6 @@ public interface Move extends Serializable {
     Position getOrigin ();
     PieceColor getColor ();
 
+    int getNewHash (int oldHash, BoardHasher hasher);
+    int getOldHash (int newHash, BoardHasher hasher);
 }

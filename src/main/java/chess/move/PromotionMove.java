@@ -1,6 +1,7 @@
 package chess.move;
 
 import chess.board.Board;
+import chess.board.BoardHasher;
 import chess.misc.Position;
 import chess.misc.exceptions.ChessException;
 import chess.piece.*;
@@ -42,6 +43,22 @@ public class PromotionMove extends NormalMove {
     public void unmakeMove(Piece[][] buffer) {
         super.unmakeMove(buffer);
         buffer[getOrigin().getY()][getOrigin().getX()] = new Pawn(color);
+    }
+
+    @Override
+    public int getNewHash(int oldHash, BoardHasher hasher) {
+        int newHash = super.getNewHash(oldHash, hasher);
+        newHash ^= hasher.getPartHash(destination, promoted);
+
+        return newHash;
+    }
+
+    @Override
+    public int getOldHash(int newHash, BoardHasher hasher) {
+        int oldHash = super.getOldHash(newHash, hasher);
+        oldHash ^= hasher.getPartHash(destination, promoted);
+
+        return oldHash;
     }
 
     @Override

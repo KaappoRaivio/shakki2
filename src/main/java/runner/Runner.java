@@ -48,8 +48,10 @@ public class Runner {
             while (true) {
                 try {
 //                    System.out.println(board.getAllPossibleMoves(turn));
+                    long start = System.currentTimeMillis();
                     Move move = currentPlayer.getMove();
-                    System.out.println("Move is: " + move);
+                    long end = System.currentTimeMillis();
+                    System.out.println("Took " + ((end - start) / 1000) + " seconds. Move is: " + move);
                     board.makeMove(move);
                     break;
                 } catch (StopException e) {

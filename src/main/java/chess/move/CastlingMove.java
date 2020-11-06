@@ -1,6 +1,7 @@
 package chess.move;
 
 import chess.board.Board;
+import chess.board.BoardHasher;
 import chess.misc.Position;
 import chess.misc.exceptions.ChessException;
 import chess.piece.King;
@@ -106,6 +107,22 @@ public class CastlingMove implements Move {
     @Override
     public PieceColor getColor () {
         return color;
+    }
+
+    @Override
+    public int getNewHash(int oldHash, BoardHasher hasher) {
+        oldHash ^= castlingRookMove.getNewHash(oldHash, hasher);
+        oldHash ^= castlingKingMove.getNewHash(oldHash, hasher);
+
+        return oldHash;
+    }
+
+    @Override
+    public int getOldHash(int newHash, BoardHasher hasher) {
+        newHash ^= castlingRookMove.getOldHash(newHash, hasher);
+        newHash ^= castlingKingMove.getOldHash(newHash, hasher);
+
+        return newHash;
     }
 
     @Override

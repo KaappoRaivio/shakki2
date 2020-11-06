@@ -13,21 +13,21 @@ public class RepetitionTracker implements Serializable {
     private boolean draw = false;
 
     public void add (Board value) {
-//        counts.merge(value, 1, Integer::sum);
-//        if (count(value) == 3) {
-//            draw = true;
-//        }
+        counts.merge(value, 1, Integer::sum);
+        if (count(value) == 3) {
+            draw = true;
+        }
 
     }
 
     public void subtract (Board value) {
-//        if (!counts.containsKey(value)) {
-//            throw new ChessException("Position \n" + value + " not known!" + value);
-//        }
-//        counts.merge(value, -1, Integer::sum);
-//        if (count(value) < 3) {
-//            draw = false;
-//        }
+        if (!counts.containsKey(value)) {
+            throw new ChessException("Position \n" + value + " not known!" + value);
+        }
+        counts.merge(value, -1, Integer::sum);
+        if (count(value) < 3) {
+            draw = false;
+        }
     }
 
     private int count (Board value) {
