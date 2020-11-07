@@ -149,16 +149,19 @@ public class Board implements Serializable{
 
 
     public boolean isMoveLegal(Move move) {
-        return isMoveLegal(move, true);
+        return isMoveLegal(move, true, false, false);
     }
 
-    public boolean isMoveLegal (Move move, boolean pathCheck) {
+    public boolean isMoveLegal (Move move, boolean pathCheck, boolean ignoreTurn, boolean includeSelfCapture) {
 
-        boolean result = move.getColor() == getTurn()
-                && !move.capturesKing();
+        boolean result = !move.capturesKing();
+
+        if (!ignoreTurn) {
+            result &= move.getColor() == getTurn();
+        }
 
         if (pathCheck) {
-            result = result && getPieceInSquare(move.getOrigin()).getPossibleMoves(this, move.getOrigin(), getLastMove()).contains(move);
+            result &= getPieceInSquare(move.getOrigin()).getPossibleMoves(this, move.getOrigin(), getLastMove(), includeSelfCapture).contains(move);
         }
 
         if (result) {
@@ -181,17 +184,27 @@ public class Board implements Serializable{
         return getAllPossibleMoves(getTurn());
     }
 
-    public Set<Move> getAllPossibleMoves (PieceColor color) {
-        if (stateHistory.getCurrentState().getPossibleMoves(color) != null) {
+    public Set<Move> getAllPossibleMoves(PieceColor color) {
+        return getAllPossibleMoves(color, false, false);
+    }
+
+    public Set<Move> getAllPossibleMoves (PieceColor color, boolean ignoreTurn, boolean includeSelfCapture) {
+        if (stateHistory.getCurrentState().getPossibleMoves(color) != null && !includeSelfCapture) {
             return stateHistory.getCurrentState().getPossibleMoves(color);
         } else {
-            var moves = calculateAllPossibleMoves(color);
-            stateHistory.getCurrentState().setPossibleMoves(color, moves);
+            var moves = calculateAllPossibleMoves(color, ignoreTurn, includeSelfCapture);
+            if (!includeSelfCapture) {
+                stateHistory.getCurrentState().setPossibleMoves(color, moves);
+            }
             return moves;
         }
     }
 
-    private Set<Move> calculateAllPossibleMoves (PieceColor color) {
+    private Set<Move> calculateAllPossibleMoves(PieceColor color) {
+        return calculateAllPossibleMoves(color, false, false);
+    }
+
+    private Set<Move> calculateAllPossibleMoves (PieceColor color, boolean ignoreTurn, boolean includeSelfCapture) {
         Set<Move> moves = new HashSet<>();
 
         for (int y = 0; y < dimX; y++) {
@@ -202,8 +215,8 @@ public class Board implements Serializable{
                     continue;
                 }
 
-                for (Move possibleMove : piece.getPossibleMoves(this, new Position(x, y), getLastMove())) {
-                    if (isMoveLegal(possibleMove, false)) {
+                for (Move possibleMove : piece.getPossibleMoves(this, new Position(x, y), getLastMove(), includeSelfCapture)) {
+                    if (isMoveLegal(possibleMove, false, ignoreTurn, includeSelfCapture)) {
                         moves.add(possibleMove);
                     }
                 }
@@ -215,7 +228,7 @@ public class Board implements Serializable{
     }
 
     public void makeMove (Move move) {
-        if (isMoveLegal(move, true)) {
+        if (isMoveLegal(move, true, false, false)) {
             executeMoveNoChecks(move);
         } else {
             throw new ChessException("Move " + move + " is not legal for position " + this + "!");
@@ -224,7 +237,7 @@ public class Board implements Serializable{
 
     public void executeMoveNoChecks(Move move) {
         move.makeMove(board);
-        hashCode = move.getNewHash(hashCode, hasher);
+        hashCode = move.getIncrementalHash(hashCode, hasher);
 
         stateHistory.push();
 
@@ -248,9 +261,10 @@ public class Board implements Serializable{
         }
 
         PieceColor newTurn = stateHistory.getCurrentState().getTurn();
+        int currentMoveCCount = stateHistory.getCurrentState().getMoveCount();
         stateHistory.getCurrentState().setLastMove(move);
         stateHistory.getCurrentState().setTurn(newTurn.invert());
-        stateHistory.getCurrentState().setMoveCount(stateHistory.getCurrentState().getMoveCount() + 1);
+        stateHistory.getCurrentState().setMoveCount(currentMoveCCount + 1);
 
         repetitionTracker.add(this);
     }
@@ -264,9 +278,8 @@ public class Board implements Serializable{
 
     private void undo (Move lastMove) {
         repetitionTracker.subtract(this);
-        stateHistory.getCurrentState().setTurn(stateHistory.getCurrentState().getTurn().invert());
         lastMove.unmakeMove(board);
-        hashCode = lastMove.getOldHash(hashCode, hasher);
+        hashCode = lastMove.getIncrementalHash(hashCode, hasher);
     }
 
     private boolean calculateCheckmate (PieceColor turn) {

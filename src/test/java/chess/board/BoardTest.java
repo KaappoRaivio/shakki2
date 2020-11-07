@@ -53,6 +53,27 @@ public class BoardTest {
     }
 
     @Test
+    public void testUndo() {
+        Board board = Board.getStartingPosition();
+        assertEquals(PieceColor.WHITE, board.getTurn());
+
+        board.makeMove(Move.parseMove("e2e4", PieceColor.WHITE, board));
+        assertEquals(PieceColor.BLACK, board.getTurn());
+
+        board.makeMove(Move.parseMove("e7e5", PieceColor.BLACK, board));
+        assertEquals(PieceColor.WHITE, board.getTurn());
+
+        board.unMakeMove(1);
+        assertEquals(PieceColor.BLACK, board.getTurn());
+
+        board.unMakeMove(1);
+        assertEquals(PieceColor.WHITE, board.getTurn());
+
+        board.makeMove(Move.parseMove("d2d4", PieceColor.WHITE, board));
+        assertEquals(PieceColor.BLACK, board.getTurn());
+    }
+
+    @Test
     public void testCheck() {
         Board board = Board.fromFEN("1k6/P7/1K6/8/8/8/8/8 b - - 0 1");
         System.out.println(board);

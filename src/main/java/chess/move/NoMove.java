@@ -5,6 +5,7 @@ import chess.misc.Position;
 import chess.misc.exceptions.ChessException;
 import chess.piece.basepiece.Piece;
 import chess.piece.basepiece.PieceColor;
+import chess.piece.basepiece.PieceType;
 import misc.Pair;
 
 public class NoMove implements Move {
@@ -38,6 +39,11 @@ public class NoMove implements Move {
     }
 
     @Override
+    public boolean isCapturingMove() {
+        throw new ChessException("Not applicable for NoMove");
+    }
+
+    @Override
     public Pair<PieceColor, Position> getNewKingPosition () {
         throw new ChessException("Not applicable for NoMove");
     }
@@ -48,18 +54,23 @@ public class NoMove implements Move {
     }
 
     @Override
+    public Position getDestination() {
+        throw new ChessException("Not applicable for NoMove");
+    }
+
+    @Override
     public PieceColor getColor () {
         throw new ChessException("Not applicable for NoMove");
     }
 
     @Override
-    public int getNewHash(int oldHash, BoardHasher hasher) {
-        return oldHash;
+    public Piece getPiece() {
+        throw new ChessException("Not applicable for NoMove");
     }
 
     @Override
-    public int getOldHash(int newHash, BoardHasher hasher) {
-        return newHash;
+    public int getIncrementalHash(int oldHash, BoardHasher hasher) {
+        return oldHash;
     }
 
     @Override

@@ -13,21 +13,12 @@ public class CastlingKingMove extends NormalMove {
     }
 
     @Override
-    public int getNewHash (int oldHash, BoardHasher hasher) {
+    public int getIncrementalHash(int oldHash, BoardHasher hasher) {
         oldHash ^= hasher.getPartHash(origin, pieceInOrigin);
         oldHash ^= hasher.getPartHash(destination, pieceInDestination);
         oldHash ^= hasher.getPartHash(destination, new King(color));
 
         return oldHash;
-    }
-
-    @Override
-    public int getOldHash (int newHash, BoardHasher hasher) {
-        newHash ^= hasher.getPartHash(destination, new King(color));
-        newHash ^= hasher.getPartHash(destination, pieceInDestination);
-        newHash ^= hasher.getPartHash(origin, pieceInOrigin);
-
-        return newHash;
     }
 
     @Override

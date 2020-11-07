@@ -13,7 +13,6 @@ import chess.piece.basepiece.PieceType;
 
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -23,11 +22,11 @@ public class Pawn extends Piece {
     }
 
     @Override
-    public Set<Move> getPossibleMoves (Board board, Position position, Move lastMove) {
+    public Set<Move> getPossibleMoves(Board board, Position position, Move lastMove, boolean includeSelfCapture) {
         Set<Move> moves = new HashSet<>();
 
         moves.addAll(handleStraightAhead(board, position));
-        moves.addAll(handleCapture(board, position));
+        moves.addAll(handleCapture(board, position, includeSelfCapture));
         moves.addAll(handleEnPassant(board, position, lastMove));
         moves.addAll(handlePromotion(board, position));
 
@@ -92,20 +91,20 @@ public class Pawn extends Piece {
         return color == PieceColor.WHITE ? position.getY() != 1 : position.getY() != 6;
     }
 
-    private Set<Move> handleCapture (Board board, Position position) {
+    private Set<Move> handleCapture (Board board, Position position, boolean includeSelfcapture) {
         Set<Move> moves = new HashSet<>();
 
-        moves.addAll(getSuitableCaptureMoves(board, position, position.offset(1, getForwardDirection(), false)));
-        moves.addAll(getSuitableCaptureMoves(board, position, position.offset(-1, getForwardDirection(), false)));
+        moves.addAll(getSuitableCaptureMoves(board, position, position.offset(1, getForwardDirection(), false), includeSelfcapture));
+        moves.addAll(getSuitableCaptureMoves(board, position, position.offset(-1, getForwardDirection(), false), includeSelfcapture));
 
 
         return moves;
     }
 
-    private Set<Move> getSuitableCaptureMoves (Board board, Position position, Position offset) {
+    private Set<Move> getSuitableCaptureMoves (Board board, Position position, Position offset, boolean includeSelfCapture) {
         Set<Move> moves = new HashSet<>();
         if (offset.verify()) {
-            if (board.getPieceInSquare(offset).getColor() == color.invert()) {
+            if (board.getPieceInSquare(offset).getColor() == color.invert() || (includeSelfCapture && board.getPieceInSquare(offset).getColor() != PieceColor.NO_COLOR)) {
                 if (offset.getY() == getEndFlank()) {
                     moves.addAll(getPromotablePieces()
                             .stream()

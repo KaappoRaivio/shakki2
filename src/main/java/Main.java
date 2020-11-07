@@ -12,7 +12,8 @@ import java.util.Collections;
 public class Main {
     public static void main (String[] args) {
 //        Board orig = Board.fromFile("/home/kaappo/git/shakki2/src/main/resources/boards/starting_position.txt");
-        Board board = Board.getStartingPosition();
+//        Board board = Board.getStartingPosition();
+        Board board = Board.fromFEN("8/6p1/2b1pB2/1pk4q/1r2PKp1/2p1R3/Q2n4/2r5 w - - 0 1");
 //        Board board = Board.fromFEN("r1bq1knr/1pp3pp/p1nb4/4p2Q/4N3/PB6/1PPP1PPP/R1B1K1NR w KQ - 0 1");
 //        Board board = Board.fromFEN("5rk1/6pp/8/4N3/3Q4/8/8/3K4 w - - 0 1");
 //        System.out.println(board.getAllPossibleMoves());

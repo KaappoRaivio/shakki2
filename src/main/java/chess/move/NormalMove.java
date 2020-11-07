@@ -45,7 +45,7 @@ public class NormalMove implements Move {
 
     @Override
     public boolean resetsFiftyMoveRule () {
-        return pieceInOrigin.getType() == PieceType.PAWN || pieceInDestination.getType() != PieceType.NO_PIECE;
+        return pieceInOrigin.getType() == PieceType.PAWN || isCapturingMove();
     }
 
     @Override
@@ -56,6 +56,11 @@ public class NormalMove implements Move {
     @Override
     public boolean capturesKing() {
         return pieceInDestination.getType() == PieceType.KING;
+    }
+
+    @Override
+    public boolean isCapturingMove() {
+        return pieceInDestination.getType() != PieceType.NO_PIECE;
     }
 
     @Override
@@ -78,21 +83,17 @@ public class NormalMove implements Move {
     }
 
     @Override
-    public int getNewHash (int oldHash, BoardHasher hasher) {
+    public Piece getPiece() {
+        return pieceInOrigin;
+    }
+
+    @Override
+    public int getIncrementalHash(int oldHash, BoardHasher hasher) {
         oldHash ^= hasher.getPartHash(origin, pieceInOrigin);
         oldHash ^= hasher.getPartHash(destination, pieceInDestination);
         oldHash ^= hasher.getPartHash(destination, pieceInOrigin);
 
         return oldHash;
-    }
-
-    @Override
-    public int getOldHash (int newHash, BoardHasher hasher) {
-        newHash ^= hasher.getPartHash(destination, pieceInOrigin);
-        newHash ^= hasher.getPartHash(destination, pieceInDestination);
-        newHash ^= hasher.getPartHash(origin, pieceInOrigin);
-
-        return newHash;
     }
 
     @Override
@@ -132,6 +133,7 @@ public class NormalMove implements Move {
 //        return getOrigin().hashCode() + getDestination().hashCode() * 64 + 4096 * pieceInOrigin +
     }
 
+    @Override
     public Position getDestination () {
         return destination;
     }

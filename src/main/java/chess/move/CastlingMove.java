@@ -3,17 +3,12 @@ package chess.move;
 import chess.board.Board;
 import chess.board.BoardHasher;
 import chess.misc.Position;
-import chess.misc.exceptions.ChessException;
-import chess.piece.King;
-import chess.piece.NoPiece;
-import chess.piece.Rook;
 import chess.piece.basepiece.Piece;
 import chess.piece.basepiece.PieceColor;
+import chess.piece.basepiece.PieceType;
 import misc.Pair;
 
 import java.util.Objects;
-
-import static chess.piece.basepiece.PieceColor.WHITE;
 
 public class CastlingMove implements Move {
     final private CastlingType castlingType;
@@ -94,6 +89,11 @@ public class CastlingMove implements Move {
     }
 
     @Override
+    public boolean isCapturingMove() {
+        return false;
+    }
+
+    @Override
     public Pair<PieceColor, Position> getNewKingPosition () {
 
         return new Pair<>(color, castlingKingMove.getDestination());
@@ -105,24 +105,28 @@ public class CastlingMove implements Move {
     }
 
     @Override
+    public Position getDestination() {
+        return castlingRookMove.getDestination();
+    }
+
+    @Override
     public PieceColor getColor () {
         return color;
     }
 
     @Override
-    public int getNewHash(int oldHash, BoardHasher hasher) {
-        oldHash ^= castlingRookMove.getNewHash(oldHash, hasher);
-        oldHash ^= castlingKingMove.getNewHash(oldHash, hasher);
-
-        return oldHash;
+    public Piece getPiece() {
+        return castlingRookMove.getPiece();
     }
 
     @Override
-    public int getOldHash(int newHash, BoardHasher hasher) {
-        newHash ^= castlingRookMove.getOldHash(newHash, hasher);
-        newHash ^= castlingKingMove.getOldHash(newHash, hasher);
+    public int getIncrementalHash(int oldHash, BoardHasher hasher) {
+        oldHash = castlingKingMove.getIncrementalHash(oldHash, hasher);
+        oldHash = castlingRookMove.getIncrementalHash(oldHash, hasher);
+//        oldHash ^= hasher.getPartHash(kingPosition, castlingKingMove.pieceInOrigin);
+//        oldHash ^= hasher.getPartHash(castlingKingMove.destination, castlingKingMove.pieceInOrigin);
 
-        return newHash;
+        return oldHash;
     }
 
     @Override

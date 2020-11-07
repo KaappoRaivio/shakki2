@@ -7,12 +7,16 @@ public class Qperft {
     public static void main(String[] args) {
         Board board = Board.fromFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w QqKk - 0 1");
 //        Board board = Board.fromFEN("8/4p1PP/p2P4/b1p1K1p1/Nk4BR/4P1p1/2p5/8 w - - 0 1");
-        System.out.println("Started");
-        long start = System.currentTimeMillis();
-        dfs(board, 5);
-        long end = System.currentTimeMillis();
+//        while (true) {
+            System.out.println("Started");
+            long start = System.currentTimeMillis();
+            dfs(board, 5);
+            long end = System.currentTimeMillis();
 
-        System.out.println(count + ", " + count * 1000.0 / (end - start) + ", " + (end - start));
+            System.out.println(count + ", " + count * 1000.0 / (end - start) + ", " + (end - start));
+            count = 0;
+            System.out.println(board);
+//        }
     }
 
     private static void dfs(Board board, int depth) {

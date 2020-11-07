@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="chess.board.BoardTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2020-11-06T19:01:41" hostname="thinkbookpro" time="0.047">
+<testsuite name="chess.board.BoardTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2020-11-07T08:14:36" hostname="thinkbookpro" time="0.045">
   <properties/>
-  <testcase name="testHashCode3" classname="chess.board.BoardTest" time="0.047"/>
-  <system-out><![CDATA[Hashtest -20876584
-Hashtest -20876584
-Hashtest -20876584
+  <testcase name="testHashCode3" classname="chess.board.BoardTest" time="0.045"/>
+  <system-out><![CDATA[Making full hash!
+Making full hash!
+Making full hash!
  
   a b c d e f g h 
 8 ♜̅ ♞ ♝ ♛ ♚̅ ♝ ♞ ♜̅ 8
@@ -16,7 +16,7 @@ Hashtest -20876584
 2 ♙ ♙ ♙ ♙ · ♙ ♙ ♙ 2
 1 ♖̅ ♘ ♗ ♕ ♔̅ ♗ ♘ ♖̅ 1
   A B C D E F G H , 660252256, 660252256
-Hashtest -20876584
+Making full hash!
  
   a b c d e f g h 
 8 ♜̅ ♞ ♝ ♛ ♚̅ ♝ ♞ ♜̅ 8

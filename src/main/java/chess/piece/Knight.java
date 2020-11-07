@@ -1,7 +1,6 @@
 package chess.piece;
 
 import chess.board.Board;
-import chess.misc.exceptions.ChessException;
 import chess.misc.Position;
 import chess.move.Move;
 import chess.move.NormalMove;
@@ -13,7 +12,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class Knight extends Piece {
     public static final List<Position> offsets = Arrays.asList(
@@ -33,12 +31,12 @@ public class Knight extends Piece {
     }
 
     @Override
-    public Set<Move> getPossibleMoves (Board board, Position position, Move lastMove) {
+    public Set<Move> getPossibleMoves(Board board, Position position, Move lastMove, boolean includeSelfCapture) {
         Set<Move> moves = new HashSet<>();
 
         for (Position offset : offsets) {
             Position destination = position.offset(offset, false);
-            if (destination.verify() && board.getPieceInSquare(destination).getColor() != color) {
+            if (destination.verify() && (board.getPieceInSquare(destination).getColor() != color || includeSelfCapture)) {
                 moves.add(new NormalMove(position, destination, board));
             }
         }

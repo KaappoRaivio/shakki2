@@ -38,18 +38,11 @@ public class EnPassantMove extends NormalMove {
     }
 
     @Override
-    public int getNewHash (int oldHash, BoardHasher hasher) {
-        int newHash = super.getNewHash(oldHash, hasher);
+    public int getIncrementalHash(int oldHash, BoardHasher hasher) {
+        int newHash = super.getIncrementalHash(oldHash, hasher);
         newHash ^= hasher.getPartHash(opponentPawnPosition, opponentPawn);
 
         return newHash;
     }
 
-    @Override
-    public int getOldHash (int newHash, BoardHasher hasher) {
-        int oldHash = super.getOldHash(newHash, hasher);
-        newHash ^= hasher.getPartHash(opponentPawnPosition, opponentPawn);
-
-        return newHash;
-    }
 }

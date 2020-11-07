@@ -8,6 +8,7 @@ import chess.piece.CastlingKing;
 import chess.piece.CastlingRook;
 import chess.piece.basepiece.Piece;
 import chess.piece.basepiece.PieceColor;
+import chess.piece.basepiece.PieceType;
 import misc.Pair;
 
 import java.io.Serializable;
@@ -43,12 +44,15 @@ public interface Move extends Serializable {
     boolean resetsFiftyMoveRule ();
     boolean affectsKingPosition ();
     boolean capturesKing ();
+    boolean isCapturingMove ();
 
     Pair<PieceColor, Position> getNewKingPosition ();
 
     Position getOrigin ();
+    Position getDestination ();
     PieceColor getColor ();
+    Piece getPiece();
 
-    int getNewHash (int oldHash, BoardHasher hasher);
-    int getOldHash (int newHash, BoardHasher hasher);
+    int getIncrementalHash(int oldHash, BoardHasher hasher);
+
 }

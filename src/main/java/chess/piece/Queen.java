@@ -15,9 +15,9 @@ public class Queen extends Piece {
     }
 
     @Override
-    public Set<Move> getPossibleMoves (Board board, Position position, Move lastMove) {
-        Set<Move> moves = new Rook(color).getPossibleMoves(board, position, lastMove);
-        moves.addAll(new Bishop(color).getPossibleMoves(board, position, lastMove));
+    public Set<Move> getPossibleMoves(Board board, Position position, Move lastMove, boolean includeSelfCapture) {
+        Set<Move> moves = new Rook(color).getPossibleMoves(board, position, lastMove, includeSelfCapture);
+        moves.addAll(new Bishop(color).getPossibleMoves(board, position, lastMove, includeSelfCapture));
 
         return moves;
     }

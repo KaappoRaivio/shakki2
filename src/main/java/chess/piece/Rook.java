@@ -3,7 +3,6 @@ package chess.piece;
 import chess.board.Board;
 import chess.misc.Position;
 import chess.move.Move;
-import chess.move.NormalMove;
 import chess.piece.basepiece.Piece;
 import chess.piece.basepiece.PieceColor;
 import chess.piece.basepiece.PieceType;
@@ -21,13 +20,13 @@ public class Rook extends Piece {
     }
 
     @Override
-    public Set<Move> getPossibleMoves (Board board, Position position, Move lastMove) {
+    public Set<Move> getPossibleMoves(Board board, Position position, Move lastMove, boolean includeSelfCapture) {
         Set<Move> moves = new HashSet<>();
         
-        moves.addAll(getStraightPathMoves(board, position, 0, 1));
-        moves.addAll(getStraightPathMoves(board, position, 0, -1));
-        moves.addAll(getStraightPathMoves(board, position, 1, 0));
-        moves.addAll(getStraightPathMoves(board, position, -1, 0));
+        moves.addAll(getStraightPathMoves(board, position, 0, 1, includeSelfCapture));
+        moves.addAll(getStraightPathMoves(board, position, 0, -1, includeSelfCapture));
+        moves.addAll(getStraightPathMoves(board, position, 1, 0, includeSelfCapture));
+        moves.addAll(getStraightPathMoves(board, position, -1, 0, includeSelfCapture));
 
         return moves;
     }

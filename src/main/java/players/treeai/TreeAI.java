@@ -2,14 +2,13 @@ package players.treeai;
 
 import chess.board.Board;
 import chess.move.Move;
-import chess.piece.basepiece.Piece;
+import chess.move.NoMove;
 import chess.piece.basepiece.PieceColor;
-import players.Player;
+import misc.Splitter;
 import runner.CapableOfPlaying;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.lang.Math.max;
 
@@ -30,57 +29,59 @@ public class TreeAI implements CapableOfPlaying {
     public Move getMove() {
         Map<Move, Double> values = new HashMap<>();
 
-        for (Move move : board.getAllPossibleMoves(color)) {
-            board.executeMoveNoChecks(move);
-            values.put(move, -deepEvaluateBoard(board));
-            board.unMakeMove(1);
+
+        List<TreeAIWorker> threads = new ArrayList<>();
+        int availableProcessors = Runtime.getRuntime().availableProcessors();
+//        int availableProcessors = 1;
+        List<Set<Move>> split = Splitter.splitListInto(board.getAllPossibleMoves(color), availableProcessors);
+
+        for (int i = 0; i < availableProcessors; i++) {
+            TreeAIWorker thread = new TreeAIWorker(split.get(i), board.deepCopy(), i, depth, new BoardEvaluator(depth));
+            threads.add(thread);
+            thread.start();
+            System.out.println("created " + thread);
         }
-
-        System.out.println(values);
-
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        return values
-                .entrySet()
-                .stream()
-                .max(Comparator.comparingDouble(Map.Entry::getValue))
-                .orElseThrow()
-                .getKey();
-    }
-
-    private double deepEvaluateBoard(Board board) {
-        return deepEvaluateBoard(board, depth, 0, -1e23, 1e23);
-    }
-
-    private double deepEvaluateBoard(Board board, int currentDepth, int absoluteLimit, double alpha, double beta) {
-        if (board.isCheck() && currentDepth == 0 && absoluteLimit == 0) {
-//            currentDepth += 2;
-//            absoluteLimit += 2;
-//            System.out.println("Adding" + ", " + absoluteLimit);
-        } else {
-//            System.out.println("not adding");
-        }
-        if (board.isCheckmate() || board.isDraw() || currentDepth <= 0) {
-            return evaluator.evaluateBoard(board, currentDepth);
-        } else {
-            double totalPositionValue = -1e22;
-            for (Move move : board.getAllPossibleMoves()) {
-                board.executeMoveNoChecks(move);
-                totalPositionValue = max(-deepEvaluateBoard(board, currentDepth - 1, absoluteLimit, -beta, -alpha), totalPositionValue);
-                board.unMakeMove(1);
-                alpha = max(alpha, totalPositionValue);
-                if (alpha >= beta) {
-                    break;
-                }
+        for (TreeAIWorker thread : threads) {
+            try {
+                thread.join();
+                System.out.println("Joined " + thread);
+            } catch (InterruptedException e) {
             }
-
-            return totalPositionValue;
         }
+
+        for (TreeAIWorker worker : threads) {
+            values.putAll(worker.getResult());
+        }
+//        for (Move move : board.getAllPossibleMoves(color)) {
+//            board.executeMoveNoChecks(move);
+//            values.put(move, -deepEvaluateBoard(board));
+//            board.unMakeMove(1);
+//        }
+//o-o
+//        System.out.println(values);
+//
+//        try {
+//            Thread.sleep(1000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+
+//        Map<Move, Double> top4 = new HashMap<>();
+        List<Map.Entry<Move, Double>> top4 = new ArrayList<>();
+        for (int i = 0; i < 4; i++) {
+            Map.Entry<Move, Double> value = values
+                    .entrySet()
+                    .stream()
+                    .max(Comparator.comparingDouble(Map.Entry::getValue))
+                    .orElse(Map.entry(NoMove.NO_MOVE, -1e40));
+            values.remove(value.getKey());
+            top4.add(value);
+        }
+
+        System.out.println(top4.stream().map(item -> item.getKey() + ": " + item.getValue()).collect(Collectors.joining("\n")));
+        return top4.get(0).getKey();
     }
+
 
     @Override
     public void updateValues(Board board, PieceColor turn, int moveCount) {

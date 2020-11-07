@@ -61,12 +61,12 @@ public class BoardHasher implements Serializable {
         if (piece.getColor() == PieceColor.NO_COLOR) {
             return 0;
         } else {
-            return bitSets[y * 8 + x][Optional.of(keys.get(piece)).orElseThrow()];
+            return bitSets[y * 8 + x][keys.get(piece)];
         }
     }
 
     public int getFullHash (Board board) {
-        System.out.println("Hashtest " + getPartHash(0, 0, new CastlingRook(PieceColor.WHITE)));
+        System.out.println("Making full hash!");
         int hash = 0;
 
         for (int y = 0; y < 8; y++) {
