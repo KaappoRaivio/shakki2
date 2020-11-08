@@ -2,6 +2,7 @@ package players.treeai;
 
 import chess.board.Board;
 import chess.move.Move;
+import com.google.common.util.concurrent.AtomicDouble;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,6 +11,15 @@ import java.util.Set;
 import static java.lang.Math.max;
 
 public class TreeAIWorker extends Thread {
+    private volatile static AtomicDouble globalAlpha = new AtomicDouble();
+    private volatile static AtomicDouble globalBeta = new AtomicDouble();
+
+    public static void resetAlphaAndBeta () {
+        globalAlpha.set(-1e23);
+        globalBeta.set(1e23);
+    }
+
+
     private Set<Move> moves;
     private Board board;
     private int id;
@@ -57,19 +67,23 @@ public class TreeAIWorker extends Thread {
         return deepEvaluateBoard(board, depth, 0, -1e23, 1e23);
     }
 
-    private double deepEvaluateBoard(Board board, int currentDepth, int absoluteLimit, double alpha, double beta) {
+    private double deepEvaluateBoard(Board board, int currentDepth, int absoluteLimit, double α, double β) {
         if (board.isCheckmate() || board.isDraw() || currentDepth <= 0) {
             return evaluator.evaluateBoard(board, currentDepth);
+//            return 0;
         } else {
             double totalPositionValue = -1e22;
             for (Move move : board.getAllPossibleMoves()) {
                 board.executeMoveNoChecks(move);
-                totalPositionValue = max(-deepEvaluateBoard(board, currentDepth - 1, absoluteLimit, -beta, -alpha), totalPositionValue);
+                totalPositionValue = max(-deepEvaluateBoard(board, currentDepth - 1, absoluteLimit, -β, -α), totalPositionValue);
                 board.unMakeMove(1);
-                alpha = max(alpha, totalPositionValue);
-                if (alpha >= beta) {
+
+                α = max(α, totalPositionValue);
+                if (α >= β) {
                     break;
                 }
+
+//                globalAlpha.set
             }
 
             return totalPositionValue;

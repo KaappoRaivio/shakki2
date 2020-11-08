@@ -11,6 +11,8 @@ import chess.piece.basepiece.PieceColor;
 import chess.piece.basepiece.PieceType;
 import misc.Pair;
 import misc.Saver;
+import players.treeai.TreeAI;
+import runner.CapableOfPlaying;
 
 import java.io.Serializable;
 import java.util.*;
@@ -204,7 +206,7 @@ public class Board implements Serializable{
         return calculateAllPossibleMoves(color, false, false);
     }
 
-    private Set<Move> calculateAllPossibleMoves (PieceColor color, boolean ignoreTurn, boolean includeSelfCapture) {
+    public Set<Move> calculateAllPossibleMoves (PieceColor color, boolean ignoreTurn, boolean includeSelfCapture) {
         Set<Move> moves = new HashSet<>();
 
         for (int y = 0; y < dimX; y++) {
@@ -261,10 +263,10 @@ public class Board implements Serializable{
         }
 
         PieceColor newTurn = stateHistory.getCurrentState().getTurn();
-        int currentMoveCCount = stateHistory.getCurrentState().getMoveCount();
+        int currentMoveCount = stateHistory.getCurrentState().getMoveCount();
         stateHistory.getCurrentState().setLastMove(move);
         stateHistory.getCurrentState().setTurn(newTurn.invert());
-        stateHistory.getCurrentState().setMoveCount(currentMoveCCount + 1);
+        stateHistory.getCurrentState().setMoveCount(currentMoveCount + 1);
 
         repetitionTracker.add(this);
     }
@@ -339,26 +341,28 @@ public class Board implements Serializable{
         String hPadding = " ";
         String vPadding = "";
 
-        StringBuilder builder = new StringBuilder(vPadding).append(hPadding).append("\n  a b c d e f g h").append(hPadding).append("\n").append(vPadding);
+        String letters = getTurn() == PieceColor.WHITE ? " a b c d e f g h" : " h g f e d c b a";
+        StringBuilder builder = new StringBuilder(vPadding).append(hPadding).append("\n ").append(letters).append(hPadding).append("\n").append(vPadding);
         for (int y = dimY - 1; y >= 0; y--) {
             if (y < dimY - 1) {
                 builder.append("\n");
             }
 
-            builder.append(y + 1).append(hPadding);
+            int currentRow = getTurn() == PieceColor.WHITE ? y + 1 : 8 - y;
+            builder.append(currentRow).append(hPadding);
 
-            for (int x = 0; x < board[y].length; x++) {
-                builder.append(board[y][x]);
+            for (int x = 0; x < dimX; x++) {
+                builder.append(getPieceInSquareRelativeTo(getTurn(), x, y));
 
-                if (x + 1 < board[y].length) {
+                if (x + 1 < dimX) {
                     builder.append(" ");
                 }
             }
 
-            builder.append(hPadding).append(y + 1);
+            builder.append(hPadding).append(currentRow);
         }
 
-        return builder.append("\n").append(vPadding).append(hPadding).append(" A B C D E F G H").append(hPadding).toString();
+        return builder.append("\n").append(vPadding).append(hPadding).append(letters).append(hPadding).toString();
     }
 
     @Override
@@ -439,15 +443,38 @@ public class Board implements Serializable{
     }
 
     public static void main(String[] args) {
-        Board board = Board.fromFEN("rnb1kbnr/pppppppp/8/1q6/3PP3/8/PPP2PPP/RNBQKBNR b - - 0 1");
-        System.out.println(board.hashCode());
+//        Board board = Board.fromFEN("r1b1k2r/pp2q2p/2p2npb/2np4/4pP2/4P2N/PPPNB1PP/R1BQK2R w - - 0 1");
+        Board board = Board.getStartingPosition();
+
+//        System.out.println(board.getAllPossibleMoves(PieceColor.WHITE));
+        BoardHelpers.executeSequenceOfMoves(board,
+                List.of("g1f3", "d7d5", "e2e3", "f7f6", "d2d4", "e7e5", "b1d2", "d8e7", "d4e5", "f6e5", "f1b5", "c7c6", "b5e2", "g8f6", "f3g5", "e5e4", "e2h5", "g7g6", "h5e2", "f8h6", "f2f4", "b8d7", "g5h3", "d7c5"));
         System.out.println(board);
-        board.makeMove(Move.parseMove("b5b4", PieceColor.BLACK, board));
-        System.out.println(board.hashCode());
-        System.out.println(board);
-        board.unMakeMove(1);
-        System.out.println(board.hashCode());
-        System.out.println(board);
+        System.out.println(board.getAllPossibleMoves());
+
+//        board.makeMove(Move.parseMove(""));
+//        CapableOfPlaying ai = new TreeAI(PieceColor.WHITE, board, 4, 8);
+//        ai.updateValues(board, PieceColor.WHITE, 30);
+//        System.out.println(ai.getMove());
+//        System.out.println(board.hashCode());
+//        System.out.println(board);
+//        board.makeMove(Move.parseMove("b5b4", PieceColor.BLACK, board));
+//        System.out.println(board.hashCode());
+//        System.out.println(board);
+//        board.unMakeMove(1);
+//        System.out.println(board.hashCode());
+//        Board board = Board.getStartingPosition();
+//        BoardHelpers.executeSequenceOfMoves(x, List.of("e2e4", "e7e5"));
+//        board.makeMove(Move.parseMove("e2e4", PieceColor.WHITE, board));
+        System.out.println(board.getMoveHistoryPretty());
+
+//        board.makeMove(Move.parseMove("e7e5", PieceColor.WHITE, board));
+//        System.out.println(board.getMoveHistoryPretty());
+//        System.out.println(board);
+//        Board board = Board.getStartingPosition();
+//        System.out.println(board);
+//        board.makeMove(Move.parseMove("e2e4", PieceColor.WHITE, board));
+//        System.out.println(board);
     }
 
     public BoardHasher getHasher() {

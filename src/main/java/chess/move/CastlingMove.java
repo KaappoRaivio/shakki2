@@ -156,6 +156,13 @@ public class CastlingMove implements Move {
 
     @Override
     public int hashCode () {
-        return Objects.hash(castlingType, getColor(), kingPosition, board, castlingRookMove, castlingKingMove);
+//        return Objects.hash(castlingType, getColor(), kingPosition, board, castlingRookMove, castlingKingMove);
+        int result = 1 << 26;
+
+        if (color == PieceColor.WHITE) {
+            return result | (castlingType == CastlingType.KING_SIDE ? 1 : 2);
+        } else {
+            return result | (castlingType == CastlingType.KING_SIDE ? 3 : 4);
+        }
     }
 }

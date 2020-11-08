@@ -21,6 +21,12 @@ class GameStage {
         double middlegameWeight = calculateMiddlegameWeight(materialSum);
         double endgameWeight = calculateEndgameWeight(materialSum);
 
+        double divisor = openingWeight + middlegameWeight + endgameWeight;
+
+        openingWeight /= divisor;
+        middlegameWeight /= divisor;
+        endgameWeight /= divisor;
+
         return new GameStage(openingWeight, middlegameWeight, endgameWeight);
     }
 
@@ -37,13 +43,13 @@ class GameStage {
 
     private static double calculateOpeningWeight(double materialSum) {
 //        return 0.000000469 * Math.exp(0.364 * materialSum);
-        return clamp(-3 + materialSum / 10.0);
+        return clamp(0.2 * materialSum - 7);
     }
 
     private static double calculateMiddlegameWeight(double materialSum) {
-        if (materialSum < 40 && materialSum >= 30) {
-            return clamp(-0.1 * materialSum + 4);
-        } else if (materialSum < 30 && materialSum >= 20) {
+        if (materialSum < 40 && materialSum >= 35) {
+            return clamp(-0.1 * materialSum + 4.5);
+        } else if (materialSum < 35 && materialSum >= 20) {
             return 1;
         } else if (materialSum < 20 && materialSum >= 14) {
             return clamp(1. / 6 * materialSum - 7. / 3);

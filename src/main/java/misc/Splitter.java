@@ -7,6 +7,8 @@ import java.util.Set;
 
 public class Splitter {
     public static <T> List<Set<T>> splitListInto(Set<T> moves, int amountOfChunks) {
+        moves = new HashSet<>(Set.copyOf(moves));
+
         int surfaceArea = moves.size();
 
 

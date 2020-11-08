@@ -48,24 +48,21 @@ public class Pawn extends Piece {
         };
     }
 
+    private static final HashSet<PieceType> promotablePieces = new HashSet<>(Set.of(
+            PieceType.QUEEN,
+            PieceType.ROOK,
+            PieceType.BISHOP,
+            PieceType.KNIGHT
+    ));
     private Set<Move> handlePromotion (Board board, Position position) {
         if (position.getY() == getEndFlank() - getForwardDirection() && board.isSquareEmpty(position.offsetY(getForwardDirection()))) {
-            return getPromotablePieces()
+            return promotablePieces
                     .stream()
                     .map(pieceType -> new PromotionMove(position, position.offsetY(getForwardDirection()), board, pieceType))
                     .collect(Collectors.toSet());
         } else {
             return Collections.emptySet();
         }
-    }
-
-    private Set<PieceType> getPromotablePieces () {
-        return new HashSet<>(Set.of(
-                PieceType.QUEEN,
-                PieceType.ROOK,
-                PieceType.BISHOP,
-                PieceType.KNIGHT
-        ));
     }
 
     private Set<Move> handleStraightAhead (Board board, Position position) {
@@ -106,7 +103,12 @@ public class Pawn extends Piece {
         if (offset.verify()) {
             if (board.getPieceInSquare(offset).getColor() == color.invert() || (includeSelfCapture && board.getPieceInSquare(offset).getColor() != PieceColor.NO_COLOR)) {
                 if (offset.getY() == getEndFlank()) {
-                    moves.addAll(getPromotablePieces()
+                    moves.addAll(new HashSet<>(Set.of(
+                            PieceType.QUEEN,
+                            PieceType.ROOK,
+                            PieceType.BISHOP,
+                            PieceType.KNIGHT
+                            ))
                             .stream()
                             .map(type -> new PromotionMove(position, offset, board, type))
                             .collect(Collectors.toSet())
@@ -148,7 +150,7 @@ public class Pawn extends Piece {
     private static boolean isEnPassantPossible(Move lastMove) {
         if (lastMove instanceof NormalMove) {
             NormalMove move = (NormalMove) lastMove;
-            return Math.abs(move.getOrigin().getY() - move.getDestination().getY()) == 2;
+            return Math.abs(move.getOrigin().getY() - move.getDestination().getY()) == 2 && lastMove.getPiece().getType() == PieceType.PAWN;
 
         } else {
             return false;

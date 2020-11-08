@@ -8,22 +8,10 @@ import chess.piece.basepiece.Piece;
 import chess.piece.basepiece.PieceColor;
 import chess.piece.basepiece.PieceType;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class Knight extends Piece {
-    public static final List<Position> offsets = Arrays.asList(
-            new Position(1, 2),
-            new Position(2, 1),
-            new Position(2, -1, false),
-            new Position(1, -2, false),
-            new Position(-1, -2, false),
-            new Position(-2, -1, false),
-            new Position(-2, 1, false),
-            new Position(-1, 2, false)
-        );
+    public static final List<Position> offsets = List.of(new Position(1, 2), new Position(2, 1), new Position(2, -1, false), new Position(1, -2, false), new Position(-1, -2, false), new Position(-2, -1, false), new Position(-2, 1, false), new Position(-1, 2, false));
 
 
     public Knight (PieceColor color) {

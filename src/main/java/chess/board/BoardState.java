@@ -54,6 +54,7 @@ public class BoardState implements Serializable {
         this.whiteKingPosition = other.whiteKingPosition;
         this.blackKingPosition = other.blackKingPosition;
         this.movesSinceFiftyMoveReset = other.movesSinceFiftyMoveReset;
+        this.moveCount = other.moveCount;
         this.lastMove = other.lastMove;
         this.turn = other.turn;
 //        this.isCheckForWhite = other.isCheckForWhite;

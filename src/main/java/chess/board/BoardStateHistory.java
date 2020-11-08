@@ -17,7 +17,7 @@ public class BoardStateHistory implements Serializable {
     public BoardStateHistory () { }
 
     void push () {
-        states.push(new BoardState(Optional.ofNullable(states.peek()).orElseThrow()));
+        states.push(new BoardState(Objects.requireNonNull(states.peek())));
     }
 
     void pull () {
@@ -25,7 +25,7 @@ public class BoardStateHistory implements Serializable {
     }
 
     public BoardState getCurrentState () {
-        return Optional.ofNullable(states.peek()).orElseThrow();
+        return Objects.requireNonNull(states.peek());
     }
 
     List<BoardState> getPreviousStates() {

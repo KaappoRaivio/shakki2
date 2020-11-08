@@ -66,7 +66,6 @@ public class BoardHasher implements Serializable {
     }
 
     public int getFullHash (Board board) {
-        System.out.println("Making full hash!");
         int hash = 0;
 
         for (int y = 0; y < 8; y++) {

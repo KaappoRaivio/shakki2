@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 public class King extends Piece {
-    public static final List<Position> offsets = Arrays.asList(
+    public static final List<Position> offsets = List.of(
             new Position (1, 1),
             new Position (1, 0),
             new Position (1, -1, false),

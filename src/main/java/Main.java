@@ -1,4 +1,5 @@
 import chess.board.Board;
+import chess.move.Move;
 import chess.piece.basepiece.PieceColor;
 import players.Player;
 import players.treeai.TreeAI;
@@ -12,8 +13,10 @@ import java.util.Collections;
 public class Main {
     public static void main (String[] args) {
 //        Board orig = Board.fromFile("/home/kaappo/git/shakki2/src/main/resources/boards/starting_position.txt");
-//        Board board = Board.getStartingPosition();
-        Board board = Board.fromFEN("8/6p1/2b1pB2/1pk4q/1r2PKp1/2p1R3/Q2n4/2r5 w - - 0 1");
+        Board board = Board.getStartingPosition();
+//        Board board = Board.fromFEN("rnbq1rk1/ppp1ppb1/3p1n1p/6N1/3PP2B/2NB4/PPP2PPP/R2QK2R b KQ - 0 1");
+//        board.makeMove(Move.parseMove("h6g5", PieceColor.BLACK, board));
+
 //        Board board = Board.fromFEN("r1bq1knr/1pp3pp/p1nb4/4p2Q/4N3/PB6/1PPP1PPP/R1B1K1NR w KQ - 0 1");
 //        Board board = Board.fromFEN("5rk1/6pp/8/4N3/3Q4/8/8/3K4 w - - 0 1");
 //        System.out.println(board.getAllPossibleMoves());
@@ -23,7 +26,7 @@ public class Main {
         UI ui = new TtyUI();
 
         CapableOfPlaying[] players = {
-                new TreeAI(PieceColor.WHITE, board, 4),
+                new TreeAI(PieceColor.WHITE, board, 4, 8),
                 new Player(PieceColor.BLACK, "kaappo", ui),
         };
 
