@@ -168,18 +168,18 @@ public class Pawn extends Piece {
         return moves;
     }
 
-    @Override
-    public double getValue(int x, int y) {
-//        return super.getValue(position) * (7 - getEndFlank()) - position.getY();
-        switch (color) {
-            case BLACK:
-                return super.getValue(x, y) + 10 * (7 - y);
-            case WHITE:
-                return super.getValue(x, y) + 10 * y;
-            default:
-                return 0;
-        }
-    }
+//    @Override
+//    public double getValue(int x, int y) {
+////        return super.getValue(position) * (7 - getEndFlank()) - position.getY();
+//        switch (color) {
+//            case BLACK:
+//                return super.getValue(x, y) + 5 * (7 - y);
+//            case WHITE:
+//                return super.getValue(x, y) + 5 * y;
+//            default:
+//                return 0;
+//        }
+//    }
 
     private static boolean isEnPassantPossible(Move lastMove) {
         if (lastMove instanceof NormalMove) {

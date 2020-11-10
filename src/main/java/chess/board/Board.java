@@ -219,11 +219,11 @@ public class Board implements Serializable{
                         moves.getFirst().add(possibleMove);
                     }
                 }
-                for (Move possibleMove : possibleMoves.getSecond()) {
-                    if (isMoveLegal(possibleMove, false, ignoreTurn, true)) {
-                        moves.getSecond().add(possibleMove);
-                    }
-                };
+//                for (Move possibleMove : possibleMoves.getSecond()) {
+//                    if (isMoveLegal(possibleMove, false, ignoreTurn, true)) {
+//                        moves.getSecond().add(possibleMove);
+//                    }
+//                };
             }
         }
 

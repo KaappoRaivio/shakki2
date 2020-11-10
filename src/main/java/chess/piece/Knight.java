@@ -16,7 +16,7 @@ public class Knight extends Piece {
 
 
     public Knight (PieceColor color) {
-        super(PieceType.KNIGHT, color, "♞", 320);
+        super(PieceType.KNIGHT, color, "♞", 300);
     }
 
     @Override
@@ -27,10 +27,10 @@ public class Knight extends Piece {
             Position destination = position.offset(offset, false);
             if (destination.verify()) {
                 NormalMove move = new NormalMove(position, destination, board);
-                moves.getSecond().add(move);
-                if (!move.isSelfCapture()) {
+//                moves.getSecond().add(move);
+//                if (!move.isSelfCapture()) {
                     moves.getFirst().add(move);
-                };
+//                };
             }
         }
 

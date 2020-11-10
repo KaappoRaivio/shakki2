@@ -57,7 +57,8 @@ abstract public class Piece implements Serializable {
         return getValue(position.getX(), position.getY());
     }
 
-    public double getValue (int x, int y) {
+    public final double getValue (int x, int y) {
+//        System.out.println(value);
         return value;
     }
 
@@ -139,15 +140,15 @@ abstract public class Piece implements Serializable {
     protected Pair<Set<Move>, Set<Move>> getStraightPathMoves (Board board, Position position, int deltaX, int deltaY) {
         Pair<Set<Move>, Set<Move>> moves = new Pair<>(new HashSet<>(), new HashSet<>());
 
-        for (Position destination : getStraightPath(board, position, deltaX, deltaY, true)) {
+        for (Position destination : getStraightPath(board, position, deltaX, deltaY, false)) {
 //            moves.add(Move.parseMove(position.toString() + destination.toString(), board.getPieceInSquare(position).getColor(), board));
 
 
             NormalMove move = new NormalMove(position, destination, board);
-            moves.getSecond().add(move);
-            if (!move.isSelfCapture()) {
+//            moves.getSecond().add(move);
+//            if (!move.isSelfCapture()) {
                 moves.getFirst().add(move);
-            }
+//            }
         }
 
         return  moves;

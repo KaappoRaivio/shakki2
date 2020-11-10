@@ -14,7 +14,7 @@ import java.util.Set;
 
 public class Bishop extends Piece {
     public Bishop (PieceColor color) {
-        super(PieceType.BISHOP, color, "♝", 330);
+        super(PieceType.BISHOP, color, "♝", 300);
     }
 
     @Override

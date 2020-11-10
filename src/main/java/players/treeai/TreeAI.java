@@ -57,6 +57,7 @@ public class TreeAI implements CapableOfPlaying {
 
         List<TreeAIWorker> threads = new ArrayList<>();
         depthIteration: for (int depthIteration = 2; depthIteration <= depth; depthIteration++) {
+//        depthIteration: for (int depthIteration = depth; depthIteration <= depth; depthIteration++) {
             threads = new ArrayList<>();
             List<Set<Move>> split = Splitter.splitListInto(board.getAllPossibleMoves(color), amountOfProcessors);
 
@@ -82,6 +83,7 @@ public class TreeAI implements CapableOfPlaying {
                     }
                     synchronized (TreeAIWorker.lock) {
                         try {
+//                            TreeAIWorker.lock.wait();
                             TreeAIWorker.lock.wait(wait);
                         } catch (InterruptedException ignored) {}
                     }

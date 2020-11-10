@@ -28,12 +28,12 @@ public class Main {
         CapableOfPlaying[] players;
         Scanner scanner = new Scanner(System.in);
         int AIDepth = 10;
-        int allocatedTime = 25000;
+        int allocatedTime = 30000;
         boolean useOpeningLibrary = true;
         while (true) {
             System.out.print("Ai plays as: ");
-//            String line = scanner.nextLine();
-            String line = "none";
+            String line = scanner.nextLine();
+//            String line = "none";
 
             if (line.equals("white")) {
                 players = new CapableOfPlaying[]{
@@ -45,7 +45,7 @@ public class Main {
             } else if (line.equals("black")) {
                 players = new CapableOfPlaying[]{
                         new Player(PieceColor.WHITE, "chess.com", ui),
-                        new TreeAI(PieceColor.BLACK, board, AIDepth, 8),
+                        new TreeAI(PieceColor.BLACK, board, AIDepth, 8, useOpeningLibrary, allocatedTime),
                 };
                 break;
             } else if (line.equals("none")) {

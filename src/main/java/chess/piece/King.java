@@ -26,7 +26,7 @@ public class King extends Piece {
     );
 
     public King (PieceColor color) {
-        this(color, "♚", 400);
+        this(color, "♚", 100);
     }
 
     King (PieceColor color, String symbol, int value) {
@@ -42,10 +42,10 @@ public class King extends Piece {
 
             if (destination.verify()) {
                 NormalMove move = new NormalMove(position, destination, board);
-                moves.getSecond().add(move);
-                if (!move.isSelfCapture()) {
+//                moves.getSecond().add(move);
+//                if (!move.isSelfCapture()) {
                     moves.getFirst().add(move);
-                }
+//                }
             }
         }
 

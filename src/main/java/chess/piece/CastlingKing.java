@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 public class CastlingKing extends King {
 
     public CastlingKing (PieceColor color) {
-        super(color, "♚̅", 500);
+        super(color, "♚̅", 100);
     }
 
 

@@ -21,13 +21,16 @@ public class CastlingRook extends Rook {
     public Pair<Set<Move>, Set<Move>> getPossibleMoves(Board board, Position position, Move lastMove) {
         Pair<Set<Move>, Set<Move>> possibleMoves = super.getPossibleMoves(board, position, lastMove);
         Pair<Set<Move>, Set<Move>> result = new Pair<>(new HashSet<>(), new HashSet<>());
-        mergePairs(result, new Pair<>(possibleMoves.getFirst().stream().map(move -> {
-                    NormalMove normalMove = ((NormalMove) move);
-                    return new CastlingRookMove(normalMove.getOrigin(), normalMove.getDestination(), board); }).collect(Collectors.toSet()),
-                possibleMoves.getSecond().stream().map(move -> {
-                    NormalMove normalMove = ((NormalMove) move);
-                    return new CastlingRookMove(normalMove.getOrigin(), normalMove.getDestination(), board); }).collect(Collectors.toSet()))
-        );
-        return result;
+//        mergePairs(result, new Pair<>(possibleMoves.getFirst().stream().map(move -> {
+//                    NormalMove normalMove = ((NormalMove) move);
+//                    return new CastlingRookMove(normalMove.getOrigin(), normalMove.getDestination(), board); }).collect(Collectors.toSet()),
+//                possibleMoves.getSecond().stream().map(move -> {
+//                    NormalMove normalMove = ((NormalMove) move);
+//                    return new CastlingRookMove(normalMove.getOrigin(), normalMove.getDestination(), board); }).collect(Collectors.toSet()))
+//        );
+        return new Pair<>(possibleMoves.getFirst().stream().map(move -> {
+            NormalMove normalMove = ((NormalMove) move);
+            return new CastlingRookMove(normalMove.getOrigin(), normalMove.getDestination(), board); }).collect(Collectors.toSet()), new HashSet<>());
+//        return result;
     }
 }
