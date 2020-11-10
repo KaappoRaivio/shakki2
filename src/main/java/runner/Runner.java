@@ -4,6 +4,7 @@ import chess.board.Board;
 import chess.misc.exceptions.StopException;
 import chess.move.Move;
 import chess.piece.basepiece.PieceColor;
+import ui.UndoException;
 
 import java.util.List;
 import java.util.Scanner;
@@ -34,12 +35,17 @@ public class Runner {
         }
         ui.updateValues(board.deepCopy(), turn, moveCount);
 
-        while (true) {
+        mainloop: while (true) {
+
             CapableOfPlaying currentPlayer = players[(moveCount + 1) % 2];
             if (board.isCheckmate()) {
                 System.out.println("=== === Checkmate! === ===");
                 System.out.println(board);
                 System.out.println(currentPlayer.getColor().invert() + " wins!");
+                break;
+            } else if (board.isDraw()) {
+                System.out.println("=== === Draw! === ===");
+                System.out.println(board);
                 break;
             }
 
@@ -54,6 +60,14 @@ public class Runner {
                     System.out.println("Took " + ((end - start) / 1000) + " seconds. Move is: " + move);
                     board.makeMove(move);
                     break;
+                } catch (UndoException e) {
+                    board.unMakeMove(2);
+                    for (CapableOfPlaying player : players) {
+                        player.updateValues(board.deepCopy(), turn, moveCount);
+                    }
+                    ui.updateValues(board.deepCopy(), turn, moveCount);
+
+                    continue mainloop;
                 } catch (StopException e) {
                     throw e;
                 } catch (RuntimeException e) {

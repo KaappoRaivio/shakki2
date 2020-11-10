@@ -1,5 +1,6 @@
 package chess.move;
 
+import chess.board.Board;
 import chess.board.BoardHasher;
 import chess.misc.Position;
 import chess.misc.exceptions.ChessException;
@@ -71,6 +72,11 @@ public class NoMove implements Move {
     @Override
     public int getIncrementalHash(int oldHash, BoardHasher hasher) {
         return oldHash;
+    }
+
+    @Override
+    public String getShortAlgebraic(Board board) {
+        return toString();
     }
 
     @Override

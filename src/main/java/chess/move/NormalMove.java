@@ -12,7 +12,8 @@ import misc.Pair;
 
 ;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class NormalMove implements Move {
     final protected Position origin;
@@ -22,12 +23,22 @@ public class NormalMove implements Move {
     final protected PieceColor color;
 
     public NormalMove (Position origin, Position destination, Board board) {
+        Piece pieceInOrigin;
+        Piece pieceInDestination;
         this.origin = origin;
         this.destination = destination;
         pieceInOrigin = board.getPieceInSquare(origin);
         pieceInDestination = board.getPieceInSquare(destination);
 
-        this.color = board.getPieceInSquare(origin).getColor();
+        PieceColor color = board.getPieceInSquare(origin).getColor();
+        if (color == PieceColor.NO_COLOR) {
+            color = board.getPieceInSquare(destination).getColor();
+            pieceInOrigin = pieceInDestination;
+            pieceInDestination = new NoPiece();
+        }
+        this.pieceInOrigin = pieceInOrigin;
+        this.pieceInDestination = pieceInDestination;
+        this.color = color;
     }
 
     @Override
@@ -97,21 +108,79 @@ public class NormalMove implements Move {
     }
 
     @Override
-    public String toString () {
-        switch (pieceInOrigin.getType()) {
-            case PAWN:
-                if (pieceInDestination.getType() != PieceType.NO_PIECE) {
-                    return origin.toString().substring(0, 1).toLowerCase() + "x" + destination.toString().toLowerCase();
+    public String getShortAlgebraic (Board board) {
+        StringBuilder builder = new StringBuilder();
+        board.makeMove(this);
+        if (pieceInOrigin.getType() != PieceType.PAWN) {
+            builder.append(MoveHashMap.moveHashMap.get(pieceInOrigin.getType()).toUpperCase());
+
+            String clarifierY = "";
+            String clarifierX = "";
+            Set<Position> brotherPiecePositions = getBrotherPiecePositions(board);
+            for (Position location : brotherPiecePositions) {
+                if (location.getX() == origin.getX()) {
+                    clarifierX = origin.toString().substring(1);
+                } else if (location.getY() == origin.getY()) {
+                    clarifierY = origin.toString().substring(0, 1);
                 } else {
-                    return destination.toString().toLowerCase();
+                    clarifierX = origin.toString().substring(0, 1);
                 }
-            default:
-                if (pieceInDestination.getType() != PieceType.NO_PIECE) {
-                    return MoveHashMap.moveHashMap.get(pieceInOrigin.getType()).toUpperCase() + "x" + destination.toString().toLowerCase();
-                } else {
-                    return MoveHashMap.moveHashMap.get(pieceInOrigin.getType()).toUpperCase() + destination.toString().toLowerCase();
-                }
+            }
+            builder.append(clarifierX.toLowerCase()).append(clarifierY.toLowerCase());
+        } else {
+            if (isCapturingMove()) {
+                builder.append(origin.toString().substring(0, 1).toLowerCase());
+            }
+//            builder.append(destination.toString().toLowerCase());
         }
+
+        if (isCapturingMove()) {
+            builder.append("x");
+        }
+
+        builder.append(destination.toString().toLowerCase());
+        if (board.isCheckmate()) {
+            builder.append("#");
+        } else if (board.isCheck()) {
+            builder.append("+");
+        }
+
+        board.unMakeMove(1);
+        return builder.toString();
+    }
+
+    private Set<Position> getBrotherPiecePositions(Board board) {
+        Set<Move> possibleMoves = board
+                .getPieceInSquare(destination)
+                .getPossibleMoves(board, destination, board.getLastMove()).getSecond();
+        return possibleMoves
+                .stream()
+                .filter(move -> move.getColor() == color
+                            && board.getPieceInSquare(move.getDestination()).getType() == pieceInOrigin.getType())
+                .map(Move::getDestination)
+                .collect(Collectors.toSet());
+
+    }
+
+    public boolean isSelfCapture () {
+        return pieceInOrigin.getColor() == pieceInDestination.getColor();
+    }
+
+    @Override
+    public String toString () {
+        if (pieceInOrigin.getType() == PieceType.PAWN) {
+            if (pieceInDestination.getType() != PieceType.NO_PIECE) {
+                return origin.toString().substring(0, 1).toLowerCase() + "x" + destination.toString().toLowerCase();
+            } else {
+                return destination.toString().toLowerCase();
+            }
+        }
+        if (isCapturingMove()) {
+            return MoveHashMap.moveHashMap.get(pieceInOrigin.getType()).toUpperCase() + "x" + destination.toString().toLowerCase();
+        } else {
+            return MoveHashMap.moveHashMap.get(pieceInOrigin.getType()).toUpperCase() + destination.toString().toLowerCase();
+        }
+//        return color.toString();
 
     }
 
@@ -144,6 +213,12 @@ public class NormalMove implements Move {
     public Position getDestination () {
         return destination;
     }
+
+    public static void main(String[] args) {
+
+//        board.makeMove();
+
+    }
 }
 
 class MoveHashMap {
@@ -153,6 +228,7 @@ class MoveHashMap {
             Map.entry(PieceType.KNIGHT, "n"),
             Map.entry(PieceType.QUEEN, "q"),
             Map.entry(PieceType.PAWN, "p"),
-            Map.entry(PieceType.BISHOP, "b")
+            Map.entry(PieceType.BISHOP, "b"),
+            Map.entry(PieceType.NO_PIECE, "null")
     );
 }

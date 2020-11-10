@@ -45,4 +45,9 @@ public class EnPassantMove extends NormalMove {
         return newHash;
     }
 
+    @Override
+    public boolean isSelfCapture() {
+        return false;
+    }
+
 }

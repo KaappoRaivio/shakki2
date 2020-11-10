@@ -55,4 +55,10 @@ public interface Move extends Serializable {
 
     int getIncrementalHash(int oldHash, BoardHasher hasher);
 
+    String getShortAlgebraic(Board board);
+
+    public static void main(String[] args) {
+        Board board = Board.getStartingPosition();
+        System.out.println(Move.parseMove("e2e4", PieceColor.WHITE, board));
+    }
 }

@@ -6,24 +6,24 @@ import chess.move.Move;
 import chess.piece.basepiece.Piece;
 import chess.piece.basepiece.PieceColor;
 import chess.piece.basepiece.PieceType;
+import misc.Pair;
 
 import java.util.Set;
-import java.util.function.BiFunction;
 
 public class Queen extends Piece {
     private Rook rook;
     private Bishop bishop;
 
     public Queen (PieceColor color) {
-        super(PieceType.QUEEN, color, color == PieceColor.WHITE ? "♕" : "♛", 900);
+        super(PieceType.QUEEN, color, "♛", 900);
          rook = new Rook(color);
          bishop = new Bishop(color);
     }
 
     @Override
-    public Set<Move> getPossibleMoves(Board board, Position position, Move lastMove, boolean includeSelfCapture) {
-        Set<Move> moves = rook.getPossibleMoves(board, position, lastMove, includeSelfCapture);
-        moves.addAll(bishop.getPossibleMoves(board, position, lastMove, includeSelfCapture));
+    public Pair<Set<Move>, Set<Move>> getPossibleMoves(Board board, Position position, Move lastMove) {
+        Pair<Set<Move>, Set<Move>> moves = rook.getPossibleMoves(board, position, lastMove);
+        mergePairs(moves, bishop.getPossibleMoves(board, position, lastMove));
 
         return moves;
     }

@@ -31,6 +31,8 @@ public class TtyUI implements UI {
                 String response = new Scanner(System.in).nextLine();
                 if (response.toLowerCase().equals("stop")) {
                     throw new StopException();
+                }  if (response.toLowerCase().equals("undo")) {
+                    throw new UndoException();
                 }
                 return Move.parseMove(response, turn, board);
             } catch (ChessException e) { e.printStackTrace();}

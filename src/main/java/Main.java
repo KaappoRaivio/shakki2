@@ -1,5 +1,4 @@
 import chess.board.Board;
-import chess.move.Move;
 import chess.piece.basepiece.PieceColor;
 import players.Player;
 import players.treeai.TreeAI;
@@ -9,6 +8,7 @@ import runner.UI;
 import ui.TtyUI;
 
 import java.util.Collections;
+import java.util.Scanner;
 
 public class Main {
     public static void main (String[] args) {
@@ -25,10 +25,38 @@ public class Main {
 
         UI ui = new TtyUI();
 
-        CapableOfPlaying[] players = {
-                new TreeAI(PieceColor.WHITE, board, 4, 8),
-                new Player(PieceColor.BLACK, "kaappo", ui),
-        };
+        CapableOfPlaying[] players;
+        Scanner scanner = new Scanner(System.in);
+        int AIDepth = 10;
+        int allocatedTime = 25000;
+        boolean useOpeningLibrary = true;
+        while (true) {
+            System.out.print("Ai plays as: ");
+//            String line = scanner.nextLine();
+            String line = "none";
+
+            if (line.equals("white")) {
+                players = new CapableOfPlaying[]{
+                        new TreeAI(PieceColor.WHITE, board, AIDepth, 8, useOpeningLibrary, allocatedTime),
+                        new Player(PieceColor.BLACK, "chess.com", ui),
+        //                new TreeAI(PieceColor.WHITE, board, 3, 8),
+                };
+                break;
+            } else if (line.equals("black")) {
+                players = new CapableOfPlaying[]{
+                        new Player(PieceColor.WHITE, "chess.com", ui),
+                        new TreeAI(PieceColor.BLACK, board, AIDepth, 8),
+                };
+                break;
+            } else if (line.equals("none")) {
+                players = new CapableOfPlaying[]{
+                        new TreeAI(PieceColor.WHITE, board, AIDepth, 8, useOpeningLibrary, allocatedTime),
+                        new TreeAI(PieceColor.BLACK, board, AIDepth, 8, useOpeningLibrary, allocatedTime),
+                };
+                break;
+            }
+        }
+
 
         Runner runner = new Runner(board, players, ui, Collections.emptyList());
         runner.play(board.getTurn());

@@ -39,7 +39,7 @@ public class Splitter {
         return result;
     }
 
-    private static <T> T choice (Set<? extends T> collection) {
+    public static <T> T choice(Set<? extends T> collection) {
         T item = null;
         for (T t : collection) {
             item = t;

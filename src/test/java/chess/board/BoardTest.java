@@ -6,6 +6,7 @@ import misc.Pair;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -16,12 +17,22 @@ public class BoardTest {
 
     @Test
     public void testStalemate() {
-//        Board board = Board.fromFile("/home/kaappo/git/shakki2/src/main/resources/boards/test_pos1.txt");
+//        Board board = Board.fromF
+//        ile("/home/kaappo/git/shakki2/src/main/resources/boards/test_pos1.txt");
+
         Board board = Board.fromFEN("k7/2Q5/8/3K4/8/8/8/8 b - - 0 1");
         assertTrue(board.isDraw());
 
         Board board2 = Board.fromFEN("k7/P7/1K6/8/8/8/8/8 b - - 0 1");
         assertTrue(board2.isDraw());
+
+        Board board3 = Board.getStartingPosition();
+        assertFalse(board3.isDraw());
+        System.out.println(board3);
+        System.out.println(board3.getAllPossibleMoves());
+        board3.makeMove(Move.parseMove("e2e4", PieceColor.WHITE, board3));
+        System.out.println(board3.getAllPossibleMoves());
+        assertFalse(board3.isDraw());
     }
 
     @Test
@@ -154,15 +165,18 @@ public class BoardTest {
 
         );
 
+        int index = 0;
         for (var FENAndMoves : FENs) {
             Board board = Board.fromFEN(FENAndMoves.getFirst());
-            System.out.println(board + ", " + board.getAllPossibleMoves().size() + ", " + board.getAllPossibleMoves() + ", " + FENAndMoves.getSecond());
+            System.out.println(index + ": " + board + ", \n" +  board.getAllPossibleMoves() + ", \n" + FENAndMoves.getSecond() + "\n" + board.getLastMove() + "\n");
+//            System.out.println(index + ": " + board + ", \n" + board.getAllPossibleMoves().size() + ", \n" + board.getAllPossibleMoves() + ", \n" + FENAndMoves.getSecond() + "\n\n");
             assertTrue(
                     movesEqual(
                             board.getAllPossibleMoves(),
                             FENAndMoves.getSecond()
                     )
             );
+            index++;
         }
     }
 
@@ -197,7 +211,21 @@ public class BoardTest {
     }
 
     private boolean movesEqual(Set<Move> moves, String movesRepresentation) {
-        return moves.stream().map(Move::toString).collect(Collectors.toSet()).equals(readMoveSequence(movesRepresentation));
+        Set<String> collect = moves.stream().map(Move::toString).collect(Collectors.toSet());
+        Set<String> o = readMoveSequence(movesRepresentation);
+        boolean result = collect.equals(o);
+
+        if (!result) {
+            System.out.println("Problem");
+
+            Set<String> temp1 = new HashSet<>(Set.copyOf(collect));
+            Set<String> temp2 = new HashSet<>(Set.copyOf(o));
+
+            temp2.removeAll(temp1);
+
+            System.out.println(temp2);
+        }
+        return result;
     }
 
     private Set<String> readMoveSequence (String moveSequence) {

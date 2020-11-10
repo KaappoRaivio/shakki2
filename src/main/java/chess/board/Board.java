@@ -2,6 +2,7 @@ package chess.board;
 
 import chess.misc.Position;
 import chess.misc.ReadWriter;
+import chess.misc.TermColor;
 import chess.misc.exceptions.ChessException;
 import chess.move.Move;
 import chess.move.NoMove;
@@ -11,12 +12,13 @@ import chess.piece.basepiece.PieceColor;
 import chess.piece.basepiece.PieceType;
 import misc.Pair;
 import misc.Saver;
-import players.treeai.TreeAI;
-import runner.CapableOfPlaying;
 
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static chess.piece.basepiece.PieceColor.BLACK;
+import static chess.piece.basepiece.PieceColor.WHITE;
 
 public class Board implements Serializable{
     private Piece[][] board;
@@ -31,7 +33,7 @@ public class Board implements Serializable{
     private int hashCode;
 
     private Board (Piece[][] board) {
-        this(board, 0, "", PieceColor.WHITE, 0);
+        this(board, 0, "", WHITE, 0);
     }
 
     Board (Piece[][] board, int fiftyMoveReset, String lastMoveString, PieceColor turn, int moveCount) {
@@ -73,7 +75,7 @@ public class Board implements Serializable{
             for (int x = 0; x < board[y].length; x++) {
                 Piece piece = getPieceInSquare(x, y);
 
-                if (piece.getType() == PieceType.KING && piece.getColor() == PieceColor.WHITE) {
+                if (piece.getType() == PieceType.KING && piece.getColor() == WHITE) {
                     whiteKingPos = new Position(x, y);
                 } else if (piece.getType() == PieceType.KING && piece.getColor() == PieceColor.BLACK) {
                     blackKingPos = new Position(x, y);
@@ -115,8 +117,10 @@ public class Board implements Serializable{
     }
 
     public Piece getPieceInSquareRelativeTo(PieceColor color, Position position, boolean flip) {
-        int x = position.getX();
-        int y = position.getY();
+        return getPieceInSquareRelativeTo(color, position.getX(), position.getY(), flip);
+    }
+
+        public Piece getPieceInSquareRelativeTo(PieceColor color, int x, int y, boolean flip) {
         if (flip && color == PieceColor.BLACK) x = 7 - x;
 
         return getPieceInSquareRelativeTo(color, x, y);
@@ -163,7 +167,7 @@ public class Board implements Serializable{
         }
 
         if (pathCheck) {
-            result &= getPieceInSquare(move.getOrigin()).getPossibleMoves(this, move.getOrigin(), getLastMove(), includeSelfCapture).contains(move);
+            result &= getPieceInSquare(move.getOrigin()).getPossibleMoves(this, move.getOrigin(), getLastMove()).getFirst().contains(move);
         }
 
         if (result) {
@@ -177,11 +181,6 @@ public class Board implements Serializable{
         }
     }
 
-
-//    public Set<Move> getAllPossibleMoves() {
-//        return getAllPossibleMoves(getTurn());
-//    }
-
     public Set<Move> getAllPossibleMoves () {
         return getAllPossibleMoves(getTurn());
     }
@@ -191,23 +190,20 @@ public class Board implements Serializable{
     }
 
     public Set<Move> getAllPossibleMoves (PieceColor color, boolean ignoreTurn, boolean includeSelfCapture) {
-        if (stateHistory.getCurrentState().getPossibleMoves(color) != null && !includeSelfCapture) {
-            return stateHistory.getCurrentState().getPossibleMoves(color);
+        Pair<Set<Move>, Set<Move>> possibleMovesPair = stateHistory.getCurrentState().getPossibleMoves(color);
+        Set<Move> possibleMoves = includeSelfCapture ? possibleMovesPair.getSecond()
+                : possibleMovesPair.getFirst();
+        if (possibleMoves != null) {
+            return possibleMoves;
         } else {
-            var moves = calculateAllPossibleMoves(color, ignoreTurn, includeSelfCapture);
-            if (!includeSelfCapture) {
-                stateHistory.getCurrentState().setPossibleMoves(color, moves);
-            }
-            return moves;
+            var moves = calculateAllPossibleMoves(color, ignoreTurn);
+            stateHistory.getCurrentState().setPossibleMoves(color, moves);
+            return includeSelfCapture ? moves.getSecond() : moves.getFirst();
         }
     }
 
-    private Set<Move> calculateAllPossibleMoves(PieceColor color) {
-        return calculateAllPossibleMoves(color, false, false);
-    }
-
-    public Set<Move> calculateAllPossibleMoves (PieceColor color, boolean ignoreTurn, boolean includeSelfCapture) {
-        Set<Move> moves = new HashSet<>();
+    public Pair<Set<Move>, Set<Move>> calculateAllPossibleMoves (PieceColor color, boolean ignoreTurn) {
+        Pair<Set<Move>, Set<Move>> moves = new Pair<>(new HashSet<>(), new HashSet<>());
 
         for (int y = 0; y < dimX; y++) {
             for (int x = 0; x < dimY; x++) {
@@ -217,11 +213,17 @@ public class Board implements Serializable{
                     continue;
                 }
 
-                for (Move possibleMove : piece.getPossibleMoves(this, new Position(x, y), getLastMove(), includeSelfCapture)) {
-                    if (isMoveLegal(possibleMove, false, ignoreTurn, includeSelfCapture)) {
-                        moves.add(possibleMove);
+                Pair<Set<Move>, Set<Move>> possibleMoves = piece.getPossibleMoves(this, new Position(x, y), getLastMove());
+                for (Move possibleMove : possibleMoves.getFirst()) {
+                    if (isMoveLegal(possibleMove, false, ignoreTurn, false)) {
+                        moves.getFirst().add(possibleMove);
                     }
                 }
+                for (Move possibleMove : possibleMoves.getSecond()) {
+                    if (isMoveLegal(possibleMove, false, ignoreTurn, true)) {
+                        moves.getSecond().add(possibleMove);
+                    }
+                };
             }
         }
 
@@ -338,28 +340,42 @@ public class Board implements Serializable{
 
     @Override
     public String toString() {
+        String[] s1 = toString(getTurn()).split("\n");
+        String[] s2 = toString(getTurn().invert()).split("\n");
+
+        StringBuilder builder = new StringBuilder();
+
+        for (int i = 0; i < s1.length; i++) {
+            builder.append(s1[i]).append("    ").append(s2[i]).append("\n");
+        }
+
+        return builder.append(getTurn()).append(" to move\n").toString();
+    }
+
+    private String toString (PieceColor perspective) {
         String hPadding = " ";
         String vPadding = "";
 
-        String letters = getTurn() == PieceColor.WHITE ? " a b c d e f g h" : " h g f e d c b a";
+        String letters = perspective == WHITE ? " a b c d e f g h " : " h g f e d c b a ";
         StringBuilder builder = new StringBuilder(vPadding).append(hPadding).append("\n ").append(letters).append(hPadding).append("\n").append(vPadding);
+
+        PieceColor squareColor = BLACK;
         for (int y = dimY - 1; y >= 0; y--) {
+            squareColor = squareColor.invert();
             if (y < dimY - 1) {
                 builder.append("\n");
             }
 
-            int currentRow = getTurn() == PieceColor.WHITE ? y + 1 : 8 - y;
-            builder.append(currentRow).append(hPadding);
+            int currentRow = perspective == WHITE ? y + 1 : 8 - y;
+            builder.append(currentRow);
 
             for (int x = 0; x < dimX; x++) {
-                builder.append(getPieceInSquareRelativeTo(getTurn(), x, y));
+                builder.append(getSquare(getPieceInSquareRelativeTo(perspective, x, y), squareColor, x == 0, x == 7));
+                squareColor = squareColor.invert();
 
-                if (x + 1 < dimX) {
-                    builder.append(" ");
-                }
             }
 
-            builder.append(hPadding).append(currentRow);
+            builder.append(currentRow);
         }
 
         return builder.append("\n").append(vPadding).append(hPadding).append(letters).append(hPadding).toString();
@@ -423,6 +439,8 @@ public class Board implements Serializable{
     public String getMoveHistoryPretty () {
         var states = stateHistory.getPreviousStates().stream().filter(state -> !NoMove.NO_MOVE.equals(state.getLastMove())).collect(Collectors.toList());
         Collections.reverse(states);
+        Board originalPosition = deepCopy();
+        originalPosition.unMakeMove(states.size());
 
         StringBuilder builder = new StringBuilder();
 
@@ -436,10 +454,58 @@ public class Board implements Serializable{
                 i += 1;
             }
 
-            builder.append(currentState.getLastMove()).append(" ");
+            builder.append(currentState.getLastMove().getShortAlgebraic(originalPosition)).append(" ");
+            originalPosition.makeMove(currentState.getLastMove());
         }
 
         return builder.toString();
+    }
+
+    private static String getSquare (Piece piece, PieceColor squareColor, boolean firstInRow, boolean lastInRow) {
+        String res;
+        String color;
+        TermColor lightSquareColor = TermColor.ANSI_LIGHT_GRAY;
+        TermColor darkSquareColor = TermColor.ANSI_DARK_GRAY;
+        String pieceColor = piece.getColor() == WHITE ? TermColor.ANSI_WHITE.getEscape() : TermColor.ANSI_BLACK.getEscape();
+        String firstInsert = "";
+        String lastInsert = "";
+        if (firstInRow) {
+            if (squareColor == WHITE) {
+                res = "▌";
+                color = lightSquareColor.getEscape(true) + pieceColor;
+                firstInsert = TermColor.ANSI_WHITE.getEscape();
+                firstInsert += lightSquareColor.getEscape(true);
+            } else {
+                res = "▐";
+                color = darkSquareColor.getEscape(true) + pieceColor;
+                firstInsert = darkSquareColor.getEscape();
+                firstInsert += TermColor.ANSI_WHITE.getEscape(true);
+            }
+        } else if (lastInRow) {
+            if (squareColor == WHITE) {
+                res = "▌";
+                color = lightSquareColor.getEscape(true) + pieceColor;
+                lastInsert = lightSquareColor.getEscape(true) + TermColor.ANSI_WHITE.getEscape();
+                lastInsert += "▐";
+            } else {
+                res = "▐";
+                color = darkSquareColor.getEscape(true) + pieceColor;
+                lastInsert = darkSquareColor.getEscape(true) + TermColor.ANSI_WHITE.getEscape();
+                lastInsert += "▐";
+            }
+        } else {
+            if (squareColor == WHITE) {
+                res = "▌";
+                color = lightSquareColor.getEscape(true) + pieceColor;
+            } else {
+                res = "▐";
+                color = darkSquareColor.getEscape(true) + pieceColor;
+            }
+        }
+
+
+
+        return lightSquareColor.getEscape(true) + darkSquareColor.getEscape() + firstInsert + res + color + piece + lastInsert + TermColor.ANSI_RESET.getEscape();
     }
 
     public static void main(String[] args) {
@@ -448,9 +514,29 @@ public class Board implements Serializable{
 
 //        System.out.println(board.getAllPossibleMoves(PieceColor.WHITE));
         BoardHelpers.executeSequenceOfMoves(board,
-                List.of("g1f3", "d7d5", "e2e3", "f7f6", "d2d4", "e7e5", "b1d2", "d8e7", "d4e5", "f6e5", "f1b5", "c7c6", "b5e2", "g8f6", "f3g5", "e5e4", "e2h5", "g7g6", "h5e2", "f8h6", "f2f4", "b8d7", "g5h3", "d7c5"));
-        System.out.println(board);
-        System.out.println(board.getAllPossibleMoves());
+                List.of("g1f3", "d7d5", "e2e3", "f7f6", "d2d4", "e7e5", "b1d2", "d8e7", "d4e5", "f6e5", "f1b5", "c7c6", "b5e2", "g8f6", "f3g5", "e5e4", "e2h5", "g7g6", "h5e2", "f8h6", "f2f4", "b8d7", "g5h3"));
+        System.out.println(board.toString());
+        System.out.println(board.getStateHistory().getCurrentState().getMovesSinceFiftyMoveReset());
+
+//
+//        String s1 = "▐█";
+//        String s2 = "▌ ";
+//
+//        for (int i = 0; i < 10; i++) {
+////            System.out.print(s1);
+////            System.out.print(s2);
+//            System.out.print(getSquare(new King(BLACK), WHITE));
+//            System.out.print(getSquare(new King(WHITE), BLACK));
+//        }
+//        System.out.println();
+//        for (int i = 0; i < 10; i++) {
+////            System.out.print(s1);
+////            System.out.print(s2);
+//            System.out.print(getSquare(new King(WHITE), BLACK));
+//            System.out.print(getSquare(new King(BLACK), WHITE));
+//        }
+
+
 
 //        board.makeMove(Move.parseMove(""));
 //        CapableOfPlaying ai = new TreeAI(PieceColor.WHITE, board, 4, 8);

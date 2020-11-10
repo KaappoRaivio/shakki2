@@ -5,6 +5,7 @@ import chess.misc.Position;
 import chess.misc.exceptions.ChessException;
 import chess.move.Move;
 import chess.move.NormalMove;
+import misc.Pair;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -28,7 +29,7 @@ abstract public class Piece implements Serializable {
     }
 
 
-    abstract public Set<Move> getPossibleMoves(Board board, Position position, Move lastMove, boolean includeSelfCapture);
+    abstract public Pair<Set<Move>, Set<Move>> getPossibleMoves(Board board, Position position, Move lastMove);
     protected abstract double[][] getPieceSquareTable ();
 
     @Override
@@ -52,21 +53,11 @@ abstract public class Piece implements Serializable {
         return type.getOrdinal() + color.getOrdinal();
     }
 
-//    public int getIndex (Board board, Position position, Move lastMove) {
-//        return getColor() == PieceColor.WHITE ? getType().ordinal(): getType().ordinal() + 1;
-//    }
+    public final double getValue (Position position) {
+        return getValue(position.getX(), position.getY());
+    }
 
-    public double getValue (Position position) {
-//        switch (color) {
-//            case NO_COLOR:
-//            case WHITE:
-//                return value + value * (getPieceSquareTable()[position.getY()][position.getX()]);
-//            case BLACK:
-//                return value + value * (getPieceSquareTable()[7 - position.getY()][position.getX()]);
-//            default:
-//                throw new ChessException("");
-
-//        }
+    public double getValue (int x, int y) {
         return value;
     }
 
@@ -140,12 +131,23 @@ abstract public class Piece implements Serializable {
         return moves;
     }
 
-    protected Set<Move> getStraightPathMoves (Board board, Position position, int deltaX, int deltaY, boolean includeSelfCapture) {
-        Set<Move> moves = new HashSet<>();
+    protected void mergePairs(Pair<Set<Move>, Set<Move>> moves, Pair<Set<Move>, Set<Move>> straightPathMoves) {
+        moves.getFirst().addAll(straightPathMoves.getFirst());
+        moves.getSecond().addAll(straightPathMoves.getSecond());
+    }
 
-        for (Position destination : getStraightPath(board, position, deltaX, deltaY, includeSelfCapture)) {
+    protected Pair<Set<Move>, Set<Move>> getStraightPathMoves (Board board, Position position, int deltaX, int deltaY) {
+        Pair<Set<Move>, Set<Move>> moves = new Pair<>(new HashSet<>(), new HashSet<>());
+
+        for (Position destination : getStraightPath(board, position, deltaX, deltaY, true)) {
 //            moves.add(Move.parseMove(position.toString() + destination.toString(), board.getPieceInSquare(position).getColor(), board));
-            moves.add(new NormalMove(position, destination, board));
+
+
+            NormalMove move = new NormalMove(position, destination, board);
+            moves.getSecond().add(move);
+            if (!move.isSelfCapture()) {
+                moves.getFirst().add(move);
+            }
         }
 
         return  moves;

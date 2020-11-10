@@ -35,10 +35,12 @@ public class Pair<K, V> implements Serializable {
     }
 
     public K getFirst () {
-        return Objects.requireNonNull(first);
+//        return Objects.requireNonNull(first);
+        return first;
     }
 
     public V getSecond () {
-        return Objects.requireNonNull(second);
+//        return Objects.requireNonNull(second);
+        return second;
     }
 }

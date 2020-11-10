@@ -12,8 +12,8 @@ import java.util.stream.Collectors;
 import static org.junit.Assert.*;
 
 public class TreeAITest {
-    @Test
-    public void testParallerBoards () {
+//    @Test
+    public void testParallelBoards() {
         long[] counts = new long[8];
 
         final int mastercount = 10;
@@ -25,7 +25,7 @@ public class TreeAITest {
                         Board board = Board.getStartingPosition();
                         for (int a = 0; a < 10000; a++) {
 //                            Math.sin(a);
-                            board.calculateAllPossibleMoves(PieceColor.WHITE, false ,false);
+                            board.calculateAllPossibleMoves(PieceColor.WHITE, false);
                             //                        board.getAllPossibleMoves();
                             //                        for (Move move : board.getAllPossibleMoves()) {
                             ////                            board.executeMoveNoChecks(move);

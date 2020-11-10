@@ -7,8 +7,8 @@ import chess.move.NormalMove;
 import chess.piece.basepiece.Piece;
 import chess.piece.basepiece.PieceColor;
 import chess.piece.basepiece.PieceType;
+import misc.Pair;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -26,7 +26,7 @@ public class King extends Piece {
     );
 
     public King (PieceColor color) {
-        this(color, color == PieceColor.WHITE ? "♔" : "♚", 400);
+        this(color, "♚", 400);
     }
 
     King (PieceColor color, String symbol, int value) {
@@ -34,14 +34,18 @@ public class King extends Piece {
     }
 
     @Override
-    public Set<Move> getPossibleMoves(Board board, Position position, Move lastMove, boolean includeSelfCapture) {
-        Set<Move> moves = new HashSet<>();
+    public Pair<Set<Move>, Set<Move>> getPossibleMoves(Board board, Position position, Move lastMove) {
+        Pair<Set<Move>, Set<Move>> moves = new Pair<>(new HashSet<>(), new HashSet<>());
 
         for (Position offset : offsets) {
             Position destination = position.offset(offset, false);
 
-            if (destination.verify() && (board.getPieceInSquare(destination).getColor() != color || includeSelfCapture)) {
-                moves.add(new NormalMove(position, destination, board));
+            if (destination.verify()) {
+                NormalMove move = new NormalMove(position, destination, board);
+                moves.getSecond().add(move);
+                if (!move.isSelfCapture()) {
+                    moves.getFirst().add(move);
+                }
             }
         }
 

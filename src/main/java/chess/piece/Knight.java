@@ -7,6 +7,7 @@ import chess.move.NormalMove;
 import chess.piece.basepiece.Piece;
 import chess.piece.basepiece.PieceColor;
 import chess.piece.basepiece.PieceType;
+import misc.Pair;
 
 import java.util.*;
 
@@ -15,17 +16,21 @@ public class Knight extends Piece {
 
 
     public Knight (PieceColor color) {
-        super(PieceType.KNIGHT, color, color == PieceColor.WHITE ? "♘" : "♞", 320);
+        super(PieceType.KNIGHT, color, "♞", 320);
     }
 
     @Override
-    public Set<Move> getPossibleMoves(Board board, Position position, Move lastMove, boolean includeSelfCapture) {
-        Set<Move> moves = new HashSet<>();
+    public Pair<Set<Move>, Set<Move>> getPossibleMoves(Board board, Position position, Move lastMove) {
+        Pair<Set<Move>, Set<Move>> moves = new Pair<>(new HashSet<>(), new HashSet<>());
 
         for (Position offset : offsets) {
             Position destination = position.offset(offset, false);
-            if (destination.verify() && (board.getPieceInSquare(destination).getColor() != color || includeSelfCapture)) {
-                moves.add(new NormalMove(position, destination, board));
+            if (destination.verify()) {
+                NormalMove move = new NormalMove(position, destination, board);
+                moves.getSecond().add(move);
+                if (!move.isSelfCapture()) {
+                    moves.getFirst().add(move);
+                };
             }
         }
 

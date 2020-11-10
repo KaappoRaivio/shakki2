@@ -7,42 +7,45 @@ import chess.move.*;
 import chess.piece.basepiece.Piece;
 import chess.piece.basepiece.PieceColor;
 import chess.piece.basepiece.PieceType;
+import misc.Pair;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class CastlingKing extends King {
 
     public CastlingKing (PieceColor color) {
-        super(color, color == PieceColor.WHITE ? "♔̅" : "♚̅", 500);
+        super(color, "♚̅", 500);
     }
 
 
     @Override
-    public Set<Move> getPossibleMoves(Board board, Position position, Move lastMove, boolean includeSelfCapture) {
-        Set<Move> possiblePositions = super.getPossibleMoves(board, position, lastMove, includeSelfCapture)
-                .stream()
-                .map(move -> {
+    public Pair<Set<Move>, Set<Move>> getPossibleMoves(Board board, Position position, Move lastMove) {
+        Pair<Set<Move>, Set<Move>> possibleMoves = super.getPossibleMoves(board, position, lastMove);
+        Pair<Set<Move>, Set<Move>> result = new Pair<>(new HashSet<>(), new HashSet<>());
+        mergePairs(result, handleKingSideCastling(board, position));
+        mergePairs(result, handleQueenSideCastling(board, position));
+        mergePairs(result, new Pair<>(possibleMoves.getFirst().stream().map(move -> {
+            NormalMove normalMove = ((NormalMove) move);
+            return new CastlingKingMove(normalMove.getOrigin(), normalMove.getDestination(), board); }).collect(Collectors.toSet()),
+                possibleMoves.getSecond().stream().map(move -> {
                     NormalMove normalMove = ((NormalMove) move);
-                    return new CastlingKingMove(normalMove.getOrigin(), normalMove.getDestination(), board);
-                }).collect(Collectors.toSet());
+                    return new CastlingKingMove(normalMove.getOrigin(), normalMove.getDestination(), board); }).collect(Collectors.toSet()))
+        );
 
-        if (position.getX() == 4) {
-            possiblePositions.addAll(handleKingSideCastling(board, position));
-            possiblePositions.addAll(handleQueenSideCastling(board, position));
-        }
-        return possiblePositions;
+        return result;
     }
 
-    private Set<Move> handleKingSideCastling (Board board, Position position) {
+    private Pair<Set<Move>, Set<Move>> handleKingSideCastling (Board board, Position position) {
 
         try {
 
             Piece supposedRook = board.getPieceInSquare(position.offsetX(3));
 
             if (supposedRook.getType() != PieceType.ROOK || !(supposedRook instanceof CastlingRook)) {
-                return Collections.emptySet();
+                return new Pair<>(Collections.emptySet(), Collections.emptySet());
             }
 
             if (board.isSquareUnderThreat(position)
@@ -50,24 +53,24 @@ public class CastlingKing extends King {
                     || board.isSquareUnderThreat(position.offsetX(2), color)
                     || !board.isSquareEmpty(position.offsetX(1))
                     || !board.isSquareEmpty(position.offsetX(2))) {
-                return Collections.emptySet();
+                return new Pair<>(Collections.emptySet(), Collections.emptySet());
             }
 
-            return Set.of(new CastlingMove(CastlingType.KING_SIDE, color, board));
+            return new Pair<>(Set.of(new CastlingMove(CastlingType.KING_SIDE, color, board)), Set.of());
         } catch (ChessException e) {
-            return Collections.emptySet();
+            return new Pair<>(Collections.emptySet(), Collections.emptySet());
         }
 
 
     }
 
-    private Set<Move> handleQueenSideCastling (Board board, Position position) {
+    private Pair<Set<Move>, Set<Move>> handleQueenSideCastling (Board board, Position position) {
 
         try {
             Piece supposedRook = board.getPieceInSquare(position.offsetX(-4));
 
             if (supposedRook.getType() != PieceType.ROOK || !(supposedRook instanceof CastlingRook)) {
-                return Collections.emptySet();
+                return new Pair<>(Collections.emptySet(), Collections.emptySet());
             }
 
             if (board.isSquareUnderThreat(position)
@@ -76,12 +79,12 @@ public class CastlingKing extends King {
                     || !board.isSquareEmpty(position.offsetX(-1))
                     || !board.isSquareEmpty(position.offsetX(-2))
                     || !board.isSquareEmpty(position.offsetX(-3))) { // Rook's path can be threatened, so no threat check for position.offsetX(-3)
-                return Collections.emptySet();
+                return new Pair<>(Collections.emptySet(), Collections.emptySet());
             }
 
-            return Set.of(new CastlingMove(CastlingType.QUEEN_SIDE, color, board));
+            return new Pair<>(Set.of(new CastlingMove(CastlingType.QUEEN_SIDE, color, board)), Collections.emptySet());
         } catch (ChessException e) {
-            return Collections.emptySet();
+            return new Pair<>(Collections.emptySet(), Collections.emptySet());
         }
     }
 

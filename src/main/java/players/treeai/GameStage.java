@@ -1,6 +1,7 @@
 package players.treeai;
 
 import chess.board.Board;
+import chess.misc.Position;
 import chess.piece.basepiece.Piece;
 
 class GameStage {
@@ -14,8 +15,8 @@ class GameStage {
         this.endgameWeight = endgameWeight;
     }
 
-    static GameStage getGameStage(Board board) {
-        double materialSum = getSumOfMaterial(board) / 200;
+    static GameStage getGameStage(Board board, double materialSum) {
+        materialSum /= 200;
 
         double openingWeight = calculateOpeningWeight(materialSum);
         double middlegameWeight = calculateMiddlegameWeight(materialSum);
@@ -30,16 +31,6 @@ class GameStage {
         return new GameStage(openingWeight, middlegameWeight, endgameWeight);
     }
 
-    private static double getSumOfMaterial(Board board) {
-        double totalValue = 0;
-        for (int y = 0; y < 8; y++) {
-            for (int x = 0; x < 8; x++) {
-                Piece piece = board.getPieceInSquare(x, y);
-                totalValue += piece.getValue(null);
-            }
-        }
-        return totalValue;
-    }
 
     private static double calculateOpeningWeight(double materialSum) {
 //        return 0.000000469 * Math.exp(0.364 * materialSum);
