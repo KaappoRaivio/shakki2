@@ -152,7 +152,7 @@ public class NormalMove implements Move {
     private Set<Position> getBrotherPiecePositions(Board board) {
         Set<Move> possibleMoves = board
                 .getPieceInSquare(destination)
-                .getPossibleMoves(board, destination, board.getLastMove()).getSecond();
+                .getPossibleMoves(board, destination, board.getLastMove());
         return possibleMoves
                 .stream()
                 .filter(move -> move.getColor() == color

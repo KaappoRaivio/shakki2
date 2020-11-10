@@ -8,6 +8,7 @@ import chess.piece.basepiece.PieceColor;
 import chess.piece.basepiece.PieceType;
 import misc.Pair;
 
+import java.util.List;
 import java.util.Set;
 
 public class Queen extends Piece {
@@ -21,9 +22,9 @@ public class Queen extends Piece {
     }
 
     @Override
-    public Pair<Set<Move>, Set<Move>> getPossibleMoves(Board board, Position position, Move lastMove) {
-        Pair<Set<Move>, Set<Move>> moves = rook.getPossibleMoves(board, position, lastMove);
-        mergePairs(moves, bishop.getPossibleMoves(board, position, lastMove));
+    public Set<Move> getPossibleMoves(Board board, Position position, Move lastMove) {
+        Set<Move> moves = rook.getPossibleMoves(board, position, lastMove);
+        moves.addAll(bishop.getPossibleMoves(board, position, lastMove));
 
         return moves;
     }

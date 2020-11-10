@@ -59,7 +59,7 @@ public class TreeAI implements CapableOfPlaying {
         depthIteration: for (int depthIteration = 2; depthIteration <= depth; depthIteration++) {
 //        depthIteration: for (int depthIteration = depth; depthIteration <= depth; depthIteration++) {
             threads = new ArrayList<>();
-            List<Set<Move>> split = Splitter.splitListInto(board.getAllPossibleMoves(color), amountOfProcessors);
+            List<List<Move>> split = Splitter.splitListInto(board.getAllPossibleMoves(color), amountOfProcessors);
 
             TreeAIWorker.resetAlphaAndBeta();
             for (int i = 0; i < amountOfProcessors; i++) {

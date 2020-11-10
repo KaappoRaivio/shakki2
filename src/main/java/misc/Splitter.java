@@ -6,9 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 public class Splitter {
-    public static <T> List<Set<T>> splitListInto(Set<T> moves, int amountOfChunks) {
-        moves = new HashSet<>(Set.copyOf(moves));
-
+    public static <T> List<List<T>> splitListInto(List<T> moves, int amountOfChunks) {
         int surfaceArea = moves.size();
 
 
@@ -23,29 +21,24 @@ public class Splitter {
             lengths[i] += 1;
         }
 
-        List<Set<T>> result = new ArrayList<>();
+        List<List<T>> result = new ArrayList<>();
 
 
-
-        for (int length : lengths) {
-            Set<T> temp = new HashSet<>();
-            for (int i = 0; i < length; i++) {
-                temp.add(choice(moves));
-            }
-
-            result.add(temp);
+        for (int chunk = 0; chunk < amountOfChunks; chunk++) {
+            result.add(moves.subList(lengths[chunk] * chunk, lengths[chunk] * chunk + lengths[chunk]));
         }
+
 
         return result;
     }
 
-    public static <T> T choice(Set<? extends T> collection) {
-        T item = null;
-        for (T t : collection) {
-            item = t;
-            break;
-        }
-        collection.remove(item);
-        return item;
-    }
+//    public static <T> T choice(Set<? extends T> collection) {
+//        T item = null;
+//        for (T t : collection) {
+//            item = t;
+//            break;
+//        }
+//        collection.remove(item);
+//        return item;
+//    }
 }

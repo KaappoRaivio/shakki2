@@ -9,6 +9,7 @@ import chess.piece.basepiece.PieceColor;
 import chess.piece.basepiece.PieceType;
 import misc.Pair;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -34,22 +35,8 @@ public class King extends Piece {
     }
 
     @Override
-    public Pair<Set<Move>, Set<Move>> getPossibleMoves(Board board, Position position, Move lastMove) {
-        Pair<Set<Move>, Set<Move>> moves = new Pair<>(new HashSet<>(), new HashSet<>());
-
-        for (Position offset : offsets) {
-            Position destination = position.offset(offset, false);
-
-            if (destination.verify()) {
-                NormalMove move = new NormalMove(position, destination, board);
-//                moves.getSecond().add(move);
-//                if (!move.isSelfCapture()) {
-                    moves.getFirst().add(move);
-//                }
-            }
-        }
-
-        return moves;
+    public Set<Move> getPossibleMoves(Board board, Position position, Move lastMove) {
+        return getMovesFromOffsets(offsets, board, position);
     }
 
     @Override

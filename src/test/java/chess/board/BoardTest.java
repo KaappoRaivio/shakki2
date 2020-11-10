@@ -162,7 +162,6 @@ public class BoardTest {
                 new Pair<>("R6R/3Q4/1Q4Q1/4Q3/2Q4Q/Q4Q2/pp1Q4/kBNN1KB1 w - - 0 1", "Bc2, Bd3, Be4, Bf5, Bxa2, Nd3, Ne2, Nxa2, Nb3, Ne3, Nf2, Nxb2, Nc3, Kg2, Ke1, Ke2, Kf2, Bh2, Bf2, Be3, Bd4, Bc5, Qd3, Qd4, Qd5, Qd6, Qe2, Qf2, Qg2, Qh2, Qc2, Qxb2, Qe3, Qf4, Qg5, Qh6, Qc3, Qb4, Qa5, Qe1, Qa4, Qa5, Qa6, Qa7, Qxa2, Qb3, Qc3, Qd3, Qe3, Qb4, Qc5, Qd6, Qe7, Qf8, Qxb2, Qf4, Qf5, Qf6, Qf7, Qf8, Qf2, Qg3, Qh3, Qe3, Qd3, Qc3, Qb3, Qg4, Qh5, Qe4, Qd5, Qc6, Qb7, Qe2, Qg2, Qh1, Qc5, Qc6, Qc7, Qc8, Qc3, Qc2, Qd4, Qe4, Qf4, Qg4, Qb4, Qa4, Qd5, Qe6, Qf7, Qg8, Qb5, Qa6, Qb3, Qxa2, Qd3, Qe2, Qh5, Qh6, Qh7, Qh3, Qh2, Qh1, Qg4, Qf4, Qe4, Qd4, Qg5, Qf6, Qe7, Qd8, Qg3, Qf2, Qe1, Qe6, Qe7, Qe8, Qe4, Qe3, Qe2, Qe1, Qf5, Qg5, Qh5, Qd5, Qc5, Qb5, Qa5, Qf6, Qg7, Qd6, Qc7, Qb8, Qd4, Qc3, Qxb2, Qf4, Qg3, Qh2, Qb7, Qb8, Qb5, Qb4, Qb3, Qxb2, Qc6, Qd6, Qe6, Qf6, Qa6, Qc7, Qd8, Qa7, Qa5, Qc5, Qd4, Qe3, Qf2, Qg7, Qg8, Qg5, Qg4, Qg3, Qg2, Qh6, Qf6, Qe6, Qd6, Qc6, Qh7, Qf7, Qe8, Qf5, Qe4, Qd3, Qc2, Qh5, Qd8, Qd6, Qd5, Qd4, Qd3, Qe7, Qf7, Qg7, Qh7, Qc7, Qb7, Qa7, Qe8, Qc8, Qc6, Qb5, Qa4, Qe6, Qf5, Qg4, Qh3, Ra7, Ra6, Ra5, Ra4, Rb8, Rc8, Rd8, Re8, Rf8, Rg8, Rh7, Rh6, Rh5, Rg8, Rf8, Re8, Rd8, Rc8, Rb8"),
                 new Pair<>("8/8/8/8/k2Pp2Q/8/8/3K4 b - d3 0 1", "Kb5, Kb4, Kb3, Ka3, Ka5, e3"),
                 new Pair<>("8/8/8/7Q/k2Pp3/8/8/3K4 b - d3 0 1", "Kb4, Kb3, Ka3, e3, d3")
-
         );
 
         int index = 0;
@@ -210,7 +209,7 @@ public class BoardTest {
                         && boardBlack.isMoveLegal(Move.parseMove("O-O-O", PieceColor.BLACK, boardBlack)));
     }
 
-    private boolean movesEqual(Set<Move> moves, String movesRepresentation) {
+    private boolean movesEqual(List<Move> moves, String movesRepresentation) {
         Set<String> collect = moves.stream().map(Move::toString).collect(Collectors.toSet());
         Set<String> o = readMoveSequence(movesRepresentation);
         boolean result = collect.equals(o);

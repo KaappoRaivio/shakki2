@@ -5,6 +5,7 @@ import chess.move.Move;
 import com.google.common.util.concurrent.AtomicDouble;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -24,7 +25,7 @@ public class TreeAIWorker extends Thread {
     }
 
 
-    private Set<Move> moves;
+    private List<Move> moves;
     private Board board;
     private int id;
     private int depth;
@@ -46,7 +47,7 @@ public class TreeAIWorker extends Thread {
     private boolean ready = false;
 
 
-    public TreeAIWorker(Set<Move> moves, Board board, int id, int depth, BoardEvaluator evaluator, ConcurrentHashMap<Integer, TranspositionTableEntry> transpositionTable) {
+    public TreeAIWorker(List<Move> moves, Board board, int id, int depth, BoardEvaluator evaluator, ConcurrentHashMap<Integer, TranspositionTableEntry> transpositionTable) {
         super();
 
         this.moves = moves;

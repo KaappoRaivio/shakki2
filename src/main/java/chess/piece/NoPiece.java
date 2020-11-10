@@ -9,8 +9,8 @@ import chess.piece.basepiece.PieceType;
 import misc.Pair;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class NoPiece extends Piece {
     public NoPiece () {
@@ -18,8 +18,8 @@ public class NoPiece extends Piece {
     }
 
     @Override
-    public Pair<Set<Move>, Set<Move>> getPossibleMoves(Board board, Position position, Move lastMove) {
-        return new Pair<>(Collections.emptySet(), Collections.emptySet());
+    public Set<Move> getPossibleMoves(Board board, Position position, Move lastMove) {
+        return Collections.emptySet();
     }
 
     @Override

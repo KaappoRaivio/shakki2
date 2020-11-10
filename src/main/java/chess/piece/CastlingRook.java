@@ -8,7 +8,9 @@ import chess.move.CastlingRookMove;
 import chess.piece.basepiece.PieceColor;
 import misc.Pair;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -18,9 +20,8 @@ public class CastlingRook extends Rook {
     }
 
     @Override
-    public Pair<Set<Move>, Set<Move>> getPossibleMoves(Board board, Position position, Move lastMove) {
-        Pair<Set<Move>, Set<Move>> possibleMoves = super.getPossibleMoves(board, position, lastMove);
-        Pair<Set<Move>, Set<Move>> result = new Pair<>(new HashSet<>(), new HashSet<>());
+    public Set<Move> getPossibleMoves(Board board, Position position, Move lastMove) {
+        Set<Move> possibleMoves = super.getPossibleMoves(board, position, lastMove);
 //        mergePairs(result, new Pair<>(possibleMoves.getFirst().stream().map(move -> {
 //                    NormalMove normalMove = ((NormalMove) move);
 //                    return new CastlingRookMove(normalMove.getOrigin(), normalMove.getDestination(), board); }).collect(Collectors.toSet()),
@@ -28,9 +29,9 @@ public class CastlingRook extends Rook {
 //                    NormalMove normalMove = ((NormalMove) move);
 //                    return new CastlingRookMove(normalMove.getOrigin(), normalMove.getDestination(), board); }).collect(Collectors.toSet()))
 //        );
-        return new Pair<>(possibleMoves.getFirst().stream().map(move -> {
+        return possibleMoves.stream().map(move -> {
             NormalMove normalMove = ((NormalMove) move);
-            return new CastlingRookMove(normalMove.getOrigin(), normalMove.getDestination(), board); }).collect(Collectors.toSet()), new HashSet<>());
+            return new CastlingRookMove(normalMove.getOrigin(), normalMove.getDestination(), board); }).collect(Collectors.toSet());
 //        return result;
     }
 }

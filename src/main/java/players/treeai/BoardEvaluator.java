@@ -11,8 +11,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import static misc.Splitter.choice;
-
 public class BoardEvaluator {
     private int depth;
     private PieceColor color;

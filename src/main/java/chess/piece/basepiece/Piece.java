@@ -8,7 +8,9 @@ import chess.move.NormalMove;
 import misc.Pair;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 abstract public class Piece implements Serializable {
@@ -29,7 +31,21 @@ abstract public class Piece implements Serializable {
     }
 
 
-    abstract public Pair<Set<Move>, Set<Move>> getPossibleMoves(Board board, Position position, Move lastMove);
+    abstract public Set<Move> getPossibleMoves(Board board, Position position, Move lastMove);
+
+    protected Set<Move> getMovesFromOffsets(List<Position> offsets, Board board, Position position) {
+        Set<Move> moves = new HashSet<>();
+
+        for (Position offset : offsets) {
+            Position destination = position.offset(offset, false);
+            if (destination.verify() && board.getPieceInSquare(destination).getColor() != color) {
+                NormalMove move = new NormalMove(position, destination, board);
+                moves.add(move);
+            }
+        }
+        return moves;
+    }
+
     protected abstract double[][] getPieceSquareTable ();
 
     @Override
@@ -132,13 +148,8 @@ abstract public class Piece implements Serializable {
         return moves;
     }
 
-    protected void mergePairs(Pair<Set<Move>, Set<Move>> moves, Pair<Set<Move>, Set<Move>> straightPathMoves) {
-        moves.getFirst().addAll(straightPathMoves.getFirst());
-        moves.getSecond().addAll(straightPathMoves.getSecond());
-    }
-
-    protected Pair<Set<Move>, Set<Move>> getStraightPathMoves (Board board, Position position, int deltaX, int deltaY) {
-        Pair<Set<Move>, Set<Move>> moves = new Pair<>(new HashSet<>(), new HashSet<>());
+    protected List<Move> getStraightPathMoves (Board board, Position position, int deltaX, int deltaY) {
+        List<Move> moves = new ArrayList<>();
 
         for (Position destination : getStraightPath(board, position, deltaX, deltaY, false)) {
 //            moves.add(Move.parseMove(position.toString() + destination.toString(), board.getPieceInSquare(position).getColor(), board));
@@ -147,7 +158,7 @@ abstract public class Piece implements Serializable {
             NormalMove move = new NormalMove(position, destination, board);
 //            moves.getSecond().add(move);
 //            if (!move.isSelfCapture()) {
-                moves.getFirst().add(move);
+                moves.add(move);
 //            }
         }
 

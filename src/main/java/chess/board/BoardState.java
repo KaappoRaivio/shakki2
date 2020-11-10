@@ -8,6 +8,7 @@ import misc.Pair;
 
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class BoardState implements Serializable {
@@ -25,8 +26,8 @@ public class BoardState implements Serializable {
     private Boolean isCheckmateForWhite;
     private Boolean isCheckmateForBlack;
 
-    private Pair<Set<Move>, Set<Move>> possibleMovesWhite;
-    private Pair<Set<Move>, Set<Move>> possibleMovesBlack;
+    private List<Move> possibleMovesWhite;
+    private List<Move> possibleMovesBlack;
 
 
     private int moveCount;
@@ -38,8 +39,8 @@ public class BoardState implements Serializable {
         this.lastMove = lastMove;
         this.turn = turn;
         this.moveCount = moveCount;
-        possibleMovesWhite = new Pair<>(null, null);
-        possibleMovesBlack = new Pair<>(null, null);
+//        possibleMovesWhite = null;
+//        possibleMovesBlack = null;
     }
 
 //    BoardState(Position whiteKingPosition, Position blackKingPosition, int movesSinceFiftyMoveReset, Move lastMove, PieceColor turn, int moveCount) {
@@ -61,8 +62,8 @@ public class BoardState implements Serializable {
         this.moveCount = other.moveCount;
         this.lastMove = other.lastMove;
         this.turn = other.turn;
-        possibleMovesWhite = new Pair<>(null, null);
-        possibleMovesBlack = new Pair<>(null, null);
+//        possibleMovesWhite = new Pair<>(null, null);
+//        possibleMovesBlack = new Pair<>(null, null);
 //        this.isCheckForWhite = other.isCheckForWhite;
 //        this.isCheckForBlack = other.isCheckForBlack;
 //        this.isCheck = other.isCheck;
@@ -176,7 +177,7 @@ public class BoardState implements Serializable {
                 '}';
     }
 
-    public Pair<Set<Move>, Set<Move>> getPossibleMoves (PieceColor color) {
+    public List<Move> getPossibleMoves (PieceColor color) {
         switch (color) {
             case BLACK:
                 return possibleMovesBlack;
@@ -187,7 +188,7 @@ public class BoardState implements Serializable {
         }
     }
 
-    public void setPossibleMoves (PieceColor color, Pair<Set<Move>, Set<Move>> moves) {
+    public void setPossibleMoves (PieceColor color, List<Move> moves) {
         switch (color) {
             case BLACK:
                 possibleMovesBlack = moves;
