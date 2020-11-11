@@ -34,7 +34,7 @@ public class Main {
 
         CapableOfPlaying[] players;
         Scanner scanner = new Scanner(System.in);
-        int AIDepth = 4;
+        int AIDepth = 3;
         int allocatedTime = 30000;
         boolean useOpeningLibrary = false;
         label:

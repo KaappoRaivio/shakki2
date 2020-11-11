@@ -78,7 +78,7 @@ public class Runner {
                 }
             }
 
-//            System.out.println(board.getMoveHistoryPretty());
+            System.out.println(board.getMoveHistoryPretty());
 
             turn = turn.invert();
             moveCount += 1;
@@ -89,7 +89,6 @@ public class Runner {
 
 
             for (CapableOfPlaying player : players) {
-                System.out.println(board);
                 player.updateValues(board.deepCopy(), turn, moveCount);
             }
             ui.updateValues(board.deepCopy(), turn, moveCount);

@@ -447,7 +447,7 @@ public class Board implements Serializable{
 
         StringBuilder builder = new StringBuilder();
 
-        if (states.get(0).getLastMove().getColor() == PieceColor.BLACK) {
+        if (states.size() > 0 && states.get(0).getLastMove().getColor() == PieceColor.BLACK) {
             states.add(0, new BoardState(null, null, 0, NoMove.NO_MOVE, WHITE, states.get(0).getMoveCount() - 1));
             states.forEach(state -> state.setMoveCount(state.getMoveCount() + 1));
         }

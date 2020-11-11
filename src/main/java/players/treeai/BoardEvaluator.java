@@ -23,7 +23,9 @@ public class BoardEvaluator {
     double evaluateBoard(Board board, int currentDepth) {
         PieceColor perspective = board.getTurn().invert();
 //        System.out.println(perspective);
-        if (board.isCheckmate(perspective)) {
+        if (board.isDraw()) {
+            return 0;
+        } else if (board.isCheckmate(perspective)) {
 //            System.out.println("Checkmate for " + (perspective == color ? "self " : "opponent ") + board + ", " + currentDepth);
             return 1e9 * (currentDepth + 1);
         } else if (board.isCheckmate(perspective.invert())) {
