@@ -107,6 +107,7 @@ public class TreeAI implements CapableOfPlaying {
     @Override
     public void updateValues(Board board, PieceColor turn, int moveCount) {
         if (turn != board.getTurn()) {
+            System.exit(1);
             throw new RuntimeException("Turns are not the same " + turn + ", " + board.getTurn());
         }
 

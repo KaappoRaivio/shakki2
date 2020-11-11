@@ -81,7 +81,7 @@ public class NoMove implements Move {
 
     @Override
     public String toString () {
-        return "NoMove";
+        return "...";
     }
 
     @Override

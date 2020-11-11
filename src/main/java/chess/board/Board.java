@@ -18,8 +18,7 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static chess.piece.basepiece.PieceColor.BLACK;
-import static chess.piece.basepiece.PieceColor.WHITE;
+import static chess.piece.basepiece.PieceColor.*;
 
 public class Board implements Serializable{
     private Piece[][] board;
@@ -448,18 +447,21 @@ public class Board implements Serializable{
 
         StringBuilder builder = new StringBuilder();
 
+        if (states.get(0).getLastMove().getColor() == PieceColor.BLACK) {
+            states.add(0, new BoardState(null, null, 0, NoMove.NO_MOVE, WHITE, states.get(0).getMoveCount() - 1));
+            states.forEach(state -> state.setMoveCount(state.getMoveCount() + 1));
+        }
+
         for (int i = 0; i < states.size(); i++) {
             BoardState currentState = states.get(i);
             if (i % 2 == 0) {
                 builder.append((currentState.getMoveCount() + 1) / 2).append(". ");
             }
-            if (i == 0 && states.get(i).getLastMove().getColor() == PieceColor.BLACK) {
-                builder.append("... ");
-                i += 1;
-            }
 
             builder.append(currentState.getLastMove().getShortAlgebraic(originalPosition)).append(" ");
-            originalPosition.makeMove(currentState.getLastMove());
+            if (!(currentState.getLastMove() instanceof NoMove)) {
+                originalPosition.makeMove(currentState.getLastMove());
+            }
         }
 
         return builder.toString();
@@ -514,14 +516,17 @@ public class Board implements Serializable{
 
     public static void main(String[] args) {
 //        Board board = Board.fromFEN("r1b1k2r/pp2q2p/2p2npb/2np4/4pP2/4P2N/PPPNB1PP/R1BQK2R w - - 0 1");
-        Board board = Board.getStartingPosition();
+//        Board board = Board.getStartingPosition();
+        Board board = Board.fromFEN("r3kb1r/1bpq1pp1/p3pn1p/1p6/2pPP3/P1N5/1P3PPP/R2QKB1R b KQkq - 0 11");
 
 //        System.out.println(board.getAllPossibleMoves(PieceColor.WHITE));
         BoardHelpers.executeSequenceOfMoves(board,
-                List.of("g1f3", "d7d5", "e2e3", "f7f6", "d2d4", "e7e5", "b1d2", "d8e7", "d4e5", "f6e5", "f1b5", "c7c6", "b5e2", "g8f6", "f3g5", "e5e4", "e2h5", "g7g6", "h5e2", "f8h6", "f2f4", "b8d7", "g5h3"));
+                List.of("f6e4", "c3e4", "b7e4"));
+//        BoardHelpers.executeSequenceOfMoves(board,
+//                List.of("g1f3", "d7d5", "e2e3", "f7f6", "d2d4", "e7e5", "b1d2", "d8e7", "d4e5", "f6e5", "f1b5", "c7c6", "b5e2", "g8f6", "f3g5", "e5e4", "e2h5", "g7g6", "h5e2", "f8h6", "f2f4", "b8d7", "g5h3"));
         System.out.println(board.toString());
-        System.out.println(board.getStateHistory().getCurrentState().getMovesSinceFiftyMoveReset());
-
+        System.out.println("asdasdasd");
+//
 //
 //        String s1 = "▐█";
 //        String s2 = "▌ ";

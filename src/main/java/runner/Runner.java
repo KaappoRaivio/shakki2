@@ -73,11 +73,12 @@ public class Runner {
                 } catch (RuntimeException e) {
                     e.printStackTrace();
                     System.out.println("Move is invalid!");
+                    System.out.print("Press enter to continue:> ");
                     new Scanner(System.in).nextLine();
                 }
             }
 
-            System.out.println(board.getMoveHistoryPretty());
+//            System.out.println(board.getMoveHistoryPretty());
 
             turn = turn.invert();
             moveCount += 1;
@@ -88,6 +89,7 @@ public class Runner {
 
 
             for (CapableOfPlaying player : players) {
+                System.out.println(board);
                 player.updateValues(board.deepCopy(), turn, moveCount);
             }
             ui.updateValues(board.deepCopy(), turn, moveCount);
