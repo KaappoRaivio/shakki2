@@ -12,6 +12,7 @@ import chess.piece.basepiece.PieceColor;
 import chess.piece.basepiece.PieceType;
 import misc.Pair;
 import misc.Saver;
+import org.apache.commons.lang3.ObjectUtils;
 
 import java.io.Serializable;
 import java.util.*;
@@ -337,8 +338,8 @@ public class Board implements Serializable{
 
     @Override
     public String toString() {
-        String[] s1 = toString(getTurn()).split("\n");
-        String[] s2 = toString(getTurn().invert()).split("\n");
+        String[] s1 = toString(WHITE).split("\n");
+        String[] s2 = toString(BLACK).split("\n");
 
         StringBuilder builder = new StringBuilder();
 
@@ -346,7 +347,13 @@ public class Board implements Serializable{
             builder.append(s1[i]).append("    ").append(s2[i]).append("\n");
         }
 
-        return builder.append(getTurn()).append(" to move\n").toString();
+        try {
+            builder.append(getTurn()).append(" to move\n");
+        } catch (NullPointerException e) {
+            builder.append("Turn not available");
+        }
+
+        return builder.toString();
     }
 
     private String toString (PieceColor perspective) {

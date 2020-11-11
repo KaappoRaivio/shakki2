@@ -13,8 +13,12 @@ import java.util.Scanner;
 public class Main {
     public static void main (String[] args) {
 //        Board orig = Board.fromFile("/home/kaappo/git/shakki2/src/main/resources/boards/starting_position.txt");
-        Board board = Board.getStartingPosition();
-//        Board board = Board.fromFEN("rnbq1rk1/ppp1ppb1/3p1n1p/6N1/3PP2B/2NB4/PPP2PPP/R2QK2R b KQ - 0 1");
+//        Board board = Board.getStartingPosition();
+        Board board = Board.fromFEN("1k6/3r4/8/8/8/3P4/8/1K6 b - - 0 1");
+
+//        Board board = Board.fromFEN("r3kb1r/1bpq1pp1/p3pn1p/1p4B1/2pPP3/P1N5/1P3PPP/R2QKB1R w KQkq - 0 11");
+//        Board board = Board.fromFEN("r3kb1r/1bpq1ppp/p3pn2/1p4B1/2pPP3/P1N5/1P3PPP/R2QKB1R w KQkq - 0 11");
+
 //        board.makeMove(Move.parseMove("h6g5", PieceColor.BLACK, board));
 
 //        Board board = Board.fromFEN("r1bq1knr/1pp3pp/p1nb4/4p2Q/4N3/PB6/1PPP1PPP/R1B1K1NR w KQ - 0 1");
@@ -27,13 +31,13 @@ public class Main {
 
         CapableOfPlaying[] players;
         Scanner scanner = new Scanner(System.in);
-        int AIDepth = 10;
+        int AIDepth = 5;
         int allocatedTime = 30000;
-        boolean useOpeningLibrary = true;
+        boolean useOpeningLibrary = false;
         while (true) {
             System.out.print("Ai plays as: ");
-            String line = scanner.nextLine();
-//            String line = "none";
+//            String line = scanner.nextLine();
+            String line = "black";
 
             if (line.equals("white")) {
                 players = new CapableOfPlaying[]{

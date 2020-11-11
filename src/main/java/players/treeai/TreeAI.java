@@ -21,7 +21,7 @@ public class TreeAI implements CapableOfPlaying {
     private boolean useOpeningLibrary;
     private int allocatedTime;
     private BoardEvaluator evaluator;
-    private int amountOfProcessors;
+    private int amountOfProcessors = 1;
     private Openings openings;
 
     public TreeAI(PieceColor color, Board board, int depth, int amountOfProcessors) {
@@ -31,11 +31,12 @@ public class TreeAI implements CapableOfPlaying {
     public TreeAI(PieceColor color, Board board, int depth, int amountOfProcessors, boolean useOpeningLibrary, int allocatedTime) {
         this.color = color;
         this.board = board;
-        this.depth = depth - 1;
+        this.depth = depth;
         this.useOpeningLibrary = useOpeningLibrary;
         this.allocatedTime = allocatedTime;
         evaluator = new BoardEvaluator(depth, color);
         this.amountOfProcessors = amountOfProcessors;
+
         openings = new Openings();
     }
 
@@ -50,76 +51,65 @@ public class TreeAI implements CapableOfPlaying {
 
         Map<Move, Double> values = new HashMap<>();
 
-        long evaluationStart = System.currentTimeMillis();
-        Move currentlyBestMove = null ;
 
         ConcurrentHashMap<Integer, TranspositionTableEntry> sharedTranspositionTable = new ConcurrentHashMap<>();
 
+        //        depthIteration: for (int depthIteration = depth; depthIteration <= depth; depthIteration++) {
         List<TreeAIWorker> threads = new ArrayList<>();
-        depthIteration: for (int depthIteration = 2; depthIteration <= depth; depthIteration++) {
-//        depthIteration: for (int depthIteration = depth; depthIteration <= depth; depthIteration++) {
-            threads = new ArrayList<>();
-            List<List<Move>> split = Splitter.splitListInto(board.getAllPossibleMoves(color), amountOfProcessors);
+        List<List<Move>> split = Splitter.splitListInto(board.getAllPossibleMoves(color), amountOfProcessors);
+        System.out.println(split + ", " + board.getAllPossibleMoves(color));
 
-            TreeAIWorker.resetAlphaAndBeta();
-            for (int i = 0; i < amountOfProcessors; i++) {
-                TreeAIWorker thread = new TreeAIWorker(split.get(i), board.deepCopy(), i, depthIteration, new BoardEvaluator(depth, color), sharedTranspositionTable);
-                threads.add(thread);
-                System.out.println("\tCreated " + thread);
-                thread.start();
-            }
-//            try {
-//                Thread.sleep(wait);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-            long wait = allocatedTime - (System.currentTimeMillis() - evaluationStart);
-            System.out.println("Waiting for " + wait + " ms");
-            for (TreeAIWorker thread : threads) {
-
-                    if (wait <= 0) {
-                        System.out.println("Making move with depth " + (depthIteration - 1));
-                        break depthIteration;
-                    }
-                    synchronized (TreeAIWorker.lock) {
-                        try {
-//                            TreeAIWorker.lock.wait();
-                            TreeAIWorker.lock.wait(wait);
-                        } catch (InterruptedException ignored) {}
-                    }
-                    wait = allocatedTime - (System.currentTimeMillis() - evaluationStart);
-
-                    System.out.println("\tJoined " + thread + ", " + wait);
-
-            }
-
-            for (TreeAIWorker worker : threads) {
-                values.putAll(worker.getResult());
-            }
-
-            List<Map.Entry<Move, Double>> top4 = new ArrayList<>();
-            for (int i = 0; i < 4; i++) {
-                Map.Entry<Move, Double> value = values
-                        .entrySet()
-                        .stream()
-                        .max(Comparator.comparingDouble(Map.Entry::getValue))
-                        .orElse(Map.entry(NoMove.NO_MOVE, -1e40));
-                values.remove(value.getKey());
-                top4.add(value);
-            }
-
-            System.out.println("Iteration " + depthIteration + ":");
-            System.out.println(top4.stream().map(item -> item.getKey().getShortAlgebraic(board) + ": " + item.getValue()).collect(Collectors.joining("\n")));
-            currentlyBestMove = top4.get(0).getKey();
+        for (int i = 0; i < amountOfProcessors; i++) {
+            TreeAIWorker thread = new TreeAIWorker(split.get(i), board.deepCopy(), i, depth, new BoardEvaluator(depth, color), sharedTranspositionTable);
+            threads.add(thread);
+            System.out.println("\tCreated " + thread);
+            thread.start();
         }
+
+        for (TreeAIWorker thread : threads) {
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            System.out.println("\tJoined " + thread);
+
+        }
+
+        var moveHistory = new HashMap<Move, List<Move>>();
+
+        for (TreeAIWorker worker : threads) {
+            if (!worker.isReady()) throw new RuntimeException("Thread not ready!");
+            values.putAll(worker.getResult());
+            moveHistory.putAll(worker.moveHistorys);
+        }
+        System.out.println(moveHistory);
+
+        List<Map.Entry<Move, Double>> top4 = new ArrayList<>();
+        for (int i = 0; i < values.size(); i++) {
+            Map.Entry<Move, Double> value = values
+                    .entrySet()
+                    .stream()
+                    .max(Comparator.comparingDouble(Map.Entry::getValue))
+                    .orElse(Map.entry(NoMove.NO_MOVE, -1e40));
+            values.remove(value.getKey());
+            top4.add(value);
+        }
+
+        System.out.println(top4.stream().map(item -> item.getKey().getShortAlgebraic(board) + ": " + item.getValue() + ", " + moveHistory.get(item.getKey())).collect(Collectors.joining("\n")));
+
         threads.forEach(TreeAIWorker::_stop);
-        return currentlyBestMove;
+        return top4.get(0).getKey();
 
     }
 
 
     @Override
     public void updateValues(Board board, PieceColor turn, int moveCount) {
+        if (turn != board.getTurn()) {
+            throw new RuntimeException("Turns are not the same " + turn + ", " + board.getTurn());
+        }
+
         this.board = board;
     }
 

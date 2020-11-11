@@ -3,11 +3,11 @@ package players.treeai;
 import chess.board.Board;
 import chess.misc.Position;
 import chess.move.Move;
+import chess.piece.CastlingKing;
 import chess.piece.basepiece.Piece;
 import chess.piece.basepiece.PieceColor;
 import chess.piece.basepiece.PieceType;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -21,35 +21,48 @@ public class BoardEvaluator {
     }
 
     double evaluateBoard(Board board, int currentDepth) {
-        PieceColor perspective = board.getTurn();
-        if (board.isCheckmate(perspective.invert())) {
+        PieceColor perspective = board.getTurn().invert();
+//        System.out.println(perspective);
+        if (board.isCheckmate(perspective)) {
 //            System.out.println("Checkmate for " + (perspective == color ? "self " : "opponent ") + board + ", " + currentDepth);
             return 1e9 * (currentDepth + 1);
-        } else if (board.isCheckmate(perspective)) {
+        } else if (board.isCheckmate(perspective.invert())) {
 //            System.out.println("Checkmate for " + (perspective == color ? "self " : "opponent ") + board + ", " + currentDepth);
             return -1e9 * (currentDepth + 1);
+        } else {
+//            return 0;
+            return getMaterialAmount(board, perspective) - getMaterialAmount(board, perspective.invert());
         }
 
 //        Set<Move> ownMoves = board.getAllPossibleMoves(perspective, true, true);
-        Set<Move> ownMoves = Collections.emptySet();
+//        Set<Move> ownMoves = Collections.emptySet();
 //        Set<Move> opponentMoves = board.getAllPossibleMoves(perspective.invert(), true, true);
-        Set<Move> opponentMoves = Collections.emptySet();
+//        Set<Move> opponentMoves = Collections.emptySet();
 
-        double openingEvaluation = 0;
-//        System.out.println(getMaterialSum(board) / 200);
-//        double openingEvaluation = calculateOpeningEvalution(board, perspective, ownMoves)
-//                - calculateOpeningEvalution(board, perspective.invert(), opponentMoves);
-        double middlegameEvaluation = calculateMiddlegameEvalution(board, perspective, ownMoves)
-                - calculateMiddlegameEvalution(board, perspective.invert(), opponentMoves);
-        double endgameEvaluation = calculateEndgameEvaluation(board, perspective, ownMoves)
-                - calculateEndgameEvaluation(board, perspective.invert(), opponentMoves);
+//        double openingEvaluation = 0;
+////        System.out.println(getMaterialSum(board) / 200);
+////        double openingEvaluation = calculateOpeningEvalution(board, perspective, ownMoves)
+////                - calculateOpeningEvalution(board, perspective.invert(), opponentMoves);
+//        System.out.println(board.getTurn());
+//        double middlegameEvaluation = calculateMiddlegameEvalution(board, perspective, ownMoves)
+//                - calculateMiddlegameEvalution(board, perspective.invert(), opponentMoves);
+////        System.out.println(middlegameEvaluation + ", " + (calculateMiddlegameEvalution(board, perspective.invert(), ownMoves)
+////                - calculateMiddlegameEvalution(board, perspective, opponentMoves)));
+//        double endgameEvaluation = calculateEndgameEvaluation(board, perspective, ownMoves)
+//                - calculateEndgameEvaluation(board, perspective.invert(), opponentMoves);
 
-        GameStage stage = GameStage.getGameStage(board, getMaterialSum(board));
+//        if (board.getLastMove().toString().equalsIgnoreCase("Rxd3")) {
+//            System.out.println("Moi");
+//            middlegameEvaluation += 100000;
+//        }
 
-        return
-                openingEvaluation * stage.getOpeningWeight()
-                + middlegameEvaluation * stage.getMiddlegameWeight()
-                + endgameEvaluation * stage.getEndgameWeight();
+//        GameStage stage = GameStage.getGameStage(board, getMaterialSum(board));
+
+//        return
+//                openingEvaluation * stage.getOpeningWeight()
+//                + middlegameEvaluation * stage.getMiddlegameWeight()
+//                + endgameEvaluation * stage.getEndgameWeight();
+//        return middlegameEvaluation * (currentDepth + 1);
 //        return getMaterialBalance(board, perspective) - getMaterialBalance(board, perspective.invert());
     }
 
@@ -88,20 +101,27 @@ public class BoardEvaluator {
 
     private static double calculateMiddlegameEvalution (Board board, PieceColor perspective, Set<Move> possibleMoves) {
 //        double totalValue = Math.pow(getMaterialPercentage(board, perspective), 3) * 10000;
-        double totalValue = getMaterialBalance(board, perspective);
-        totalValue += calculateDevelopmentPenalty(board, perspective) * .5;
+        double totalValue = getMaterialAmount(board, perspective);
+//        totalValue += calculateDevelopmentPenalty(board, perspective) * .05;
 
 
 
-        totalValue += getProtectionValue(board, possibleMoves) * 2;
+//        totalValue += getProtectionValue(board, possibleMoves) * 2;
 
 
-        if (hasCastled(board, perspective)) {
-            totalValue += 300;
-        }
+//        if (hasCastled(board, perspective)) {
+//            totalValue += 25;
+//        }
+//        if (hasKingMoved(board, perspective)) {
+//            totalValue -= 25;
+//        }
 
 
         return totalValue;
+    }
+
+    private static boolean hasKingMoved(Board board, PieceColor perspective) {
+        return !(board.getPieceInSquareRelativeTo(perspective, 4, 0, true) instanceof CastlingKing);
     }
 
     private static double getProtectionValue(Board board, Set<Move> ownMoves) {
@@ -146,10 +166,10 @@ public class BoardEvaluator {
     }
 
     private static double getMaterialPercentage (Board board, PieceColor perspective) {
-        return (getMaterialBalance(board, perspective) / getMaterialSum(board) - 0.5) * 2;
+        return (getMaterialAmount(board, perspective) / getMaterialSum(board) - 0.5) * 2;
     }
 
-    private static double getMaterialBalance(Board board, PieceColor perspective) {
+    private static double getMaterialAmount(Board board, PieceColor perspective) {
         double totalValue = 0;
         for (int y = 0; y < 8; y++) {
             for (int x = 0; x < 8; x++) {
@@ -163,7 +183,7 @@ public class BoardEvaluator {
     }
 
     private static double calculateOpeningEvalution (Board board, PieceColor perspective, Set<Move> possibleMoves) {
-        double totalValue = getMaterialBalance(board, perspective) * 15;
+        double totalValue = getMaterialAmount(board, perspective) * 15;
         totalValue += calculateDevelopmentPenalty(board, perspective);
 
         for (int x = 0; x < 8; x++) {
@@ -218,14 +238,21 @@ public class BoardEvaluator {
     }
 
     public static void main(String[] args) {
-        Board board = Board.fromFEN("r3kb1r/1bpq1ppp/p3pn2/1p4B1/2pPP3/P1N5/1P3PPP/R2QKB1R w KQkq - 0 11");
-        BoardEvaluator evaluator = new BoardEvaluator(4, PieceColor.WHITE);
-        BoardEvaluator evaluatorb = new BoardEvaluator(4, PieceColor.BLACK);
-        System.out.println(board);
-        System.out.println(evaluator.evaluateBoard(board, 4));
-        board.makeMove(Move.parseMove("f1e2", PieceColor.WHITE, board));
-        System.out.println(board);
-        System.out.println(evaluator.evaluateBoard(board, 4));
+//        Board board = Board.fromFEN("1k6/3r4/8/8/8/3P4/8/1K6 b - - 0 1");
+//
+//        TreeAI ai = new TreeAI(PieceColor.BLACK, board, 2, 8, false, 0);
+//        ai.updateValues(board, board.getTurn(), 10);
+////        BoardEvaluator evaluator = new BoardEvaluator(4, PieceColor.WHITE);
+//        System.out.println(board);
+//        Move move = ai.getMove();
+//        System.out.println(move);
+//        board.makeMove(move);
+//        System.out.println(board);
+////        board.makeMove(Move.parseMove("d7d3", PieceColor.BLACK, board));
+//        ai.updateValues(board, board.getTurn(), 10);
+//        System.out.println(ai.getMove());
+//        System.out.println(board);
+//        System.out.println(evaluator.evaluateBoard(board, 4));
 //        BoardEvaluator evaluator = new BoardEvaluator(4, PieceColor.WHITE);
 //        while (true) {
 //            if (board.isCheckmate() || board.isDraw()) break;

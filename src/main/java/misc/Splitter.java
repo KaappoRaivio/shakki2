@@ -1,5 +1,8 @@
 package misc;
 
+import chess.board.Board;
+import chess.move.Move;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -10,35 +13,36 @@ public class Splitter {
         int surfaceArea = moves.size();
 
 
-        int[] lengths = new int[amountOfChunks];
         int remainder = surfaceArea % amountOfChunks;
 
+        List<Integer> lengths = new ArrayList<>();
         for (int i = 0; i < amountOfChunks; i++) {
-            lengths[i] = surfaceArea / amountOfChunks;
+            lengths.add(surfaceArea / amountOfChunks);
         }
 
         for (int i = 0; i < remainder; i++) {
-            lengths[i] += 1;
+            lengths.set(i, lengths.get(i) + 1);
         }
 
         List<List<T>> result = new ArrayList<>();
 
+        int x = 0;
+        for (int chunk : lengths) {
 
-        for (int chunk = 0; chunk < amountOfChunks; chunk++) {
-            result.add(moves.subList(lengths[chunk] * chunk, lengths[chunk] * chunk + lengths[chunk]));
+            result.add(moves.subList(x, x + chunk));
+            x += chunk;
         }
 
 
         return result;
     }
 
-//    public static <T> T choice(Set<? extends T> collection) {
-//        T item = null;
-//        for (T t : collection) {
-//            item = t;
-//            break;
-//        }
-//        collection.remove(item);
-//        return item;
-//    }
+    public static void main(String[] args) {
+//        Board board = Board.fromFEN("5K2/8/3P4/8/8/8/3r4/1k6 b - - 0 1");
+
+        List<String> list = List.of("a", "b", "c", "d", "e", "f", "g", "h", "i");
+//        List<Move> list = board.getAllPossibleMoves();
+
+        System.out.println(splitListInto(list, 3) + ", " + list);
+    }
 }
