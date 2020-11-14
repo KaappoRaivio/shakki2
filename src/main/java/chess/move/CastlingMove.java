@@ -152,11 +152,11 @@ public class CastlingMove implements Move {
         if (!(o instanceof CastlingMove)) return false;
         CastlingMove that = (CastlingMove) o;
         return castlingType == that.castlingType &&
-                getColor() == that.getColor() &&
-                kingPosition.equals(that.kingPosition) &&
-                board.equals(that.board) &&
-                castlingRookMove.equals(that.castlingRookMove) &&
-                castlingKingMove.equals(that.castlingKingMove);
+                getColor() == that.getColor();
+//                kingPosition.equals(that.kingPosition) &&
+//                board.equals(that.board) &&
+//                castlingRookMove.equals(that.castlingRookMove) &&
+//                castlingKingMove.equals(that.castlingKingMove);
     }
 
     @Override

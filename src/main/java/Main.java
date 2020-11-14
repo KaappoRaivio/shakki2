@@ -1,4 +1,5 @@
 import chess.board.Board;
+import chess.board.BoardHelpers;
 import chess.move.Move;
 import chess.piece.basepiece.PieceColor;
 import players.Player;
@@ -9,6 +10,7 @@ import runner.UI;
 import ui.TtyUI;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -17,7 +19,11 @@ public class Main {
 //        Board board = Board.getStartingPosition();
 //        Board board = Board.fromFEN("1k6/3r4/8/8/8/3P4/8/1K6 b - - 0 1");
 
-        Board board = Board.fromFEN("r3kb1r/1bpq1pp1/p3pn1p/1p6/2pPP3/P1N5/1P3PPP/R2QKB1R b KQkq - 0 11");
+        Board board = Board.fromFEN("4k3/4b3/8/p7/8/8/3Q4/4K3 b - - 0 1");
+//        BoardHelpers.executeSequenceOfMoves(board, List.of("f6e4", "c3e4", "b7e4", "f1e2"));
+
+//        Board board = Board.fromFEN("5QRR/8/1Q6/8/8/5PPP/8/K6k w - - 0 1");
+
         System.out.println(board.getAllPossibleMoves());
 //        board.makeMove(Move.parseMove("f8a3", PieceColor.BLACK, board));
 //        Board board = Board.fromFEN("r3kb1r/1bpq1ppp/p3pn2/1p4B1/2pPP3/P1N5/1P3PPP/R2QKB1R w KQkq - 0 11");
@@ -34,7 +40,7 @@ public class Main {
 
         CapableOfPlaying[] players;
         Scanner scanner = new Scanner(System.in);
-        int AIDepth = 3;
+        int AIDepth = 5;
         int allocatedTime = 30000;
         boolean useOpeningLibrary = false;
         label:

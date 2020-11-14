@@ -1,16 +1,13 @@
 package players.treeai;
 
 import chess.board.Board;
+import chess.misc.exceptions.ChessException;
 import chess.move.Move;
 import chess.piece.basepiece.PieceColor;
-import com.google.common.util.concurrent.AtomicDouble;
+import misc.Pair;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;
@@ -26,7 +23,7 @@ public class TreeAIWorker extends Thread {
     private BoardEvaluator evaluator;
     private ConcurrentHashMap<Integer, TranspositionTableEntry> transpositionTable;
     private Map<Move, Double> result;
-    public Map<Move, List<Move>> moveHistorys = new HashMap<>();
+    public Map<Move, String> moveHistorys = new HashMap<>();
     private boolean run;
 
     @Override
@@ -59,53 +56,94 @@ public class TreeAIWorker extends Thread {
     public void run() {
         for (Move move : moves) {
             board.executeMoveNoChecks(move);
-            double value = deepEvaluateBoard(board, move);
+            double doubleListPair = deepEvaluateBoard(board, move);
+            double value = -doubleListPair;
             board.unMakeMove(1);
 
             result.put(move, value);
+            moveHistorys.put(move, getPrincipleVariation(board.deepCopy(), move).toString());
             if (!run) break;
         }
         if (run)
             ready = true;
+            evaluated = new Pair<>(evaluator.white, evaluator.black);
             synchronized (lock) {
                 lock.notifyAll();
             }
     }
-    double deepEvaluateBoard(Board board, Move initialMove) {
-        return deepEvaluateBoard(board, depth, 0, -1e23, 1e23, initialMove);
+
+    private List<String> getPrincipleVariation(Board board, Move move) {
+        List<String> moveHistory = new ArrayList<>();
+        try {
+            while (true) {
+    //            System.out.println(move);
+                board.makeMove(move);
+                moveHistory.add(move.toString());
+                TranspositionTableEntry entry = transpositionTable.get(board.hashCode());
+                if (entry == null) {
+                    break;
+                }
+
+                move = entry.getBestMove();
+            }
+        } catch (ChessException e) {
+            System.out.println(board);
+            System.out.println(moveHistory);
+            System.out.println(move);
+            throw  e;
+        }
+
+        return moveHistory;
     }
+
+    double deepEvaluateBoard(Board board, Move initialMove) {
+        return deepEvaluateBoard(board, depth, -1e23, 1e23, initialMove);
+    }
+
+    public Pair<Integer, Integer> evaluated;
 
     public void _stop () {
         run = false;
     }
 
-    private double deepEvaluateBoard(Board board, int currentDepth, int absoluteLimit, double alpha, double beta, Move initialMove) {
-//        double alphaOrig = alpha;
-//        TranspositionTableEntry entry = transpositionTable.get(board.hashCode());
-//        if (entry != null && entry.getDepth() >= currentDepth) {
-//            if (entry.getNodeType() == TranspositionTableEntry.NODE_EXACT) {
-//                return entry.getPositionValue();
-//            } else if (entry.getNodeType() == TranspositionTableEntry.NODE_LOWER) {
-//                alpha = max(alpha, entry.getPositionValue());
-//            } else if (entry.getNodeType() == TranspositionTableEntry.NODE_UPPER) {
-//                beta = min(beta, entry.getPositionValue());
-//            }
-//
-//            if (alpha >= beta) {
-//                return entry.getPositionValue();
-//            }
-//        }
+    private double deepEvaluateBoard(Board board, int currentDepth, double alpha, double beta, Move initialMove) {
+        double alphaOrig = alpha;
+        TranspositionTableEntry entry = transpositionTable.get(board.hashCode());
+        if (entry != null && entry.getDepth() >= currentDepth && entry.getColor() == board.getTurn()) {
+            if (entry.getNodeType() == TranspositionTableEntry.NODE_EXACT) {
+                return entry.getPositionValue();
+            } else if (entry.getNodeType() == TranspositionTableEntry.NODE_LOWER) {
+                alpha = max(alpha, entry.getPositionValue());
+            } else if (entry.getNodeType() == TranspositionTableEntry.NODE_UPPER) {
+                beta = min(beta, entry.getPositionValue());
+            }
+
+            if (alpha >= beta) {
+                return entry.getPositionValue();
+            }
+        }
+
 
         if (board.isCheckmate() || board.isDraw() || currentDepth <= 0) {
-            moveHistorys.put(initialMove, List.copyOf(board.getMoveHistory()));
             return evaluator.evaluateBoard(board, currentDepth);
         } else {
             double totalPositionValue = -1e22;
+            Move bestMove = null;
+
             List<Move> allPossibleMoves = board.getAllPossibleMoves();
-            sortMoves(allPossibleMoves, board, currentDepth, evaluator);
+//            sortMoves(allPossibleMoves, board, currentDepth, evaluator);
             for (Move move : allPossibleMoves) {
+
                 board.executeMoveNoChecks(move);
-                totalPositionValue = max(-deepEvaluateBoard(board, currentDepth - 1, absoluteLimit, -beta, -alpha, initialMove), totalPositionValue);
+                int prevHash = board.hashCode();
+                double value = -deepEvaluateBoard(board, currentDepth - 1, -beta, -alpha, initialMove);
+
+                if (value > totalPositionValue) {
+                    bestMove = move;
+                    totalPositionValue = value;
+                }
+
+                if (board.hashCode() != prevHash) throw new RuntimeException("Hashes don't equal! " + board);
                 board.unMakeMove(1);
 
                 alpha = max(alpha, totalPositionValue);
@@ -114,18 +152,17 @@ public class TreeAIWorker extends Thread {
                 }
             }
 
-//            int nodeType;
-//            if (totalPositionValue <= alphaOrig) {
-//                nodeType = TranspositionTableEntry.NODE_UPPER;
-//            } else if (totalPositionValue >= beta) {
-//                nodeType = TranspositionTableEntry.NODE_LOWER;
-//            } else {
-//                nodeType = TranspositionTableEntry.NODE_EXACT;
-//            }
-//
-//            var newEntry = new TranspositionTableEntry(totalPositionValue, nodeType, currentDepth);
-//            transpositionTable.put(board.hashCode(), newEntry);
+            int nodeType;
+            if (totalPositionValue <= alphaOrig) {
+                nodeType = TranspositionTableEntry.NODE_UPPER;
+            } else if (totalPositionValue >= beta) {
+                nodeType = TranspositionTableEntry.NODE_LOWER;
+            } else {
+                nodeType = TranspositionTableEntry.NODE_EXACT;
+            }
 
+            var newEntry = new TranspositionTableEntry(totalPositionValue, nodeType, currentDepth, bestMove, board.getTurn());
+            transpositionTable.put(board.hashCode(), newEntry);
             return totalPositionValue;
         }
     }

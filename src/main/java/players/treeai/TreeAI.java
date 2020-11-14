@@ -56,8 +56,9 @@ public class TreeAI implements CapableOfPlaying {
 
         //        depthIteration: for (int depthIteration = depth; depthIteration <= depth; depthIteration++) {
         List<TreeAIWorker> threads = new ArrayList<>();
-        List<List<Move>> split = Splitter.splitListInto(board.getAllPossibleMoves(color), amountOfProcessors);
-        System.out.println(split + ", " + board.getAllPossibleMoves(color));
+        List<Move> allPossibleMoves = board.getAllPossibleMoves(color);
+//        List<Move> allPossibleMoves = List.of(Move.parseMove("f8c5", PieceColor.WHITE, board));
+        List<List<Move>> split = Splitter.splitListInto(allPossibleMoves, amountOfProcessors);
 
         for (int i = 0; i < amountOfProcessors; i++) {
             TreeAIWorker thread = new TreeAIWorker(split.get(i), board.deepCopy(), i, depth, new BoardEvaluator(depth, color), sharedTranspositionTable);
@@ -76,14 +77,16 @@ public class TreeAI implements CapableOfPlaying {
 
         }
 
-        var moveHistory = new HashMap<Move, List<Move>>();
+        var moveHistory = new HashMap<Move, String>();
 
         for (TreeAIWorker worker : threads) {
             if (!worker.isReady()) throw new RuntimeException("Thread not ready!");
             values.putAll(worker.getResult());
+//            System.out.println(worker.evaluated);
             moveHistory.putAll(worker.moveHistorys);
         }
         System.out.println(moveHistory);
+        System.out.println("values: " + values);
 
         List<Map.Entry<Move, Double>> top4 = new ArrayList<>();
         for (int i = 0; i < values.size(); i++) {
@@ -149,5 +152,9 @@ public class TreeAI implements CapableOfPlaying {
 
 //        System.out.println(evaluator.evaluateBoard(board));
 
+    }
+
+    public BoardEvaluator getEvaluator() {
+        return evaluator;
     }
 }

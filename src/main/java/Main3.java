@@ -12,7 +12,7 @@ public class Main3 {
         Board board = Board.fromFEN("r3kb1r/1bpq1ppp/p3pn2/1p4B1/2pPP3/P1N5/1P3PPP/R2QKN1R b KQkq - 0 1");
 
 
-        int depth = 4;
+        int depth = 3;
         PieceColor color = PieceColor.BLACK;
         while (true) {
             TreeAI ai = new TreeAI(color, board, depth, 8, false, 0);

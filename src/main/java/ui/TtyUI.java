@@ -25,10 +25,11 @@ public class TtyUI implements UI {
 
     @Override
     public Move getMove (PieceColor color) {
+        Scanner scanner = new Scanner(System.in);
         while (true) {
             try {
                 System.out.print("Your move:> ");
-                String response = new Scanner(System.in).nextLine();
+                String response = scanner.nextLine();
                 if (response.toLowerCase().equals("stop")) {
                     throw new StopException();
                 }  if (response.toLowerCase().equals("undo")) {

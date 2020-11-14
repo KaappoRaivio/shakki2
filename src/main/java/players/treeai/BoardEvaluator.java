@@ -20,15 +20,24 @@ public class BoardEvaluator {
         this.depth = depth;
     }
 
+
+    int white = 0;
+    int black = 0;
+
     double evaluateBoard(Board board, int currentDepth) {
-        PieceColor perspective = board.getTurn().invert();
+        PieceColor perspective = board.getTurn();
+        if (perspective == PieceColor.WHITE) {
+            white += 1;
+        } else {
+            black += 1;
+        }
 //        System.out.println(perspective);
         if (board.isDraw()) {
             return 0;
-        } else if (board.isCheckmate(perspective)) {
+        } else if (board.isCheckmate(perspective.invert())) {
 //            System.out.println("Checkmate for " + (perspective == color ? "self " : "opponent ") + board + ", " + currentDepth);
             return 1e9 * (currentDepth + 1);
-        } else if (board.isCheckmate(perspective.invert())) {
+        } else if (board.isCheckmate(perspective)) {
 //            System.out.println("Checkmate for " + (perspective == color ? "self " : "opponent ") + board + ", " + currentDepth);
             return -1e9 * (currentDepth + 1);
         } else {

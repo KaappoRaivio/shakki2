@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="misc.SplitterTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2020-11-11T18:56:30" hostname="thinkbookpro" time="0.003">
-  <properties/>
-  <testcase name="testSplitting" classname="misc.SplitterTest" time="0.003"/>
-  <system-out><![CDATA[[[a, b, c], [d, e, f], [g, h, i]]
-]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>

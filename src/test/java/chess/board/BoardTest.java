@@ -4,6 +4,7 @@ import chess.move.Move;
 import chess.piece.basepiece.PieceColor;
 import misc.Pair;
 import org.junit.Test;
+import players.treeai.TreeAI;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -101,12 +102,14 @@ public class BoardTest {
         List<String> FENs = List.of(
                 "rn1qkbnr/ppp1pppp/3p4/8/5PPb/8/PPPPP2P/RNBQKBNR w KQkq - 1 2",
                 "rn1q1bnr/ppp1kBp1/3p3p/3NN3/4P3/8/PPPP1PPP/R1BbK2R b KQkq - 2 4",
-                "6rk/1p1p1Npp/1bp5/p7/4P3/PP4P1/1K5P/8 b - - 0 1"
+                "6rk/1p1p1Npp/1bp5/p7/4P3/PP4P1/1K5P/8 b - - 0 1",
+                "5RRR/8/1Q6/8/8/5PPP/6k1/K5Q1 b - - 0 1"
         );
 
         for (String FEN : FENs) {
             Board board = Board.fromFEN(FEN);
             System.out.println(board);
+            System.out.println(board.getAllPossibleMoves());
             assertTrue(board.isCheckmate());
 //            assertFalse(board.isCheckMate(board.getTurn().invert()));
         }
@@ -235,5 +238,14 @@ public class BoardTest {
         Board board = Board.fromFEN("rnb1kbnr/pppppppp/8/1q6/3PP3/8/PPP2PPP/RNBQKBNR b - - 0 1");
         board.makeMove(Move.parseMove("b5b4", PieceColor.BLACK, board));
         System.out.println(board);
+    }
+
+
+    @Test
+    public void debug1() {
+        Board board = Board.fromFEN("r3kb1r/1bpq1pp1/p3pn1p/1p6/2pPP3/P1N5/1P3PPP/R2QKB1R b KQkq - 0 11");
+        BoardHelpers.executeSequenceOfMoves(board, List.of("f6e4", "c3e4", "b7e4", "f1e2"));
+
+//        TreeAI
     }
 }

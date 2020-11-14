@@ -283,8 +283,8 @@ public class Board implements Serializable{
         hashCode = lastMove.getIncrementalHash(hashCode, hasher);
     }
 
-    private boolean calculateCheckmate (PieceColor turn) {
-        return isCheck(turn) && getAllPossibleMoves(turn).size() == 0;
+    private boolean calculateCheckmate (PieceColor perspective) {
+        return isCheck(perspective) && getAllPossibleMoves(perspective).size() == 0;
     }
 
     private boolean calculateCheck (PieceColor turn) {
@@ -384,10 +384,37 @@ public class Board implements Serializable{
         return builder.append("\n").append(vPadding).append(hPadding).append(letters).append(hPadding).toString();
     }
 
+    public String conventionalToString() {
+        String hPadding = " ";
+        String vPadding = "";
+
+        StringBuilder builder = new StringBuilder(vPadding).append(hPadding).append("\n  a b c d e f g h").append(hPadding).append("\n").append(vPadding);
+        for (int y = dimY - 1; y >= 0; y--) {
+            if (y < dimY - 1) {
+                builder.append("\n");
+            }
+
+            builder.append(y + 1).append(hPadding);
+
+            for (int x = 0; x < board[y].length; x++) {
+                builder.append(board[y][x]);
+
+                if (x + 1 < board[y].length) {
+                    builder.append(" ");
+                }
+            }
+
+            builder.append(hPadding).append(y + 1);
+        }
+
+        return builder.append("\n").append(vPadding).append(hPadding).append(" A B C D E F G H").append(hPadding).toString();
+    }
+
+
     @Override
     public int hashCode() {
 //        return Arrays.deepHashCode(board);
-        return hashCode;
+        return getTurn() == WHITE ? hashCode : -hashCode;
     }
 
     @Override
