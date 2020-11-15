@@ -83,7 +83,7 @@ public class BoardEvaluatorHelpers {
         return totalValue;
     }
 
-    private static double getMaterialPercentage (Board board, PieceColor perspective) {
+    static double getMaterialPercentage(Board board, PieceColor perspective) {
         return (getMaterialAmount(board, perspective) / getMaterialSum(board) - 0.5) * 2;
     }
 

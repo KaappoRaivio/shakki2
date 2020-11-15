@@ -11,6 +11,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class CastlingRook extends Rook {
+    @Override
+    public String conventionalToString() {
+        return super.conventionalToString() + "̅";
+    }
+
     public CastlingRook (PieceColor color) {
         super(color, "♜̅");
     }

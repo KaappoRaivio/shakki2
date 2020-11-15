@@ -15,30 +15,28 @@ import java.util.stream.Collectors;
 import static java.lang.Math.max;
 
 public class TreeAI implements CapableOfPlaying {
-    private PieceColor color;
+    private String name;
+    private final PieceColor color;
     private Board board;
-    private int depth;
-    private boolean useOpeningLibrary;
-    private int allocatedTime;
+    private final int depth;
+    private final boolean useOpeningLibrary;
     private BoardEvaluator evaluator;
     private int amountOfProcessors = 1;
     private Openings openings;
 
-    public TreeAI(PieceColor color, Board board, int depth, int amountOfProcessors) {
-        this(color, board, depth, amountOfProcessors, true, 10000);
-    }
 
-    public TreeAI(PieceColor color, Board board, int depth, int amountOfProcessors, boolean useOpeningLibrary, int allocatedTime) {
+    public TreeAI(String name, PieceColor color, Board board, int depth, int amountOfProcessors, boolean useOpeningLibrary, BoardEvaluator evaluator) {
+        this.name = name;
         this.color = color;
         this.board = board;
         this.depth = depth;
         this.useOpeningLibrary = useOpeningLibrary;
-        this.allocatedTime = allocatedTime;
-        evaluator = new BoardEvaluator(depth, color);
+        this.evaluator = evaluator;
         this.amountOfProcessors = amountOfProcessors;
 
         openings = new Openings();
     }
+
 
     @Override
     public Move getMove() {
@@ -60,9 +58,9 @@ public class TreeAI implements CapableOfPlaying {
 //        List<Move> allPossibleMoves = List.of(Move.parseMove("f8c5", PieceColor.WHITE, board));
         List<List<Move>> split = Splitter.splitListInto(allPossibleMoves, amountOfProcessors);
 
-        BoardEvaluator evaluator = new BoardEvaluator(depth, color);
+        BasicBoardEvaluator evaluator = new BasicBoardEvaluator(depth, color);
         System.out.println(evaluator.getGameStage(board));
-        board.useRepetitionTracker(false);
+        board.useExpensiveDrawCalculation(false);
         for (int i = 0; i < amountOfProcessors; i++) {
             TreeAIWorker thread = new TreeAIWorker(split.get(i), board.deepCopy(), i, depth, evaluator, sharedTranspositionTable);
             threads.add(thread);
@@ -91,7 +89,7 @@ public class TreeAI implements CapableOfPlaying {
         System.out.println(moveHistory);
         System.out.println("values: " + values);
 
-        board.useRepetitionTracker(true);
+        board.useExpensiveDrawCalculation(true);
         for (Move move : values.keySet()) {
             board.makeMove(move);
             if (board.isDraw()) {
@@ -134,28 +132,33 @@ public class TreeAI implements CapableOfPlaying {
         return color;
     }
 
+    @Override
+    public String getName() {
+        return name;
+    }
+
     public static void main(String[] args) {
         //        Board board = Board.getStartingPosition();
 //        BoardEvaluator evaluator = new BoardEvaluator(4);
 //        Board board = Board.fromFEN("1k1R4/8/1K6/8/8/8/8/8 b - - 0 1");
 
 
-        Board board = Board.getStartingPosition();
-        TreeAI multiAI = new TreeAI(PieceColor.WHITE, board, 5, 8);
-        TreeAI singleAI = new TreeAI(PieceColor.WHITE, board, 5, 1);
-
-        multiAI.updateValues(board, PieceColor.WHITE, 30);
-        singleAI.updateValues(board, PieceColor.WHITE, 30);
-
-        long start = System.currentTimeMillis();
-        Move move = multiAI.getMove();
-        System.out.println("multicore took " + (System.currentTimeMillis() - start) + " ms");
-
-        long start2 = System.currentTimeMillis();
-        Move move2 = singleAI.getMove();
-        System.out.println("singlecore took " + (System.currentTimeMillis() - start2) + " ms");
-        System.out.println(move + ", " + move2);
-        System.out.println(board);
+//        Board board = Board.getStartingPosition();
+//        TreeAI multiAI = new TreeAI(PieceColor.WHITE, board, 5, 8);
+//        TreeAI singleAI = new TreeAI(PieceColor.WHITE, board, 5, 1);
+//
+//        multiAI.updateValues(board, PieceColor.WHITE, 30);
+//        singleAI.updateValues(board, PieceColor.WHITE, 30);
+//
+//        long start = System.currentTimeMillis();
+//        Move move = multiAI.getMove();
+//        System.out.println("multicore took " + (System.currentTimeMillis() - start) + " ms");
+//
+//        long start2 = System.currentTimeMillis();
+//        Move move2 = singleAI.getMove();
+//        System.out.println("singlecore took " + (System.currentTimeMillis() - start2) + " ms");
+//        System.out.println(move + ", " + move2);
+//        System.out.println(board);
 
 //        int amountOfThreads = 8;
 

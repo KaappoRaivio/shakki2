@@ -8,4 +8,5 @@ public interface CapableOfPlaying {
     Move getMove ();
     void updateValues (Board board, PieceColor turn, int moveCount);
     PieceColor getColor ();
+    String getName ();
 }

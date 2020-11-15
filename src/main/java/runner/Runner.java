@@ -46,6 +46,7 @@ public class Runner {
             } else if (board.isDraw()) {
                 System.out.println("=== === Draw! === ===");
                 System.out.println(board);
+                turn = PieceColor.NO_COLOR;
                 break;
             }
 
@@ -95,7 +96,7 @@ public class Runner {
 
         }
 
-        return turn;
+        return turn.invert();
     }
 
     public Board getBoard() {

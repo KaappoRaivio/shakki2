@@ -163,4 +163,28 @@ abstract public class Piece implements Serializable {
 
         return  moves;
     }
+
+    public String conventionalToString () {
+        if (color == PieceColor.BLACK) return symbol;
+        else {
+            switch (type) {
+                case KING:
+                    return "♔";
+                case ROOK:
+                    return "♖";
+                case BISHOP:
+                    return "♗";
+                case PAWN:
+                    return "♙";
+                case QUEEN:
+                    return "♕";
+                case KNIGHT:
+                    return "♘";
+                case NO_PIECE:
+                    return ".";
+                default:
+                    throw new RuntimeException("Unknown type!");
+            }
+        }
+    }
 }

@@ -30,7 +30,7 @@ public class Board implements Serializable{
     private final BoardStateHistory stateHistory;
     private BoardHasher hasher = new BoardHasher();
     private int hashCode;
-    private boolean useRepetitionTracker = true;
+    private boolean useExpensiveDrawCalculation = true;
 
     private Board (Piece[][] board) {
         this(board, 0, "", WHITE, 0);
@@ -228,8 +228,8 @@ public class Board implements Serializable{
         return moves;
     }
 
-    public void useRepetitionTracker (boolean use) {
-        useRepetitionTracker = use;
+    public void useExpensiveDrawCalculation(boolean use) {
+        useExpensiveDrawCalculation = use;
     }
 
     public void makeMove (Move move) {
@@ -271,7 +271,7 @@ public class Board implements Serializable{
         stateHistory.getCurrentState().setTurn(newTurn.invert());
         stateHistory.getCurrentState().setMoveCount(currentMoveCount + 1);
 
-        if (useRepetitionTracker) {
+        if (useExpensiveDrawCalculation) {
             repetitionTracker.add(this);
         }
     }
@@ -284,7 +284,7 @@ public class Board implements Serializable{
     }
 
     private void undo (Move lastMove) {
-        if (useRepetitionTracker) repetitionTracker.subtract(this);
+        if (useExpensiveDrawCalculation) repetitionTracker.subtract(this);
         lastMove.unmakeMove(board);
         hashCode = lastMove.getIncrementalHash(hashCode, hasher);
     }
@@ -333,8 +333,14 @@ public class Board implements Serializable{
 
     public boolean isDraw () {
         // 100 half moves equal 50 whole moves
-        return repetitionTracker.isDraw() || stateHistory.getCurrentState().getMovesSinceFiftyMoveReset() >= 100
+        boolean result = repetitionTracker.isDraw() || stateHistory.getCurrentState().getMovesSinceFiftyMoveReset() >= 100
                 || (!isCheck() && getAllPossibleMoves().size() == 0);
+
+        if (useExpensiveDrawCalculation) {
+            result |= BoardHelpers.hasInsufficientMaterial(this);
+        }
+
+        return result;
     }
 
     public RepetitionTracker getRepetitionTracker() {
@@ -403,7 +409,7 @@ public class Board implements Serializable{
             builder.append(y + 1).append(hPadding);
 
             for (int x = 0; x < board[y].length; x++) {
-                builder.append(board[y][x]);
+                builder.append(board[y][x].conventionalToString());
 
                 if (x + 1 < board[y].length) {
                     builder.append(" ");
@@ -595,6 +601,7 @@ public class Board implements Serializable{
 //        BoardHelpers.executeSequenceOfMoves(x, List.of("e2e4", "e7e5"));
 //        board.makeMove(Move.parseMove("e2e4", PieceColor.WHITE, board));
         System.out.println(board.getMoveHistoryPretty());
+        System.out.println(board.conventionalToString());
 
 //        board.makeMove(Move.parseMove("e7e5", PieceColor.WHITE, board));
 //        System.out.println(board.getMoveHistoryPretty());

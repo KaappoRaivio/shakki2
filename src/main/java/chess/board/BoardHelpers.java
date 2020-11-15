@@ -1,13 +1,56 @@
 package chess.board;
 
 import chess.move.Move;
+import chess.piece.basepiece.Piece;
+import chess.piece.basepiece.PieceType;
 
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class BoardHelpers {
     public static void executeSequenceOfMoves (Board board, List<String> moves) {
         for (String move : moves) {
             board.makeMove(Move.parseMove(move, board.getTurn(), board));
         }
+    }
+
+    public static boolean hasInsufficientMaterial(Board board) {
+        Map<PieceType, Integer> pieces = new HashMap<>(Map.of(
+                PieceType.KING, 0,
+                PieceType.QUEEN, 0,
+                PieceType.BISHOP, 0,
+                PieceType.KNIGHT, 0,
+                PieceType.ROOK, 0,
+                PieceType.PAWN, 0,
+                PieceType.NO_PIECE, 0
+        ));
+
+        for (int y = 0; y < 8; y++) {
+            for (int x = 0; x < 8; x++) {
+                if (board.getPieceInSquare(x, y).getColor() == board.getTurn()) {
+                    pieces.merge(board.getPieceInSquare(x, y).getType(), 1, Integer::sum);
+                }
+            }
+        }
+
+//        if (!hasAll(pieces, List.of()))
+        return pieces.get(PieceType.ROOK) == 0 && pieces.get(PieceType.QUEEN) == 0 && pieces.get(PieceType.PAWN) == 0 && pieces.get(PieceType.BISHOP) < 2;
+    }
+
+    private static <T> boolean hasAll (List<T> target, List<T> probes) {
+        Map<T, Boolean> contains = probes.stream().collect(Collectors.toMap(probe -> probe, probe -> false));
+
+        for (T t : target) {
+            if (contains.containsKey(t)) {
+                contains.put(t, true);
+            }
+        }
+
+        return contains.values().stream().allMatch(a -> a);
+    }
+
+    public static void main(String[] args) {
+        Board board = Board.fromFEN("1k6/8/8/8/8/8/3B1N2/K7 w - - 0 1");
+        System.out.println(hasInsufficientMaterial(board));
     }
 }

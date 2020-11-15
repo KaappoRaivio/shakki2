@@ -31,6 +31,11 @@ public class CastlingKing extends King {
         return result;
     }
 
+    @Override
+    public String conventionalToString() {
+        return super.conventionalToString() + "̅";
+    }
+
     private List<Move> handleKingSideCastling (Board board, Position position) {
             Piece supposedRook = board.getPieceInSquare(position.offsetX(3));
 

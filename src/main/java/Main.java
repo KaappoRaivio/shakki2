@@ -3,6 +3,7 @@ import chess.board.BoardHelpers;
 import chess.move.Move;
 import chess.piece.basepiece.PieceColor;
 import players.Player;
+import players.treeai.BasicBoardEvaluator;
 import players.treeai.TreeAI;
 import runner.CapableOfPlaying;
 import runner.Runner;
@@ -51,7 +52,7 @@ public class Main {
             switch (line) {
                 case "white":
                     players = new CapableOfPlaying[]{
-                            new TreeAI(PieceColor.WHITE, board, AIDepth, 8, useOpeningLibrary, allocatedTime),
+                            new TreeAI("ai", PieceColor.WHITE, board, AIDepth, 8, useOpeningLibrary, new BasicBoardEvaluator(AIDepth, PieceColor.WHITE)),
                             new Player(PieceColor.BLACK, "chess.com", ui),
                             //                new TreeAI(PieceColor.WHITE, board, 3, 8),
                     };
@@ -59,13 +60,13 @@ public class Main {
                 case "black":
                     players = new CapableOfPlaying[]{
                             new Player(PieceColor.WHITE, "chess.com", ui),
-                            new TreeAI(PieceColor.BLACK, board, AIDepth, 8, useOpeningLibrary, allocatedTime),
+                            new TreeAI("ai", PieceColor.BLACK, board, AIDepth, 8, useOpeningLibrary, new BasicBoardEvaluator(AIDepth, PieceColor.BLACK)),
                     };
                     break label;
                 case "both":
                     players = new CapableOfPlaying[]{
-                            new TreeAI(PieceColor.WHITE, board, AIDepth, 8, useOpeningLibrary, allocatedTime),
-                            new TreeAI(PieceColor.BLACK, board, AIDepth, 8, useOpeningLibrary, allocatedTime),
+                            new TreeAI("ai", PieceColor.WHITE, board, AIDepth, 8, useOpeningLibrary, new BasicBoardEvaluator(AIDepth, PieceColor.WHITE)),
+                            new TreeAI("ai", PieceColor.BLACK, board, AIDepth, 8, useOpeningLibrary, new BasicBoardEvaluator(AIDepth, PieceColor.BLACK)),
                     };
                     break label;
                 case "none":

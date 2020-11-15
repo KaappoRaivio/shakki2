@@ -20,7 +20,7 @@ public class TreeAIWorker extends Thread {
     private Board board;
     private int id;
     private int depth;
-    private BoardEvaluator evaluator;
+    private BasicBoardEvaluator evaluator;
     private ConcurrentHashMap<Integer, TranspositionTableEntry> transpositionTable;
     private Map<Move, Double> result;
     public Map<Move, String> moveHistorys = new HashMap<>();
@@ -39,7 +39,7 @@ public class TreeAIWorker extends Thread {
     private boolean ready = false;
 
 
-    public TreeAIWorker(List<Move> moves, Board board, int id, int depth, BoardEvaluator evaluator, ConcurrentHashMap<Integer, TranspositionTableEntry> transpositionTable) {
+    public TreeAIWorker(List<Move> moves, Board board, int id, int depth, BasicBoardEvaluator evaluator, ConcurrentHashMap<Integer, TranspositionTableEntry> transpositionTable) {
         super();
 
         this.moves = moves;
@@ -125,13 +125,13 @@ public class TreeAIWorker extends Thread {
 
 
         if (board.isCheckmate() || board.isDraw() || currentDepth <= 0) {
-            return evaluator.evaluateBoard(board, currentDepth);
+            return quiesce(board, alpha, beta, currentDepth);
         } else {
             double totalPositionValue = -1e22;
             Move bestMove = null;
 
             List<Move> allPossibleMoves = board.getAllPossibleMoves();
-//            sortMoves(allPossibleMoves, board, currentDepth, evaluator);
+            sortMoves(allPossibleMoves, board, currentDepth, evaluator);
             for (Move move : allPossibleMoves) {
 
                 board.executeMoveNoChecks(move);
@@ -171,12 +171,44 @@ public class TreeAIWorker extends Thread {
         allPossibleMoves.sort((a, b) -> {
             board.executeMoveNoChecks(a);
             double score1 = evaluator.evaluateBoard(board, currentDepth);
+            if (board.isCheckmate() || board.isCheck()) score1 += 10000;
             board.unMakeMove(1);
             board.executeMoveNoChecks(b);
             double score2 = evaluator.evaluateBoard(board, currentDepth);
+            if (board.isCheckmate() || board.isCheck()) score2 += 10000;
             board.unMakeMove(1);
-            return (int) (score1 - score2);
+            return Double.compare(score1, score2);
         });
+    }
+
+    private double quiesce (Board board, double alpha, double beta, int currentDepth) {
+        double standingPat = evaluator.evaluateBoard(board, currentDepth);
+
+        if (standingPat >= beta) {
+            return beta;
+        }
+        if (alpha < standingPat) {
+            alpha = standingPat;
+        }
+
+        double score = -1e22;
+
+        for (Move move : board.getAllPossibleMoves()) {
+            if (move.isCapturingMove()) {
+                board.makeMove(move);
+                score = -quiesce(board, -beta, -alpha, currentDepth);
+                board.unMakeMove(1);
+
+                if (score >= beta) {
+                    return beta;
+                }
+                if (score > alpha) {
+                    alpha = score;
+                }
+            }
+        }
+
+        return alpha;
     }
 
 
@@ -193,7 +225,7 @@ public class TreeAIWorker extends Thread {
         Board board = Board.fromFEN("r3kb1r/1bpq1ppp/p3pn2/1p4B1/2pPP3/P1N5/1P3PPP/R2QKB1R w KQkq - 0 11");
 
         var a = board.getAllPossibleMoves();
-        sortMoves(a, board, 4, new BoardEvaluator(3, PieceColor.WHITE));
+        sortMoves(a, board, 4, new BasicBoardEvaluator(3, PieceColor.WHITE));
         System.out.println(board);
         System.out.println(a);
     }

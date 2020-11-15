@@ -50,5 +50,13 @@ public class ReadWriter {
 
     }
 
-
+    public static void appendFile (String path, String text) {
+        String buffer;
+        try {
+            buffer = readFile(path);
+        } catch (Exception e) {
+            buffer = "";
+        };
+        writeFile(path, buffer + text);
+    }
 }

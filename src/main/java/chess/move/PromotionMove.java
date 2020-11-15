@@ -54,6 +54,11 @@ public class PromotionMove extends NormalMove {
     }
 
     @Override
+    public String getShortAlgebraic(Board board) {
+        return super.getShortAlgebraic(board) + "=" + MoveHashMap.moveHashMap.get(promoted.getType()).toUpperCase();
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
