@@ -1,8 +1,8 @@
 package chess.piece;
 
 import chess.board.Board;
-import chess.misc.exceptions.ChessException;
-import chess.misc.Position;
+import misc.exceptions.ChessException;
+import misc.Position;
 import chess.move.EnPassantMove;
 import chess.move.Move;
 import chess.move.NormalMove;
@@ -10,7 +10,6 @@ import chess.move.PromotionMove;
 import chess.piece.basepiece.Piece;
 import chess.piece.basepiece.PieceColor;
 import chess.piece.basepiece.PieceType;
-import misc.Pair;
 
 import java.util.ArrayList;
 import java.util.HashSet;

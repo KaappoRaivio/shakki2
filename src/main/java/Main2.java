@@ -1,4 +1,4 @@
-import chess.misc.Position;
+import misc.Position;
 
 import java.util.Random;
 

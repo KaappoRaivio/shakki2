@@ -1,13 +1,12 @@
 package chess.board;
 
-import chess.misc.Position;
+import misc.Position;
 import chess.piece.*;
 import chess.piece.basepiece.Piece;
 import chess.piece.basepiece.PieceColor;
 
 import java.io.Serializable;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Random;
 
 public class BoardHasher implements Serializable {

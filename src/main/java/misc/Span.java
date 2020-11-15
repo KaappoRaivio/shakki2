@@ -1,6 +1,6 @@
-package chess.misc;
+package misc;
 
-import chess.misc.exceptions.NotImplementedError;
+import misc.exceptions.NotImplementedError;
 
 import java.util.Iterator;
 import java.util.Spliterator;

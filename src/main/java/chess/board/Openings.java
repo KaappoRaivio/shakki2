@@ -1,7 +1,7 @@
 package chess.board;
 
-import chess.misc.ReadWriter;
-import chess.misc.Triple;
+import misc.ReadWriter;
+import misc.Triple;
 import chess.move.Move;
 import chess.piece.basepiece.PieceColor;
 import misc.Pair;

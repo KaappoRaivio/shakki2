@@ -2,7 +2,7 @@ package chess.move;
 
 import chess.board.Board;
 import chess.board.BoardHasher;
-import chess.misc.Position;
+import misc.Position;
 import chess.piece.NoPiece;
 import chess.piece.basepiece.Piece;
 

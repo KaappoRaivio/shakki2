@@ -1,7 +1,7 @@
 package players.treeai;
 
 import chess.board.Board;
-import chess.misc.exceptions.ChessException;
+import misc.exceptions.ChessException;
 import chess.move.Move;
 import chess.piece.basepiece.PieceColor;
 import misc.Pair;

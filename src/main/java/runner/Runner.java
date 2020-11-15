@@ -1,7 +1,7 @@
 package runner;
 
 import chess.board.Board;
-import chess.misc.exceptions.StopException;
+import misc.exceptions.StopException;
 import chess.move.Move;
 import chess.piece.basepiece.PieceColor;
 import ui.UndoException;

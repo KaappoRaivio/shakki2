@@ -2,8 +2,8 @@ package chess.move;
 
 import chess.board.Board;
 import chess.board.BoardHasher;
-import chess.misc.Position;
-import chess.misc.exceptions.ChessException;
+import misc.Position;
+import misc.exceptions.ChessException;
 import chess.piece.CastlingRook;
 import chess.piece.Rook;
 import chess.piece.basepiece.Piece;

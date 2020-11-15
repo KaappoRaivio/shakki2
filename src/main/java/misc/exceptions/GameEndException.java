@@ -1,4 +1,4 @@
-package chess.misc.exceptions;
+package misc.exceptions;
 
 public class GameEndException extends ChessException {
     public GameEndException (String message) {

@@ -1,4 +1,4 @@
-package chess.misc.exceptions;
+package misc.exceptions;
 
 public class ChessException extends RuntimeException {
     public ChessException (String message) {

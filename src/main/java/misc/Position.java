@@ -1,10 +1,8 @@
-package chess.misc;
+package misc;
 
-import chess.misc.exceptions.ChessException;
-import misc.Pair;
+import misc.exceptions.ChessException;
 
 import java.io.Serializable;
-import java.util.Objects;
 import java.util.regex.Pattern;
 
 public class Position implements Serializable {

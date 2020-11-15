@@ -1,8 +1,8 @@
 package ui;
 
 import chess.board.Board;
-import chess.misc.exceptions.ChessException;
-import chess.misc.exceptions.StopException;
+import misc.exceptions.ChessException;
+import misc.exceptions.StopException;
 import chess.move.Move;
 import chess.piece.basepiece.PieceColor;
 import misc.OrdinalConverter;

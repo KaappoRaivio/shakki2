@@ -60,8 +60,11 @@ public class TreeAI implements CapableOfPlaying {
 //        List<Move> allPossibleMoves = List.of(Move.parseMove("f8c5", PieceColor.WHITE, board));
         List<List<Move>> split = Splitter.splitListInto(allPossibleMoves, amountOfProcessors);
 
+        BoardEvaluator evaluator = new BoardEvaluator(depth, color);
+        System.out.println(evaluator.getGameStage(board));
+        board.useRepetitionTracker(false);
         for (int i = 0; i < amountOfProcessors; i++) {
-            TreeAIWorker thread = new TreeAIWorker(split.get(i), board.deepCopy(), i, depth, new BoardEvaluator(depth, color), sharedTranspositionTable);
+            TreeAIWorker thread = new TreeAIWorker(split.get(i), board.deepCopy(), i, depth, evaluator, sharedTranspositionTable);
             threads.add(thread);
             System.out.println("\tCreated " + thread);
             thread.start();
@@ -88,8 +91,17 @@ public class TreeAI implements CapableOfPlaying {
         System.out.println(moveHistory);
         System.out.println("values: " + values);
 
+        board.useRepetitionTracker(true);
+        for (Move move : values.keySet()) {
+            board.makeMove(move);
+            if (board.isDraw()) {
+                values.put(move, 0.0);
+            }
+            board.unMakeMove(1);
+        }
+
         List<Map.Entry<Move, Double>> top4 = new ArrayList<>();
-        for (int i = 0; i < values.size(); i++) {
+        while (values.size() > 0) {
             Map.Entry<Move, Double> value = values
                     .entrySet()
                     .stream()

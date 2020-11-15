@@ -1,8 +1,6 @@
 package players.treeai;
 
 import chess.board.Board;
-import chess.misc.Position;
-import chess.piece.basepiece.Piece;
 
 class GameStage {
     private final double openingWeight;

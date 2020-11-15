@@ -3,12 +3,11 @@ package chess.move;
 import chess.board.Board;
 import chess.board.BoardHasher;
 import chess.board.BoardNotation;
-import chess.misc.Position;
+import misc.Position;
 import chess.piece.CastlingKing;
 import chess.piece.CastlingRook;
 import chess.piece.basepiece.Piece;
 import chess.piece.basepiece.PieceColor;
-import chess.piece.basepiece.PieceType;
 import misc.Pair;
 
 import java.io.Serializable;

@@ -1,14 +1,12 @@
 package chess.piece;
 
 import chess.board.Board;
-import chess.misc.Position;
+import misc.Position;
 import chess.move.Move;
 import chess.piece.basepiece.Piece;
 import chess.piece.basepiece.PieceColor;
 import chess.piece.basepiece.PieceType;
-import misc.Pair;
 
-import java.util.List;
 import java.util.Set;
 
 public class Queen extends Piece {

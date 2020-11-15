@@ -1,15 +1,11 @@
 package chess.board;
 
-import chess.misc.Position;
+import misc.Position;
 import chess.move.Move;
-import chess.piece.basepiece.Piece;
 import chess.piece.basepiece.PieceColor;
-import misc.Pair;
 
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class BoardState implements Serializable {
     private Position whiteKingPosition;

@@ -1,4 +1,4 @@
-package chess.misc.exceptions;
+package misc.exceptions;
 
 public class CheckmateException extends GameEndException {
     public CheckmateException () {

@@ -1,11 +1,10 @@
 package chess.piece.basepiece;
 
 import chess.board.Board;
-import chess.misc.Position;
-import chess.misc.exceptions.ChessException;
+import misc.Position;
+import misc.exceptions.ChessException;
 import chess.move.Move;
 import chess.move.NormalMove;
-import misc.Pair;
 
 import java.io.Serializable;
 import java.util.ArrayList;

@@ -1,6 +1,6 @@
 package chess.board;
 
-import chess.misc.exceptions.ChessException;
+import misc.exceptions.ChessException;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -13,27 +13,26 @@ public class RepetitionTracker implements Serializable {
     private boolean draw = false;
 
     public void add (Board value) {
-//        counts.merge(value.hashCode(), 1, Integer::sum);
-//        if (count(value) == 3) {
-//            draw = true;
-//        }
+        counts.merge(value.hashCode(), 1, Integer::sum);
+        if (count(value) == 3) {
+            draw = true;
+        }
 
     }
 
     public void subtract (Board value) {
-//        if (!counts.containsKey(value.hashCode())) {
-//            System.out.println(value.getMoveHistory() + ", " + value.getMoveHistoryPretty());
-//            throw new ChessException("Position \n" + value + " not known!" + value);
-//        }
-//        counts.merge(value.hashCode(), -1, Integer::sum);
-//        if (count(value) < 3) {
-//            draw = false;
-//        }
+        if (!counts.containsKey(value.hashCode())) {
+            System.out.println(value.getMoveHistory() + ", " + value.getMoveHistoryPretty());
+            throw new ChessException("Position \n" + value + " not known!" + value);
+        }
+        counts.merge(value.hashCode(), -1, Integer::sum);
+        if (count(value) < 3) {
+            draw = false;
+        }
     }
 
     private int count (Board value) {
         return counts.getOrDefault(value.hashCode(), 0);
-//        return 0;
     }
 
     public boolean isDraw () {

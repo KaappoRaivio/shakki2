@@ -1,4 +1,4 @@
-package chess.misc.exceptions;
+package misc.exceptions;
 
 public class StopException extends RuntimeException {
     public StopException(String message) {

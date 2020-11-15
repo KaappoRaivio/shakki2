@@ -15,16 +15,15 @@ import java.util.Scanner;
 
 public class Main {
     public static void main (String[] args) {
-//        Board orig = Board.fromFile("/home/kaappo/git/shakki2/src/main/resources/boards/starting_position.txt");
-//        Board board = Board.getStartingPosition();
+        Board board = Board.getStartingPosition();
 //        Board board = Board.fromFEN("1k6/3r4/8/8/8/3P4/8/1K6 b - - 0 1");
 
-        Board board = Board.fromFEN("4k3/4b3/8/p7/8/8/3Q4/4K3 b - - 0 1");
+//        Board board = Board.fromFEN("r2qkbnr/ppp2ppp/2np4/4N2b/2B1P3/2N4P/PPPP1PP1/R1BQK2R b KQkq - 0 1");
 //        BoardHelpers.executeSequenceOfMoves(board, List.of("f6e4", "c3e4", "b7e4", "f1e2"));
 
 //        Board board = Board.fromFEN("5QRR/8/1Q6/8/8/5PPP/8/K6k w - - 0 1");
 
-        System.out.println(board.getAllPossibleMoves());
+//        System.out.println(board.getAllPossibleMoves());
 //        board.makeMove(Move.parseMove("f8a3", PieceColor.BLACK, board));
 //        Board board = Board.fromFEN("r3kb1r/1bpq1ppp/p3pn2/1p4B1/2pPP3/P1N5/1P3PPP/R2QKB1R w KQkq - 0 11");
 
@@ -40,9 +39,9 @@ public class Main {
 
         CapableOfPlaying[] players;
         Scanner scanner = new Scanner(System.in);
-        int AIDepth = 5;
+        int AIDepth = 3;
         int allocatedTime = 30000;
-        boolean useOpeningLibrary = false;
+        boolean useOpeningLibrary = true;
         label:
         while (true) {
             System.out.print("Ai plays as: ");
@@ -63,13 +62,13 @@ public class Main {
                             new TreeAI(PieceColor.BLACK, board, AIDepth, 8, useOpeningLibrary, allocatedTime),
                     };
                     break label;
-                case "none":
+                case "both":
                     players = new CapableOfPlaying[]{
                             new TreeAI(PieceColor.WHITE, board, AIDepth, 8, useOpeningLibrary, allocatedTime),
                             new TreeAI(PieceColor.BLACK, board, AIDepth, 8, useOpeningLibrary, allocatedTime),
                     };
                     break label;
-                case "all":
+                case "none":
                     players = new CapableOfPlaying[]{
                             new Player(PieceColor.WHITE, "white", ui),
                             new Player(PieceColor.BLACK, "black", ui),

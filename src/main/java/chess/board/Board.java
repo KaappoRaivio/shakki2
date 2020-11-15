@@ -1,9 +1,9 @@
 package chess.board;
 
-import chess.misc.Position;
-import chess.misc.ReadWriter;
-import chess.misc.TermColor;
-import chess.misc.exceptions.ChessException;
+import misc.Position;
+import misc.ReadWriter;
+import misc.TermColor;
+import misc.exceptions.ChessException;
 import chess.move.Move;
 import chess.move.NoMove;
 import chess.piece.NoPiece;
@@ -12,7 +12,6 @@ import chess.piece.basepiece.PieceColor;
 import chess.piece.basepiece.PieceType;
 import misc.Pair;
 import misc.Saver;
-import org.apache.commons.lang3.ObjectUtils;
 
 import java.io.Serializable;
 import java.util.*;
@@ -31,6 +30,7 @@ public class Board implements Serializable{
     private final BoardStateHistory stateHistory;
     private BoardHasher hasher = new BoardHasher();
     private int hashCode;
+    private boolean useRepetitionTracker = true;
 
     private Board (Piece[][] board) {
         this(board, 0, "", WHITE, 0);
@@ -228,6 +228,10 @@ public class Board implements Serializable{
         return moves;
     }
 
+    public void useRepetitionTracker (boolean use) {
+        useRepetitionTracker = use;
+    }
+
     public void makeMove (Move move) {
         if (isMoveLegal(move, true, false)) {
             executeMoveNoChecks(move);
@@ -267,7 +271,9 @@ public class Board implements Serializable{
         stateHistory.getCurrentState().setTurn(newTurn.invert());
         stateHistory.getCurrentState().setMoveCount(currentMoveCount + 1);
 
-        repetitionTracker.add(this);
+        if (useRepetitionTracker) {
+            repetitionTracker.add(this);
+        }
     }
 
     public void unMakeMove (int level) {
@@ -278,7 +284,7 @@ public class Board implements Serializable{
     }
 
     private void undo (Move lastMove) {
-        repetitionTracker.subtract(this);
+        if (useRepetitionTracker) repetitionTracker.subtract(this);
         lastMove.unmakeMove(board);
         hashCode = lastMove.getIncrementalHash(hashCode, hasher);
     }

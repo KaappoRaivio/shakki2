@@ -1,7 +1,7 @@
 package chess.board;
 
-import chess.misc.Position;
-import chess.misc.ReadWriter;
+import misc.Position;
+import misc.ReadWriter;
 import chess.move.CastlingType;
 import chess.move.Move;
 import chess.piece.*;

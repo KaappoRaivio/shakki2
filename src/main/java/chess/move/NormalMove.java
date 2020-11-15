@@ -2,8 +2,8 @@ package chess.move;
 
 import chess.board.Board;
 import chess.board.BoardHasher;
-import chess.misc.Position;
-import chess.misc.exceptions.ChessException;
+import misc.Position;
+import misc.exceptions.ChessException;
 import chess.piece.NoPiece;
 import chess.piece.basepiece.Piece;
 import chess.piece.basepiece.PieceColor;
@@ -198,7 +198,6 @@ public class NormalMove implements Move {
 
     @Override
     public int hashCode () {
-//        return Objects.hash(getOrigin(), getDestination(), pieceInOrigin, pieceInDestination, getColor());
         int result = 1 << 25;
         result |= getOrigin().hashCode() << (22 - 6);
         result |= getDestination().hashCode() << (22 - 12);
@@ -206,7 +205,6 @@ public class NormalMove implements Move {
         result |= pieceInDestination.hashCode() << (22 - 20);
 
         return result;
-//        return getOrigin().hashCode() + getDestination().hashCode() * 64 + 4096 * pieceInOrigin +
     }
 
     @Override

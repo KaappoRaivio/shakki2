@@ -2,13 +2,10 @@ package chess.move;
 
 import chess.board.Board;
 import chess.board.BoardHasher;
-import chess.misc.Position;
+import misc.Position;
 import chess.piece.basepiece.Piece;
 import chess.piece.basepiece.PieceColor;
-import chess.piece.basepiece.PieceType;
 import misc.Pair;
-
-import java.util.Objects;
 
 public class CastlingMove implements Move {
     final private CastlingType castlingType;

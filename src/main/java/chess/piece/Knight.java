@@ -1,13 +1,11 @@
 package chess.piece;
 
 import chess.board.Board;
-import chess.misc.Position;
+import misc.Position;
 import chess.move.Move;
-import chess.move.NormalMove;
 import chess.piece.basepiece.Piece;
 import chess.piece.basepiece.PieceColor;
 import chess.piece.basepiece.PieceType;
-import misc.Pair;
 
 import java.util.*;
 

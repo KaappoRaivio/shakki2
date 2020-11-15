@@ -1,4 +1,4 @@
-package chess.misc;
+package misc;
 
 import java.util.Objects;
 

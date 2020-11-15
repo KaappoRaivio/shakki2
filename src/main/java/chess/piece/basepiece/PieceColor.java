@@ -1,7 +1,5 @@
 package chess.piece.basepiece;
 
-import chess.misc.exceptions.ChessException;
-
 import java.io.Serializable;
 
 public enum PieceColor implements Serializable {

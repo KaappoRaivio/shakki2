@@ -1,11 +1,9 @@
 package chess.board;
 
-import chess.misc.exceptions.ChessException;
+import misc.exceptions.ChessException;
 import chess.piece.*;
 import chess.piece.basepiece.Piece;
 import chess.piece.basepiece.PieceColor;
-import chess.piece.basepiece.PieceType;
-import misc.Pair;
 
 import java.util.Map;
 import java.util.Optional;

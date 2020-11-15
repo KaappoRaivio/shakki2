@@ -1,4 +1,4 @@
-package chess.misc;
+package misc;
 
 import org.apache.commons.lang3.StringUtils;
 
