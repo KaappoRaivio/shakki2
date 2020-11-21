@@ -1,5 +1,6 @@
 package misc;
 
+import chess.piece.basepiece.PieceColor;
 import misc.exceptions.ChessException;
 
 import java.io.Serializable;
@@ -29,6 +30,12 @@ public class Position implements Serializable {
         int y = Integer.parseInt(String.valueOf(position.charAt(1))) - 1;
 
         return new Position(x, y);
+    }
+
+    public Position flip (PieceColor color) {
+        if (color == PieceColor.WHITE) return this;
+        else if (color == PieceColor.BLACK) return new Position(7 - x, 7 - y);
+        else throw new RuntimeException("No NO_COLOR");
     }
 
     public Position offset (int x, int y) {

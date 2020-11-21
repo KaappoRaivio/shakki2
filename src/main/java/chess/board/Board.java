@@ -1,9 +1,5 @@
 package chess.board;
 
-import misc.Position;
-import misc.ReadWriter;
-import misc.TermColor;
-import misc.exceptions.ChessException;
 import chess.move.Move;
 import chess.move.NoMove;
 import chess.piece.NoPiece;
@@ -11,13 +7,17 @@ import chess.piece.basepiece.Piece;
 import chess.piece.basepiece.PieceColor;
 import chess.piece.basepiece.PieceType;
 import misc.Pair;
+import misc.Position;
+import misc.ReadWriter;
 import misc.Saver;
+import misc.exceptions.ChessException;
 
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static chess.piece.basepiece.PieceColor.*;
+import static chess.piece.basepiece.PieceColor.BLACK;
+import static chess.piece.basepiece.PieceColor.WHITE;
 
 public class Board implements Serializable{
     private Piece[][] board;
@@ -48,9 +48,6 @@ public class Board implements Serializable{
         stateHistory = new BoardStateHistory(new BoardState(kingPositions.getFirst(), kingPositions.getSecond(), fiftyMoveReset, Move.parseMove(lastMoveString, newTurn, this), turn, moveCount));
         hashCode = hasher.getFullHash(this);
 
-//        stateHistory.getCurrentState().setCheck(isCheck());
-//        stateHistory.getCurrentState().setCheckmate(isCheckMate());
-//        stateHistory.getCurrentState().setPossibleMoves(getAllPossibleMoves());
         repetitionTracker.add(this);
     }
 
@@ -65,6 +62,10 @@ public class Board implements Serializable{
 
     public static Board fromFEN (String FEN) {
         return BoardIO.fromFEN(FEN);
+    }
+
+    public String toFEN () {
+        return BoardIO.toFEN(this);
     }
 
     private Pair<Position, Position> findKings () {
@@ -87,16 +88,11 @@ public class Board implements Serializable{
                 Optional.ofNullable(blackKingPos).orElseThrow(() -> new ChessException("Couldn't find black king from board " + toString() + "!")));
     }
 
-
-
-
     private void initBoard (int dimX, int dimY) {
         board = new Piece[dimY][dimX];
 
-        for (int y = 0; y < board.length; y++) {
-            for (int x = 0; x < board[y].length; x++) {
-                board[y][x] = new NoPiece();
-            }
+        for (Piece[] pieces : board) {
+            Arrays.fill(pieces, NoPiece.NO_PIECE);
         }
     }
 
@@ -129,7 +125,7 @@ public class Board implements Serializable{
     public Piece getPieceInSquareRelativeTo (PieceColor color, int x, int y) {
         switch (color) {
             case BLACK:
-                return getPieceInSquare(7- x, 7 - y);
+                return getPieceInSquare(7 - x, 7 - y);
             case WHITE:
                 return getPieceInSquare(x, y);
             default:
@@ -216,15 +212,9 @@ public class Board implements Serializable{
                         moves.add(possibleMove);
                     }
                 }
-//                for (Move possibleMove : possibleMoves.getSecond()) {
-//                    if (isMoveLegal(possibleMove, false, ignoreTurn, true)) {
-//                        moves.getSecond().add(possibleMove);
-//                    }
-//                };
             }
         }
 
-//        stateHistory.getCurrentState().setPossibleMoves(moves);
         return moves;
     }
 
@@ -302,6 +292,9 @@ public class Board implements Serializable{
         return isSquareUnderThreat(Optional.ofNullable(kingPosition).orElseThrow());
     }
 
+    public Position getKingPosition (PieceColor color) {
+        return stateHistory.getCurrentState().getKingPosition(color);
+    }
 
     public boolean isCheck () {
         return isCheck(getTurn());
@@ -316,10 +309,6 @@ public class Board implements Serializable{
             return check;
         }
     }
-
-//    public boolean isCheckMate() {
-//        return isCheckMate(getTurn());
-//    }
 
     public boolean isCheckmate() {
         return isCheckmate(getTurn());
@@ -372,64 +361,17 @@ public class Board implements Serializable{
     }
 
     private String toString (PieceColor perspective) {
-        String hPadding = " ";
-        String vPadding = "";
-
-        String letters = perspective == WHITE ? " a b c d e f g h " : " h g f e d c b a ";
-        StringBuilder builder = new StringBuilder(vPadding).append(hPadding).append("\n ").append(letters).append(hPadding).append("\n").append(vPadding);
-
-        PieceColor squareColor = BLACK;
-        for (int y = dimY - 1; y >= 0; y--) {
-            squareColor = squareColor.invert();
-            if (y < dimY - 1) {
-                builder.append("\n");
-            }
-
-            int currentRow = perspective == WHITE ? y + 1 : 8 - y;
-            builder.append(currentRow);
-
-            for (int x = 0; x < dimX; x++) {
-                builder.append(getSquare(getPieceInSquareRelativeTo(perspective, x, y), squareColor, x == 0, x == 7));
-                squareColor = squareColor.invert();
-
-            }
-
-            builder.append(currentRow);
-        }
-
-        return builder.append("\n").append(vPadding).append(hPadding).append(letters).append(hPadding).toString();
+        return BoardStringHelpers.getString(this, perspective);
     }
+
+
 
     public String conventionalToString() {
-        String hPadding = " ";
-        String vPadding = "";
-
-        StringBuilder builder = new StringBuilder(vPadding).append(hPadding).append("\n  a b c d e f g h").append(hPadding).append("\n").append(vPadding);
-        for (int y = dimY - 1; y >= 0; y--) {
-            if (y < dimY - 1) {
-                builder.append("\n");
-            }
-
-            builder.append(y + 1).append(hPadding);
-
-            for (int x = 0; x < board[y].length; x++) {
-                builder.append(board[y][x].conventionalToString());
-
-                if (x + 1 < board[y].length) {
-                    builder.append(" ");
-                }
-            }
-
-            builder.append(hPadding).append(y + 1);
-        }
-
-        return builder.append("\n").append(vPadding).append(hPadding).append(" A B C D E F G H").append(hPadding).toString();
+        return BoardStringHelpers.getConventionalString(this);
     }
-
 
     @Override
     public int hashCode() {
-//        return Arrays.deepHashCode(board);
         return getTurn() == WHITE ? hashCode : -hashCode;
     }
 
@@ -510,110 +452,10 @@ public class Board implements Serializable{
         return builder.toString();
     }
 
-    private static String getSquare (Piece piece, PieceColor squareColor, boolean firstInRow, boolean lastInRow) {
-        String res;
-        String color;
-        TermColor lightSquareColor = TermColor.ANSI_LIGHT_GRAY;
-        TermColor darkSquareColor = TermColor.ANSI_DARK_GRAY;
-        String pieceColor = piece.getColor() == WHITE ? TermColor.ANSI_WHITE.getEscape() : TermColor.ANSI_BLACK.getEscape();
-        String firstInsert = "";
-        String lastInsert = "";
-        if (firstInRow) {
-            if (squareColor == WHITE) {
-                res = "▌";
-                color = lightSquareColor.getEscape(true) + pieceColor;
-                firstInsert = TermColor.ANSI_WHITE.getEscape();
-                firstInsert += lightSquareColor.getEscape(true);
-            } else {
-                res = "▐";
-                color = darkSquareColor.getEscape(true) + pieceColor;
-                firstInsert = darkSquareColor.getEscape();
-                firstInsert += TermColor.ANSI_WHITE.getEscape(true);
-            }
-        } else if (lastInRow) {
-            if (squareColor == WHITE) {
-                res = "▌";
-                color = lightSquareColor.getEscape(true) + pieceColor;
-                lastInsert = lightSquareColor.getEscape(true) + TermColor.ANSI_WHITE.getEscape();
-                lastInsert += "▐";
-            } else {
-                res = "▐";
-                color = darkSquareColor.getEscape(true) + pieceColor;
-                lastInsert = darkSquareColor.getEscape(true) + TermColor.ANSI_WHITE.getEscape();
-                lastInsert += "▐";
-            }
-        } else {
-            if (squareColor == WHITE) {
-                res = "▌";
-                color = lightSquareColor.getEscape(true) + pieceColor;
-            } else {
-                res = "▐";
-                color = darkSquareColor.getEscape(true) + pieceColor;
-            }
-        }
 
-
-
-        return lightSquareColor.getEscape(true) + darkSquareColor.getEscape() + firstInsert + res + color + piece + lastInsert + TermColor.ANSI_RESET.getEscape();
-    }
 
     public static void main(String[] args) {
-//        Board board = Board.fromFEN("r1b1k2r/pp2q2p/2p2npb/2np4/4pP2/4P2N/PPPNB1PP/R1BQK2R w - - 0 1");
-//        Board board = Board.getStartingPosition();
-        Board board = Board.fromFEN("r3kb1r/1bpq1pp1/p3pn1p/1p6/2pPP3/P1N5/1P3PPP/R2QKB1R b KQkq - 0 11");
 
-//        System.out.println(board.getAllPossibleMoves(PieceColor.WHITE));
-        BoardHelpers.executeSequenceOfMoves(board,
-                List.of("f6e4", "c3e4", "b7e4"));
-//        BoardHelpers.executeSequenceOfMoves(board,
-//                List.of("g1f3", "d7d5", "e2e3", "f7f6", "d2d4", "e7e5", "b1d2", "d8e7", "d4e5", "f6e5", "f1b5", "c7c6", "b5e2", "g8f6", "f3g5", "e5e4", "e2h5", "g7g6", "h5e2", "f8h6", "f2f4", "b8d7", "g5h3"));
-        System.out.println(board.toString());
-        System.out.println("asdasdasd");
-//
-//
-//        String s1 = "▐█";
-//        String s2 = "▌ ";
-//
-//        for (int i = 0; i < 10; i++) {
-////            System.out.print(s1);
-////            System.out.print(s2);
-//            System.out.print(getSquare(new King(BLACK), WHITE));
-//            System.out.print(getSquare(new King(WHITE), BLACK));
-//        }
-//        System.out.println();
-//        for (int i = 0; i < 10; i++) {
-////            System.out.print(s1);
-////            System.out.print(s2);
-//            System.out.print(getSquare(new King(WHITE), BLACK));
-//            System.out.print(getSquare(new King(BLACK), WHITE));
-//        }
-
-
-
-//        board.makeMove(Move.parseMove(""));
-//        CapableOfPlaying ai = new TreeAI(PieceColor.WHITE, board, 4, 8);
-//        ai.updateValues(board, PieceColor.WHITE, 30);
-//        System.out.println(ai.getMove());
-//        System.out.println(board.hashCode());
-//        System.out.println(board);
-//        board.makeMove(Move.parseMove("b5b4", PieceColor.BLACK, board));
-//        System.out.println(board.hashCode());
-//        System.out.println(board);
-//        board.unMakeMove(1);
-//        System.out.println(board.hashCode());
-//        Board board = Board.getStartingPosition();
-//        BoardHelpers.executeSequenceOfMoves(x, List.of("e2e4", "e7e5"));
-//        board.makeMove(Move.parseMove("e2e4", PieceColor.WHITE, board));
-        System.out.println(board.getMoveHistoryPretty());
-        System.out.println(board.conventionalToString());
-
-//        board.makeMove(Move.parseMove("e7e5", PieceColor.WHITE, board));
-//        System.out.println(board.getMoveHistoryPretty());
-//        System.out.println(board);
-//        Board board = Board.getStartingPosition();
-//        System.out.println(board);
-//        board.makeMove(Move.parseMove("e2e4", PieceColor.WHITE, board));
-//        System.out.println(board);
     }
 
     public BoardHasher getHasher() {

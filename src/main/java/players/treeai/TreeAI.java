@@ -6,13 +6,11 @@ import chess.move.Move;
 import chess.move.NoMove;
 import chess.piece.basepiece.PieceColor;
 import misc.Splitter;
+import org.apache.cayenne.util.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
 import runner.CapableOfPlaying;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
-
-import static java.lang.Math.max;
 
 public class TreeAI implements CapableOfPlaying {
     private String name;
@@ -50,7 +48,10 @@ public class TreeAI implements CapableOfPlaying {
         Map<Move, Double> values = new HashMap<>();
 
 
-        ConcurrentHashMap<Integer, TranspositionTableEntry> sharedTranspositionTable = new ConcurrentHashMap<>();
+//        ConcurrentHashMap<Integer, TranspositionTableEntry> sharedTranspositionTable = new ConcurrentHashMap<>();
+        ConcurrentLinkedHashMap<Integer, TranspositionTableEntry> sharedTranspositionTable = new ConcurrentLinkedHashMap.Builder<Integer, TranspositionTableEntry>()
+                .maximumWeightedCapacity(1_000_000)
+                .build();
 
         //        depthIteration: for (int depthIteration = depth; depthIteration <= depth; depthIteration++) {
         List<TreeAIWorker> threads = new ArrayList<>();
@@ -79,6 +80,7 @@ public class TreeAI implements CapableOfPlaying {
         }
 
         var moveHistory = new HashMap<Move, String>();
+        System.out.println(sharedTranspositionTable.size());
 
         try {
             Thread.sleep(100);

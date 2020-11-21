@@ -11,7 +11,9 @@ import java.util.Collections;
 import java.util.Set;
 
 public class NoPiece extends Piece {
-    public NoPiece () {
+    public static final NoPiece NO_PIECE = new NoPiece();
+
+    private NoPiece () {
         super(PieceType.NO_PIECE, PieceColor.NO_COLOR, " ", 0);
     }
 

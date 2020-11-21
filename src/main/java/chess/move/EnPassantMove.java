@@ -24,7 +24,7 @@ public class EnPassantMove extends NormalMove {
 
 
 
-        buffer[opponentPawnPosition.getY()][opponentPawnPosition.getX()] = new NoPiece();
+        buffer[opponentPawnPosition.getY()][opponentPawnPosition.getX()] = NoPiece.NO_PIECE;
     }
 
     @Override

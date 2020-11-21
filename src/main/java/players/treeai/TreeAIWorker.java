@@ -5,6 +5,7 @@ import misc.exceptions.ChessException;
 import chess.move.Move;
 import chess.piece.basepiece.PieceColor;
 import misc.Pair;
+import org.apache.cayenne.util.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -21,7 +22,7 @@ public class TreeAIWorker extends Thread {
     private int id;
     private int depth;
     private BasicBoardEvaluator evaluator;
-    private ConcurrentHashMap<Integer, TranspositionTableEntry> transpositionTable;
+    private ConcurrentLinkedHashMap<Integer, TranspositionTableEntry> transpositionTable;
     private Map<Move, Double> result;
     public Map<Move, String> moveHistorys = new HashMap<>();
     private boolean run;
@@ -39,7 +40,7 @@ public class TreeAIWorker extends Thread {
     private boolean ready = false;
 
 
-    public TreeAIWorker(List<Move> moves, Board board, int id, int depth, BasicBoardEvaluator evaluator, ConcurrentHashMap<Integer, TranspositionTableEntry> transpositionTable) {
+    public TreeAIWorker(List<Move> moves, Board board, int id, int depth, BasicBoardEvaluator evaluator, ConcurrentLinkedHashMap<Integer, TranspositionTableEntry> transpositionTable) {
         super();
 
         this.moves = moves;
@@ -61,7 +62,7 @@ public class TreeAIWorker extends Thread {
             board.unMakeMove(1);
 
             result.put(move, value);
-            moveHistorys.put(move, getPrincipleVariation(board.deepCopy(), move).toString());
+            moveHistorys.put(move, getPrincipalVariation(board.deepCopy(), move).toString());
             if (!run) break;
         }
         if (run)
@@ -72,7 +73,7 @@ public class TreeAIWorker extends Thread {
             }
     }
 
-    private List<String> getPrincipleVariation(Board board, Move move) {
+    private List<String> getPrincipalVariation(Board board, Move move) {
         List<String> moveHistory = new ArrayList<>();
         try {
             while (true) {
@@ -93,6 +94,9 @@ public class TreeAIWorker extends Thread {
             System.out.println(move);
             moveHistory.add("Could not go further due to hash collision");
             e.printStackTrace();
+        } catch (OutOfMemoryError e) {
+            System.out.println(transpositionTable.size());
+
         }
 
 //        board.unMakeMove(moveHistory.size());
@@ -184,7 +188,7 @@ public class TreeAIWorker extends Thread {
     }
 
     private double quiesce(Board board, double alpha, double beta, int currentDepth) {
-        return quiesce(board, alpha, beta, currentDepth, 0);
+        return quiesce(board, alpha, beta, currentDepth, 100);
     }
 
     private double quiesce (Board board, double alpha, double beta, int currentDepth, int limit) {

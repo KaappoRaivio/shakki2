@@ -20,6 +20,12 @@ public class BoardHelpers {
     }
 
     private static boolean hasInsufficientMaterial (Board board, PieceColor perspective) {
+        Map<PieceType, Integer> pieces = getPieceComposition(board, perspective);
+
+        return pieces.get(PieceType.ROOK) == 0 && pieces.get(PieceType.QUEEN) == 0 && pieces.get(PieceType.PAWN) == 0 && pieces.get(PieceType.BISHOP) < 2;
+    }
+
+    public static Map<PieceType, Integer> getPieceComposition(Board board, PieceColor perspective) {
         Map<PieceType, Integer> pieces = new HashMap<>(Map.of(
                 PieceType.KING, 0,
                 PieceType.QUEEN, 0,
@@ -37,9 +43,7 @@ public class BoardHelpers {
                 }
             }
         }
-
-//        if (!hasAll(pieces, List.of()))
-        return pieces.get(PieceType.ROOK) == 0 && pieces.get(PieceType.QUEEN) == 0 && pieces.get(PieceType.PAWN) == 0 && pieces.get(PieceType.BISHOP) < 2;
+        return pieces;
     }
 
     private static <T> boolean hasAll (List<T> target, List<T> probes) {

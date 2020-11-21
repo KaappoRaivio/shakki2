@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public class BoardNotation {
     public static final BoardNotation DEFAULT_NOTATION = new BoardNotation(Map.ofEntries(
-            Map.entry(".", new NoPiece()),
+            Map.entry(".", NoPiece.NO_PIECE),
 
             Map.entry("p", new Pawn(PieceColor.WHITE)),
             Map.entry("b", new Bishop(PieceColor.WHITE)),

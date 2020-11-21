@@ -4,6 +4,8 @@ import chess.move.Move;
 import chess.piece.basepiece.PieceColor;
 import players.Player;
 import players.treeai.BasicBoardEvaluator;
+import players.treeai.BasicBoardEvaluator2;
+import players.treeai.BoardEvaluator;
 import players.treeai.TreeAI;
 import runner.CapableOfPlaying;
 import runner.Runner;
@@ -16,8 +18,9 @@ import java.util.Scanner;
 
 public class Main {
     public static void main (String[] args) {
-        Board board = Board.getStartingPosition();
-//        Board board = Board.fromFEN("8/8/8/8/4k3/8/8/2BQKB2 w - - 0 1");
+//        Board board = Board.getStartingPosition();
+        Board board = Board.fromFEN("8/6pp/8/5p2/8/Pr2Qq1k/5P1P/4R1K1 w - - 0 1");
+//        BoardHelpers.executeSequenceOfMoves(board, List.of("e3b3", "f3b3", "e1e3", "b3e3"));
 //        board.useExpensiveDrawCalculation(false);
 
 //        Board board = Board.fromFEN("r2qkbnr/ppp2ppp/2np4/4N2b/2B1P3/2N4P/PPPP1PP1/R1BQK2R b KQkq - 0 1");
@@ -41,19 +44,22 @@ public class Main {
 
         CapableOfPlaying[] players;
         Scanner scanner = new Scanner(System.in);
-        int AIDepth = 2;
+        int AIDepth = 4;
         int allocatedTime = 30000;
         boolean useOpeningLibrary = false;
         label:
         while (true) {
-            System.out.print("Ai plays as: ");
-            String line = scanner.nextLine();
+//            System.out.print("Ai plays as: ");
+//            String line = scanner.nextLine();
+            String line = "white";
 //            String line = "black";
 
+            BoardEvaluator whiteEvaluator = new BasicBoardEvaluator2(AIDepth, PieceColor.WHITE);
+            BoardEvaluator blackEvaluator = new BasicBoardEvaluator(AIDepth, PieceColor.BLACK);
             switch (line) {
                 case "white":
                     players = new CapableOfPlaying[]{
-                            new TreeAI("ai", PieceColor.WHITE, board, AIDepth, 8, useOpeningLibrary, new BasicBoardEvaluator(AIDepth, PieceColor.WHITE)),
+                            new TreeAI("ai", PieceColor.WHITE, board, AIDepth, 8, useOpeningLibrary, whiteEvaluator),
                             new Player(PieceColor.BLACK, "chess.com", ui),
                             //                new TreeAI(PieceColor.WHITE, board, 3, 8),
                     };
@@ -61,13 +67,13 @@ public class Main {
                 case "black":
                     players = new CapableOfPlaying[]{
                             new Player(PieceColor.WHITE, "chess.com", ui),
-                            new TreeAI("ai", PieceColor.BLACK, board, AIDepth, 8, useOpeningLibrary, new BasicBoardEvaluator(AIDepth, PieceColor.BLACK)),
+                            new TreeAI("ai", PieceColor.BLACK, board, AIDepth, 8, useOpeningLibrary, blackEvaluator),
                     };
                     break label;
                 case "both":
                     players = new CapableOfPlaying[]{
-                            new TreeAI("ai", PieceColor.WHITE, board, AIDepth, 8, useOpeningLibrary, new BasicBoardEvaluator(AIDepth, PieceColor.WHITE)),
-                            new TreeAI("ai", PieceColor.BLACK, board, AIDepth, 8, useOpeningLibrary, new BasicBoardEvaluator(AIDepth, PieceColor.BLACK)),
+                            new TreeAI("ai", PieceColor.WHITE, board, AIDepth, 8, useOpeningLibrary, whiteEvaluator),
+                            new TreeAI("ai", PieceColor.BLACK, board, AIDepth, 8, useOpeningLibrary, blackEvaluator),
                     };
                     break label;
                 case "none":

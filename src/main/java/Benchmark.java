@@ -17,11 +17,11 @@ public class Benchmark {
     public static void main(String... args) {
 
         boolean swap = false;
-        int AIDepth = 2;
+        int AIDepth = 3;
         int amountOfProcessors = 8;
         boolean useOpeningLibrary = true;
 
-        String filename = "/home/kaappo/git/shakki2/src/main/java/result(" + new Date().toString() + ").txt";
+        String filename = "/home/kaappo/git/shakki2/src/main/java/result (" + new Date().toString() + ").txt";
         System.out.println(filename);
         int iteration = 0;
         while (true) {

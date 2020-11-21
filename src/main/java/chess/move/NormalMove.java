@@ -33,10 +33,10 @@ public class NormalMove implements Move {
 
         PieceColor color = board.getPieceInSquare(origin).getColor();
         if (color == PieceColor.NO_COLOR) {
-            System.out.println("Suspicios move generation with no piece at origin! " + board  + ", " + origin);
+            System.out.println("Suspicious move generation with no piece at origin! " + board  + ", " + origin);
             color = board.getPieceInSquare(destination).getColor();
             pieceInOrigin = pieceInDestination;
-            pieceInDestination = new NoPiece();
+            pieceInDestination = NoPiece.NO_PIECE;
         }
         this.pieceInOrigin = pieceInOrigin;
         this.pieceInDestination = pieceInDestination;
@@ -47,7 +47,7 @@ public class NormalMove implements Move {
     @Override
     public void makeMove (Piece[][] buffer) {
         buffer[destination.getY()][destination.getX()] = buffer[origin.getY()][origin.getX()];
-        buffer[origin.getY()][origin.getX()] = new NoPiece();
+        buffer[origin.getY()][origin.getX()] = NoPiece.NO_PIECE;
     }
 
     @Override

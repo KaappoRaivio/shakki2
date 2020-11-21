@@ -1,5 +1,7 @@
 package chess.board;
 
+import chess.move.CastlingMove;
+import chess.move.NormalMove;
 import misc.Position;
 import misc.ReadWriter;
 import chess.move.CastlingType;
@@ -8,11 +10,9 @@ import chess.piece.*;
 import chess.piece.basepiece.Piece;
 import chess.piece.basepiece.PieceColor;
 import chess.piece.basepiece.PieceType;
+import players.treeai.BoardEvaluatorHelpers;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -69,7 +69,8 @@ public class BoardIO {
                     movesSince50Reset = Integer.parseInt(line.split("( )+")[1]) * 2;
                     break;
                 case MOVECOUNT:
-                    moveCount = (Integer.parseInt(line.split("( )+")[1]) - 1) * 2;
+//                    moveCount = (Integer.parseInt(line.split("( )+")[1]) - 1) * 2;
+                    moveCount = Integer.parseInt(line.split("( )+")[1]);
             }
         }
 
@@ -223,9 +224,45 @@ public class BoardIO {
         return new String(chars);
     }
 
-//    public static String getFENDump (Board board) {
-//
-//    }
+    public static String toFEN (Board board) {
+        StringBuilder builder = new StringBuilder();
+        String fenBoard = getFENBoard(board);
+        builder.append(fenBoard).append(" ");
+        builder.append(board.getTurn() == PieceColor.WHITE ? "w" : "b").append(" ");
+        builder.append(getCastlingString(board)).append(" ");
+        builder.append(getEnPassantString(board)).append(" ");
+        builder.append(board.getStateHistory().getCurrentState().getMovesSinceFiftyMoveReset()).append(" ");
+        builder.append(board.getStateHistory().getCurrentState().getMoveCount()).append(" ");
+
+        return builder.toString();
+    }
+
+    private static String getEnPassantString(Board board) {
+        Move lastMove = board.getLastMove();
+        if (lastMove instanceof NormalMove && Math.abs(lastMove.getOrigin().getY() - lastMove.getDestination().getY()) == 2 && lastMove.getPiece().getType() == PieceType.PAWN) {
+            return new Position(lastMove.getDestination().getX(), (lastMove.getOrigin().getY() + lastMove.getDestination().getY()) / 2).toString().toLowerCase();
+        }
+        return "-";
+    }
+
+    private static String getCastlingString(Board board) {
+        String whiteCastling = "";
+
+        if (board.getPieceInSquare(4, 0) instanceof CastlingKing) {
+            if (board.getPieceInSquare(7, 0) instanceof CastlingRook) whiteCastling += "K";
+            if (board.getPieceInSquare(0, 0) instanceof CastlingRook) whiteCastling += "Q";
+        }
+
+        String blackCastling = "";
+
+        if (board.getPieceInSquareRelativeTo(PieceColor.BLACK, 4, 0, true) instanceof CastlingKing) {
+            if (board.getPieceInSquareRelativeTo(PieceColor.BLACK, 7, 0, true) instanceof CastlingRook) blackCastling += "k";
+            if (board.getPieceInSquareRelativeTo(PieceColor.BLACK, 0, 0, true) instanceof CastlingRook) blackCastling += "q";
+        }
+
+        String result = whiteCastling + blackCastling;
+        return result.length() > 0 ? result : "-";
+    }
 
     private static Map<Piece, String> magicMap = Map.ofEntries(
             Map.entry(new King(PieceColor.WHITE), "K"),
@@ -254,43 +291,45 @@ public class BoardIO {
     );
 
     private static String getFENBoard (Board board) {
-        StringBuilder builder = new StringBuilder();
+//        StringBuilder builder = new StringBuilder();
 
-        for (int y = 7; y >= 0; y--) {
-            builder.append("/");
+        List<String> rows = new ArrayList<>();
+
+        for (Piece[] pieces : board.getBoard()) {
+            LinkedList<String> row = new LinkedList<>();
             for (int x = 0; x < 8; x++) {
-                Piece piece = board.getPieceInSquare(x, y);
-                if (piece.getType() == PieceType.NO_PIECE) {
-                    int count = 1;
-                    board.getPieceInSquare(x, y);
-                    while (true) {
-                        x++;
-                        Piece secondPiece = board.getPieceInSquare(x, y);
-                        if (secondPiece.getType() != PieceType.NO_PIECE) {
-                            builder.append(count);
-                            builder.append(magicMap.get(secondPiece));
-//                            x--;
-                            break;
-                        } else if (x >= 7) {
-                            builder.append(count);
-                            x++;
-                            break;
-                        }
-                        count++;
-                    }
+                Piece piece = pieces[x];
+
+                if (piece.getColor() != PieceColor.NO_COLOR) {
+                    String obj = magicMap.get(piece);
+                    row.add(Objects.requireNonNull(obj));
                 } else {
-                    builder.append(magicMap.get(piece));
+                    String value = row.peekLast();
+                    if (value != null && Character.isDigit(value.charAt(0))) {
+                        row.removeLast();
+                        row.add(String.valueOf(Integer.parseInt(value) + 1));
+                    } else {
+                        row.add("1");
+                    }
                 }
             }
+            rows.add(String.join("", row));
         }
 
-        return builder.toString();
+        Collections.reverse(rows);
+        return String.join("/", rows);
+
     }
 
     public static void main(String[] args) {
 //        System.out.println(fromFENFile("/home/kaappo/git/shakki2/src/main/resources/boards/test.fen"));
         Board board = Board.fromFEN("R6R/3Q4/1Q4Q1/4Q3/2Q4Q/Q4Q2/pp1Q4/kBNN1KB1 w - - 1 2");
         System.out.println(board);
-        System.out.println(getFENBoard(board));
+        System.out.println(board.toFEN());
+
+        board = Board.getStartingPosition();
+        System.out.println(board);
+        System.out.println(board.toFEN());
+//        System.out.println(getFENBoard(board));
     }
 }

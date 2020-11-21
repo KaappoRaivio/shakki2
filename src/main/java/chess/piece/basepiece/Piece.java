@@ -36,18 +36,7 @@ abstract public class Piece implements Serializable {
 
     abstract public Set<Move> getPossibleMoves(Board board, Position position, Move lastMove, boolean includeSelfCapture);
 
-    protected Set<Move> getMovesFromOffsets(List<Position> offsets, Board board, Position position, boolean includeSelfCapture) {
-        Set<Move> moves = new HashSet<>();
 
-        for (Position offset : offsets) {
-            Position destination = position.offset(offset, false);
-            if (destination.verify() && (board.getPieceInSquare(destination).getColor() != this.color || (includeSelfCapture && board.getPieceInSquare(destination).getColor() != PieceColor.NO_COLOR))) {
-                NormalMove move = new NormalMove(position, destination, board);
-                moves.add(move);
-            }
-        }
-        return moves;
-    }
 
     protected abstract double[][] getPieceSquareTable ();
 
@@ -114,7 +103,6 @@ abstract public class Piece implements Serializable {
     private Set<Position> getStraightPath (Board board, Position position, int deltaX, int deltaY, boolean includeSelfCapture) {
         return getStraightPath(board, position.getX(), position.getY(), deltaX, deltaY, includeSelfCapture);
     }
-
     private Set<Position> getStraightPath (Board board, int x, int y, int deltaX, int deltaY, boolean includeSelfCapture) {
         Set<Position> moves = new HashSet<>();
 
@@ -150,8 +138,8 @@ abstract public class Piece implements Serializable {
 
         return moves;
     }
-
     protected List<Move> getStraightPathMoves(Board board, Position position, int deltaX, int deltaY, boolean includeSelfCapture) {
+
         List<Move> moves = new ArrayList<>();
 
         for (Position destination : getStraightPath(board, position, deltaX, deltaY, includeSelfCapture)) {
@@ -166,6 +154,18 @@ abstract public class Piece implements Serializable {
         }
 
         return  moves;
+    }
+    protected Set<Move> getMovesFromOffsets(List<Position> offsets, Board board, Position position, boolean includeSelfCapture) {
+        Set<Move> moves = new HashSet<>();
+
+        for (Position offset : offsets) {
+            Position destination = position.offset(offset, false);
+            if (destination.verify() && (board.getPieceInSquare(destination).getColor() != this.color || (includeSelfCapture && board.getPieceInSquare(destination).getColor() != PieceColor.NO_COLOR))) {
+                NormalMove move = new NormalMove(position, destination, board);
+                moves.add(move);
+            }
+        }
+        return moves;
     }
 
     public String conventionalToString () {

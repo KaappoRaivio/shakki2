@@ -126,7 +126,7 @@ public class ThreatChecker {
             y += deltaY;
         }
 
-        return new NoPiece();
+        return NoPiece.NO_PIECE;
     }
 
     public static void main(String[] args) {
