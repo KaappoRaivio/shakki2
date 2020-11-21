@@ -127,7 +127,7 @@ public class CastlingMove implements Move {
     }
 
     @Override
-    public String getShortAlgebraic(Board board) {
+    public String getShortAlgebraicNotation(Board board) {
         switch (castlingType) {
             case QUEEN_SIDE:
                 return "O-O-O";
@@ -140,7 +140,7 @@ public class CastlingMove implements Move {
 
     @Override
     public String toString () {
-        return getShortAlgebraic(null) + " " + color;
+        return getShortAlgebraicNotation(null) + " " + color;
     }
 
     @Override

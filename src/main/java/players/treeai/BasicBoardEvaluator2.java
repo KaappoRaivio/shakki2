@@ -64,7 +64,7 @@ public class BasicBoardEvaluator2 implements BoardEvaluator {
     }
 
     private static double calculateEndgameEvaluation(Board board, PieceColor perspective, List<Move> possibleMoves) {
-        double totalValue = BoardEvaluatorHelpers.getMaterialPercentage(board, perspective) * 4000;
+        double totalValue = BoardEvaluatorHelpers.getMaterialPercentage(board, perspective) * 40000;
         totalValue += BoardEvaluatorHelpers.getAttackValue(board, possibleMoves) * 2;
         totalValue += BoardEvaluatorHelpers.getPawnAdvantage(board, perspective) * 2;
 

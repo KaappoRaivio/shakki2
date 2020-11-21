@@ -2,6 +2,7 @@ package chess.board;
 
 import chess.move.Move;
 import chess.piece.basepiece.Piece;
+import chess.piece.basepiece.PieceColor;
 import chess.piece.basepiece.PieceType;
 
 import java.util.*;
@@ -15,6 +16,10 @@ public class BoardHelpers {
     }
 
     public static boolean hasInsufficientMaterial(Board board) {
+        return hasInsufficientMaterial(board, PieceColor.WHITE) && hasInsufficientMaterial(board, PieceColor.BLACK);
+    }
+
+    private static boolean hasInsufficientMaterial (Board board, PieceColor perspective) {
         Map<PieceType, Integer> pieces = new HashMap<>(Map.of(
                 PieceType.KING, 0,
                 PieceType.QUEEN, 0,
@@ -27,7 +32,7 @@ public class BoardHelpers {
 
         for (int y = 0; y < 8; y++) {
             for (int x = 0; x < 8; x++) {
-                if (board.getPieceInSquare(x, y).getColor() == board.getTurn()) {
+                if (board.getPieceInSquare(x, y).getColor() == perspective) {
                     pieces.merge(board.getPieceInSquare(x, y).getType(), 1, Integer::sum);
                 }
             }

@@ -17,7 +17,8 @@ import java.util.Scanner;
 public class Main {
     public static void main (String[] args) {
         Board board = Board.getStartingPosition();
-//        Board board = Board.fromFEN("1k6/3r4/8/8/8/3P4/8/1K6 b - - 0 1");
+//        Board board = Board.fromFEN("8/8/8/8/4k3/8/8/2BQKB2 w - - 0 1");
+//        board.useExpensiveDrawCalculation(false);
 
 //        Board board = Board.fromFEN("r2qkbnr/ppp2ppp/2np4/4N2b/2B1P3/2N4P/PPPP1PP1/R1BQK2R b KQkq - 0 1");
 //        BoardHelpers.executeSequenceOfMoves(board, List.of("f6e4", "c3e4", "b7e4", "f1e2"));
@@ -40,9 +41,9 @@ public class Main {
 
         CapableOfPlaying[] players;
         Scanner scanner = new Scanner(System.in);
-        int AIDepth = 3;
+        int AIDepth = 2;
         int allocatedTime = 30000;
-        boolean useOpeningLibrary = true;
+        boolean useOpeningLibrary = false;
         label:
         while (true) {
             System.out.print("Ai plays as: ");
@@ -80,7 +81,7 @@ public class Main {
 
 
         Runner runner = new Runner(board, players, ui, Collections.emptyList());
-        runner.play(board.getTurn());
+        System.out.println(runner.play(board.getTurn()));
 
 //        Board board = orig.deepCopy();
 

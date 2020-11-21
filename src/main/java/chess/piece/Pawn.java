@@ -22,11 +22,11 @@ public class Pawn extends Piece {
     }
 
     @Override
-    public Set<Move> getPossibleMoves(Board board, Position position, Move lastMove) {
+    public Set<Move> getPossibleMoves(Board board, Position position, Move lastMove, boolean includeSelfCapture) {
         Set<Move> moves = new HashSet<>();
 
         moves.addAll(handleStraightAhead(board, position));
-        moves.addAll(handleCapture(board, position));
+        moves.addAll(handleCapture(board, position, includeSelfCapture));
         moves.addAll(handleEnPassant(board, position, lastMove, -1));
         moves.addAll(handleEnPassant(board, position, lastMove, 1));
         moves.addAll(handlePromotion(board, position));
@@ -91,11 +91,11 @@ public class Pawn extends Piece {
         return color == PieceColor.WHITE ? position.getY() != 1 : position.getY() != 6;
     }
 
-    private List<Move> handleCapture(Board board, Position position) {
+    private List<Move> handleCapture(Board board, Position position, boolean includeSelfCapture) {
         List<Move> moves = new ArrayList<>();
 
-        moves.addAll(getSuitableCaptureMoves(board, position, position.offset(1, getForwardDirection(), false)));
-        moves.addAll(getSuitableCaptureMoves(board, position, position.offset(-1, getForwardDirection(), false)));
+        moves.addAll(getSuitableCaptureMoves(board, position, position.offset(1, getForwardDirection(), false), includeSelfCapture));
+        moves.addAll(getSuitableCaptureMoves(board, position, position.offset(-1, getForwardDirection(), false), includeSelfCapture));
 
 
         return moves;
@@ -107,10 +107,10 @@ public class Pawn extends Piece {
             PieceType.BISHOP,
             PieceType.KNIGHT
     ));
-    private List<Move> getSuitableCaptureMoves(Board board, Position position, Position offset) {
+    private List<Move> getSuitableCaptureMoves(Board board, Position position, Position offset, boolean includeSelfCapture) {
         List<Move> moves = new ArrayList<>();
         if (offset.verify()) {
-            if (board.getPieceInSquare(offset).getColor() == color.invert()) {
+            if (board.getPieceInSquare(offset).getColor() == color.invert() || (includeSelfCapture && board.getPieceInSquare(offset).getColor() != PieceColor.NO_COLOR)) {
                 if (offset.getY() == getEndFlank()) {
                     for (PieceType type : pieceTypes) {
                         PromotionMove move = new PromotionMove(position, offset, board, type);

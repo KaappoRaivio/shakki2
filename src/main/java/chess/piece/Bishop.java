@@ -17,13 +17,13 @@ public class Bishop extends Piece {
     }
 
     @Override
-    public Set<Move> getPossibleMoves(Board board, Position position, Move lastMove) {
+    public Set<Move> getPossibleMoves(Board board, Position position, Move lastMove, boolean includeSelfCapture) {
         Set<Move> moves = new HashSet<>();
 
-        moves.addAll(getStraightPathMoves(board, position, 1, 1));
-        moves.addAll(getStraightPathMoves(board, position, -1, 1));
-        moves.addAll(getStraightPathMoves(board, position, -1, -1));
-        moves.addAll(getStraightPathMoves(board, position, 1, -1));
+        moves.addAll(getStraightPathMoves(board, position, 1, 1, includeSelfCapture));
+        moves.addAll(getStraightPathMoves(board, position, -1, 1, includeSelfCapture));
+        moves.addAll(getStraightPathMoves(board, position, -1, -1, includeSelfCapture));
+        moves.addAll(getStraightPathMoves(board, position, 1, -1, includeSelfCapture));
 
         return moves;
     }

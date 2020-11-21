@@ -232,6 +232,10 @@ public class Board implements Serializable{
         useExpensiveDrawCalculation = use;
     }
 
+    public void makeMove (String move) {
+        makeMove(Move.parseMove(move, getTurn(), this));
+    }
+
     public void makeMove (Move move) {
         if (isMoveLegal(move, true, false)) {
             executeMoveNoChecks(move);
@@ -497,7 +501,7 @@ public class Board implements Serializable{
                 builder.append((currentState.getMoveCount() + 1) / 2).append(". ");
             }
 
-            builder.append(currentState.getLastMove().getShortAlgebraic(originalPosition)).append(" ");
+            builder.append(currentState.getLastMove().getShortAlgebraicNotation(originalPosition)).append(" ");
             if (!(currentState.getLastMove() instanceof NoMove)) {
                 originalPosition.makeMove(currentState.getLastMove());
             }

@@ -54,7 +54,7 @@ public interface Move extends Serializable {
 
     int getIncrementalHash(int oldHash, BoardHasher hasher);
 
-    String getShortAlgebraic(Board board);
+    String getShortAlgebraicNotation(Board board);
 
     public static void main(String[] args) {
         Board board = Board.getStartingPosition();

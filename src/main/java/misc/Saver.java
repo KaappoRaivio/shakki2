@@ -89,6 +89,7 @@ public class Saver implements Serializable {
                 }
 
             } catch (ClassNotFoundException | ClassCastException e) {
+                e.printStackTrace();
                 throw new RuntimeException("Exception in deepcopying " + object);
             }
 

@@ -57,7 +57,7 @@ public class TreeAITest {
     public void debugPrincipleVariation() {
         Board board = Board.fromFEN("5QRR/8/1Q6/8/5R2/5PPP/7k/K7 w - - 0 1");
         System.out.println(board);
-        TreeAI ai = new TreeAI(PieceColor.WHITE, board, 3, 1, false, 0);
+        TreeAI ai = new TreeAI("debug", PieceColor.WHITE, board, 3, 1, false, new BasicBoardEvaluator(3, PieceColor.WHITE));
         ai.updateValues(board, PieceColor.WHITE, 0);
         System.out.println(ai.getEvaluator().evaluateBoard(board, 4));
         System.out.println(ai.getMove());

@@ -21,6 +21,7 @@ public class NormalMove implements Move {
     final protected Piece pieceInOrigin;
     final protected Piece pieceInDestination;
     final protected PieceColor color;
+//    final private Board board;
 
     public NormalMove (Position origin, Position destination, Board board) {
         Piece pieceInOrigin;
@@ -32,6 +33,7 @@ public class NormalMove implements Move {
 
         PieceColor color = board.getPieceInSquare(origin).getColor();
         if (color == PieceColor.NO_COLOR) {
+            System.out.println("Suspicios move generation with no piece at origin! " + board  + ", " + origin);
             color = board.getPieceInSquare(destination).getColor();
             pieceInOrigin = pieceInDestination;
             pieceInDestination = new NoPiece();
@@ -39,6 +41,7 @@ public class NormalMove implements Move {
         this.pieceInOrigin = pieceInOrigin;
         this.pieceInDestination = pieceInDestination;
         this.color = color;
+//        this.board = board;
     }
 
     @Override
@@ -108,7 +111,7 @@ public class NormalMove implements Move {
     }
 
     @Override
-    public String getShortAlgebraic (Board board) {
+    public String getShortAlgebraicNotation(Board board) {
         StringBuilder builder = new StringBuilder();
         board.makeMove(this);
         if (pieceInOrigin.getType() != PieceType.PAWN) {
@@ -152,10 +155,10 @@ public class NormalMove implements Move {
     private Set<Position> getBrotherPiecePositions(Board board) {
         Set<Move> possibleMoves = board
                 .getPieceInSquare(destination)
-                .getPossibleMoves(board, destination, board.getLastMove());
+                .getPossibleMoves(board, destination, board.getLastMove(), true);
         return possibleMoves
                 .stream()
-                .filter(move -> move.getColor() == color
+                .filter(move -> board.getPieceInSquare(move.getDestination()).getColor() == color
                             && board.getPieceInSquare(move.getDestination()).getType() == pieceInOrigin.getType())
                 .map(Move::getDestination)
                 .collect(Collectors.toSet());

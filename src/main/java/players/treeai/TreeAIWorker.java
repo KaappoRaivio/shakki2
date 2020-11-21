@@ -87,12 +87,15 @@ public class TreeAIWorker extends Thread {
                 move = entry.getBestMove();
             }
         } catch (ChessException e) {
+            System.out.println("Hash collision!");
             System.out.println(board);
             System.out.println(moveHistory);
             System.out.println(move);
-            throw  e;
+            moveHistory.add("Could not go further due to hash collision");
+            e.printStackTrace();
         }
 
+//        board.unMakeMove(moveHistory.size());
         return moveHistory;
     }
 
@@ -131,9 +134,8 @@ public class TreeAIWorker extends Thread {
             Move bestMove = null;
 
             List<Move> allPossibleMoves = board.getAllPossibleMoves();
-            sortMoves(allPossibleMoves, board, currentDepth, evaluator);
+//            sortMoves(allPossibleMoves, board, currentDepth, evaluator);
             for (Move move : allPossibleMoves) {
-
                 board.executeMoveNoChecks(move);
                 int prevHash = board.hashCode();
                 double value = -deepEvaluateBoard(board, currentDepth - 1, -beta, -alpha, initialMove);
@@ -181,9 +183,15 @@ public class TreeAIWorker extends Thread {
         });
     }
 
-    private double quiesce (Board board, double alpha, double beta, int currentDepth) {
-        double standingPat = evaluator.evaluateBoard(board, currentDepth);
+    private double quiesce(Board board, double alpha, double beta, int currentDepth) {
+        return quiesce(board, alpha, beta, currentDepth, 0);
+    }
 
+    private double quiesce (Board board, double alpha, double beta, int currentDepth, int limit) {
+        double standingPat = evaluator.evaluateBoard(board, currentDepth);
+//        return standingPat;
+        
+        
         if (standingPat >= beta) {
             return beta;
         }
@@ -191,12 +199,16 @@ public class TreeAIWorker extends Thread {
             alpha = standingPat;
         }
 
+        if (limit <= 0) {
+            return standingPat;
+        }
+
         double score = -1e22;
 
         for (Move move : board.getAllPossibleMoves()) {
             if (move.isCapturingMove()) {
                 board.makeMove(move);
-                score = -quiesce(board, -beta, -alpha, currentDepth);
+                score = -quiesce(board, -beta, -alpha, currentDepth, limit - 1);
                 board.unMakeMove(1);
 
                 if (score >= beta) {

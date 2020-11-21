@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="misc.SaverTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2020-11-17T17:45:09" hostname="thinkbookpro" time="0.662">
+  <properties/>
+  <testcase name="benchmarkDeepcopy" classname="misc.SaverTest" time="0.662"/>
+  <system-out><![CDATA[643
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

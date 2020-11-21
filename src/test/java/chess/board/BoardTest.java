@@ -37,6 +37,14 @@ public class BoardTest {
     }
 
     @Test
+    public void testDraw() {
+        Board board = Board.fromFEN("8/8/8/8/4k3/8/8/2BQKB2 w - - 0 1");
+        board.makeMove("f1c4");
+
+        assertFalse(board.isDraw());
+    }
+
+    @Test
     public void testDrawByRepetition() {
         Board board = Board.fromFEN("8/7R/4K3/8/4k3/8/8/8 w - - 0 1");
 
@@ -145,7 +153,7 @@ public class BoardTest {
         Board board1 = Board.getStartingPosition();
 //        BoardHelpers.executeSequenceOfMoves(board1, List.of("e2e4"));
         board1.makeMove(Move.parseMove("e2e4", PieceColor.WHITE, board1));
-        Board board2 = Board.fromFEN("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1");
+        Board board2 = Board.fromFEN("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1");
 
         System.out.println(board1 + ", " + board1.hashCode() + ", " + new BoardHasher().getFullHash(board1));
         System.out.println(board2 + ", " + board2.hashCode() + ", " + new BoardHasher().getFullHash(board2));

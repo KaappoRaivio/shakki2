@@ -31,8 +31,8 @@ public class King extends Piece {
     }
 
     @Override
-    public Set<Move> getPossibleMoves(Board board, Position position, Move lastMove) {
-        return getMovesFromOffsets(offsets, board, position);
+    public Set<Move> getPossibleMoves(Board board, Position position, Move lastMove, boolean includeSelfCapture) {
+        return getMovesFromOffsets(offsets, board, position, includeSelfCapture);
     }
 
     @Override

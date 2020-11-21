@@ -74,7 +74,7 @@ public class NoMove implements Move {
     }
 
     @Override
-    public String getShortAlgebraic(Board board) {
+    public String getShortAlgebraicNotation(Board board) {
         return toString();
     }
 

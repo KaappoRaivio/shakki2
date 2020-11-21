@@ -18,8 +18,8 @@ public class CastlingKing extends King {
 
 
     @Override
-    public Set<Move> getPossibleMoves(Board board, Position position, Move lastMove) {
-        Set<Move> possibleMoves = super.getPossibleMoves(board, position, lastMove);
+    public Set<Move> getPossibleMoves(Board board, Position position, Move lastMove, boolean includeSelfCapture) {
+        Set<Move> possibleMoves = super.getPossibleMoves(board, position, lastMove, includeSelfCapture);
         Set<Move> result = new HashSet<>();
         result.addAll(handleKingSideCastling(board, position));
         result.addAll(handleQueenSideCastling(board, position));

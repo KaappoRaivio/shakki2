@@ -30,14 +30,18 @@ abstract public class Piece implements Serializable {
     }
 
 
-    abstract public Set<Move> getPossibleMoves(Board board, Position position, Move lastMove);
+    public Set<Move> getPossibleMoves(Board board, Position position, Move lastMove) {
+        return getPossibleMoves(board, position, lastMove, false);
+    }
 
-    protected Set<Move> getMovesFromOffsets(List<Position> offsets, Board board, Position position) {
+    abstract public Set<Move> getPossibleMoves(Board board, Position position, Move lastMove, boolean includeSelfCapture);
+
+    protected Set<Move> getMovesFromOffsets(List<Position> offsets, Board board, Position position, boolean includeSelfCapture) {
         Set<Move> moves = new HashSet<>();
 
         for (Position offset : offsets) {
             Position destination = position.offset(offset, false);
-            if (destination.verify() && board.getPieceInSquare(destination).getColor() != color) {
+            if (destination.verify() && (board.getPieceInSquare(destination).getColor() != this.color || (includeSelfCapture && board.getPieceInSquare(destination).getColor() != PieceColor.NO_COLOR))) {
                 NormalMove move = new NormalMove(position, destination, board);
                 moves.add(move);
             }
@@ -147,10 +151,10 @@ abstract public class Piece implements Serializable {
         return moves;
     }
 
-    protected List<Move> getStraightPathMoves (Board board, Position position, int deltaX, int deltaY) {
+    protected List<Move> getStraightPathMoves(Board board, Position position, int deltaX, int deltaY, boolean includeSelfCapture) {
         List<Move> moves = new ArrayList<>();
 
-        for (Position destination : getStraightPath(board, position, deltaX, deltaY, false)) {
+        for (Position destination : getStraightPath(board, position, deltaX, deltaY, includeSelfCapture)) {
 //            moves.add(Move.parseMove(position.toString() + destination.toString(), board.getPieceInSquare(position).getColor(), board));
 
 

@@ -42,7 +42,7 @@ public class TreeAI implements CapableOfPlaying {
     public Move getMove() {
         var possibleOpeningMove = openings.getOpeningMove(board, color);
         if (possibleOpeningMove != null && useOpeningLibrary) {
-            System.out.println("Found move from library! " + possibleOpeningMove.getShortAlgebraic(board));
+            System.out.println("Found move from library! " + possibleOpeningMove.getShortAlgebraicNotation(board));
             return possibleOpeningMove;
         }
 
@@ -80,6 +80,12 @@ public class TreeAI implements CapableOfPlaying {
 
         var moveHistory = new HashMap<Move, String>();
 
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         for (TreeAIWorker worker : threads) {
             if (!worker.isReady()) throw new RuntimeException("Thread not ready!");
             values.putAll(worker.getResult());
@@ -109,7 +115,7 @@ public class TreeAI implements CapableOfPlaying {
             top4.add(value);
         }
 
-        System.out.println(top4.stream().map(item -> item.getKey().getShortAlgebraic(board) + ": " + item.getValue() + ", " + moveHistory.get(item.getKey())).collect(Collectors.joining("\n")));
+        System.out.println(top4.stream().map(item -> item.getKey().getShortAlgebraicNotation(board) + ": " + item.getValue() + ", " + moveHistory.get(item.getKey())).collect(Collectors.joining("\n")));
 
         threads.forEach(TreeAIWorker::_stop);
         return top4.get(0).getKey();
