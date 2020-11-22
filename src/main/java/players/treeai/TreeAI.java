@@ -6,9 +6,11 @@ import chess.move.Move;
 import chess.move.NoMove;
 import chess.piece.basepiece.PieceColor;
 import misc.Splitter;
+import misc.TermColor;
 import org.apache.cayenne.util.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
 import runner.CapableOfPlaying;
 
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -59,9 +61,14 @@ public class TreeAI implements CapableOfPlaying {
 //        List<Move> allPossibleMoves = List.of(Move.parseMove("f8c5", PieceColor.WHITE, board));
         List<List<Move>> split = Splitter.splitListInto(allPossibleMoves, amountOfProcessors);
 
-        BasicBoardEvaluator evaluator = new BasicBoardEvaluator(depth, color);
-        System.out.println(evaluator.getGameStage(board));
+//        BasicBoardEvaluator evaluator = new BasicBoardEvaluator(depth, color);
+        try {
+            System.out.println(((BasicBoardEvaluator2) evaluator).getGameStage(board));
+        } catch (Exception e) {
+            System.out.println(((BasicBoardEvaluator) evaluator).getGameStage(board));
+        }
         board.useExpensiveDrawCalculation(false);
+        System.out.println(TermColor.ANSI_FAINT.getEscape());
         for (int i = 0; i < amountOfProcessors; i++) {
             TreeAIWorker thread = new TreeAIWorker(split.get(i), board.deepCopy(), i, depth, evaluator, sharedTranspositionTable);
             threads.add(thread);
@@ -78,6 +85,7 @@ public class TreeAI implements CapableOfPlaying {
             System.out.println("\tJoined " + thread);
 
         }
+        System.out.println(TermColor.ANSI_RESET.getEscape());
 
         var moveHistory = new HashMap<Move, String>();
         System.out.println(sharedTranspositionTable.size());
@@ -94,8 +102,8 @@ public class TreeAI implements CapableOfPlaying {
 //            System.out.println(worker.evaluated);
             moveHistory.putAll(worker.moveHistorys);
         }
-        System.out.println(moveHistory);
-        System.out.println("values: " + values);
+//        System.out.println(moveHistory);
+//        System.out.println("values: " + values);
 
         board.useExpensiveDrawCalculation(true);
         for (Move move : values.keySet()) {
@@ -117,7 +125,16 @@ public class TreeAI implements CapableOfPlaying {
             top4.add(value);
         }
 
-        System.out.println(top4.stream().map(item -> item.getKey().getShortAlgebraicNotation(board) + ": " + item.getValue() + ", " + moveHistory.get(item.getKey())).collect(Collectors.joining("\n")));
+        System.out.println(TermColor.ANSI_BOLD.getEscape() + "Evaluation for position " + board.toFEN() + TermColor.ANSI_RESET.getEscape());
+
+        System.out.println(top4.stream().map(item -> {
+            String val1 = TermColor.ANSI_BOLD.getEscape() + item.getKey().getShortAlgebraicNotation(board) + TermColor.ANSI_RESET.getEscape();
+            double value = item.getValue();
+            String val2 = value > 1e6 ? "↑↑↑↑↑↑↑↑" : value < -1e6 ? "↓↓↓↓↓↓↓↓" : String.format("%8.2f", value);
+            String val3 = moveHistory.get(item.getKey());
+
+            return String.format("%15s: %s, %-100s", val1, val2, val3);
+        }).collect(Collectors.joining("\n")));
 
         threads.forEach(TreeAIWorker::_stop);
         return top4.get(0).getKey();

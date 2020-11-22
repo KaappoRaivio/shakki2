@@ -4,6 +4,9 @@ import java.util.Objects;
 
 public enum TermColor {
     ANSI_RESET("\u001B[0m"),
+    ANSI_BOLD("\u001B[1m"),
+    ANSI_FAINT("\u001B[2m"),
+    ANSI_ITALIC("\u001B[3m"),
     ANSI_BLACK("\u001B[30m", "\u001B[40m"),
     ANSI_RED("\u001B[31m"),
     ANSI_GREEN("\u001B[32m"),

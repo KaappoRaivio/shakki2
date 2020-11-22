@@ -1,6 +1,7 @@
 package players.treeai;
 
 import chess.board.Board;
+import misc.TermColor;
 import misc.exceptions.ChessException;
 import chess.move.Move;
 import chess.piece.basepiece.PieceColor;
@@ -8,7 +9,7 @@ import misc.Pair;
 import org.apache.cayenne.util.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;
@@ -21,7 +22,7 @@ public class TreeAIWorker extends Thread {
     private Board board;
     private int id;
     private int depth;
-    private BasicBoardEvaluator evaluator;
+    private BoardEvaluator evaluator;
     private ConcurrentLinkedHashMap<Integer, TranspositionTableEntry> transpositionTable;
     private Map<Move, Double> result;
     public Map<Move, String> moveHistorys = new HashMap<>();
@@ -40,7 +41,7 @@ public class TreeAIWorker extends Thread {
     private boolean ready = false;
 
 
-    public TreeAIWorker(List<Move> moves, Board board, int id, int depth, BasicBoardEvaluator evaluator, ConcurrentLinkedHashMap<Integer, TranspositionTableEntry> transpositionTable) {
+    public TreeAIWorker(List<Move> moves, Board board, int id, int depth, BoardEvaluator evaluator, ConcurrentLinkedHashMap<Integer, TranspositionTableEntry> transpositionTable) {
         super();
 
         this.moves = moves;
@@ -62,26 +63,30 @@ public class TreeAIWorker extends Thread {
             board.unMakeMove(1);
 
             result.put(move, value);
-            moveHistorys.put(move, getPrincipalVariation(board.deepCopy(), move).toString());
+            moveHistorys.put(move, getPrincipalVariation(board.deepCopy(), move));
             if (!run) break;
         }
         if (run)
             ready = true;
-            evaluated = new Pair<>(evaluator.white, evaluator.black);
+//            evaluated = new Pair<>(evaluator.white, evaluator.black);
             synchronized (lock) {
                 lock.notifyAll();
             }
     }
 
-    private List<String> getPrincipalVariation(Board board, Move move) {
+    private String getPrincipalVariation(Board board, Move move) {
         List<String> moveHistory = new ArrayList<>();
+        String boardFEN = "";
+        String evaluation = "not available";
         try {
             while (true) {
     //            System.out.println(move);
                 board.makeMove(move);
-                moveHistory.add(move.toString());
+                moveHistory.add(String.format("%5s", move.toString()));
                 TranspositionTableEntry entry = transpositionTable.get(board.hashCode());
                 if (entry == null) {
+                    boardFEN = String.format("%-60s", board.toFEN());
+                    evaluation = String.format("%.2f", evaluator.evaluateBoard(board, 0));
                     break;
                 }
 
@@ -99,8 +104,7 @@ public class TreeAIWorker extends Thread {
 
         }
 
-//        board.unMakeMove(moveHistory.size());
-        return moveHistory;
+        return moveHistory.subList(0, Math.min(moveHistory.size(), depth + 1)).stream().collect(Collectors.joining(",", "[ ", " ]")) + ", " + TermColor.ANSI_ITALIC.getEscape() +  boardFEN + TermColor.ANSI_RESET.getEscape() + ", " + evaluation;
     }
 
     double deepEvaluateBoard(Board board, Move initialMove) {
@@ -188,7 +192,7 @@ public class TreeAIWorker extends Thread {
     }
 
     private double quiesce(Board board, double alpha, double beta, int currentDepth) {
-        return quiesce(board, alpha, beta, currentDepth, 100);
+        return quiesce(board, alpha, beta, currentDepth, 10);
     }
 
     private double quiesce (Board board, double alpha, double beta, int currentDepth, int limit) {
@@ -204,23 +208,30 @@ public class TreeAIWorker extends Thread {
         }
 
         if (limit <= 0) {
+            System.out.println("limit exceeded");
             return standingPat;
         }
 
-        double score = -1e22;
+        double score;
 
         for (Move move : board.getAllPossibleMoves()) {
-            if (move.isCapturingMove()) {
-                board.makeMove(move);
-                score = -quiesce(board, -beta, -alpha, currentDepth, limit - 1);
+            if (!move.isCapturingMove()) {
+                continue;
+            } else {
+                board.executeMoveNoChecks(move);
+                boolean check = board.isCheck();
                 board.unMakeMove(1);
+                if (!check) continue;
+            }
+            board.makeMove(move);
+            score = -quiesce(board, -beta, -alpha, currentDepth, limit - 1);
+            board.unMakeMove(1);
 
-                if (score >= beta) {
-                    return beta;
-                }
-                if (score > alpha) {
-                    alpha = score;
-                }
+            if (score >= beta) {
+                return beta;
+            }
+            if (score > alpha) {
+                alpha = score;
             }
         }
 

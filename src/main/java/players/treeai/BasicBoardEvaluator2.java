@@ -67,7 +67,7 @@ public class BasicBoardEvaluator2 implements BoardEvaluator {
         double totalValue = BoardEvaluatorHelpers.getMaterialPercentage(board, perspective) * 5000;
         totalValue += BoardEvaluatorHelpers.getAttackValue(board, possibleMoves) * 2;
         totalValue += BoardEvaluatorHelpers.getPawnAdvantage(board, perspective) * 2;
-        totalValue += BoardEvaluatorHelpers.getPassedPawns(board, perspective) * 500;
+        totalValue += BoardEvaluatorHelpers.getPassedPawns(board, perspective) * 900;
 
 //        double totalValue = Math.pow(getMaterialPercentage(board, perspective), 3) * 1000;
 //        totalValue += getProtectionValue(board, possibleMoves);
@@ -136,7 +136,7 @@ public class BasicBoardEvaluator2 implements BoardEvaluator {
         }
 
         if (BoardEvaluatorHelpers.hasCastled(board, perspective)) {
-            totalValue += 50;
+            totalValue += 100;
         }
 
 
@@ -145,7 +145,7 @@ public class BasicBoardEvaluator2 implements BoardEvaluator {
 
 
     public static void main(String[] args) {
-        Board board = Board.fromFEN("8/6pp/P7/8/5p2/4P2k/7P/6K1 w - - 0 1");
+        Board board = Board.fromFEN("8/6pp/8/5p2/8/P3P2k/7P/6K1 b - - 0 6");
         System.out.println(new BasicBoardEvaluator2(4, PieceColor.WHITE).evaluateBoard(board, 4));
     }
 }

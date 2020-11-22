@@ -18,7 +18,7 @@ public class Benchmark {
 
         boolean swap = false;
         int AIDepth = 3;
-        int amountOfProcessors = 8;
+        int amountOfProcessors = 4;
         boolean useOpeningLibrary = true;
 
         String filename = "/home/kaappo/git/shakki2/src/main/java/result (" + new Date().toString() + ").txt";

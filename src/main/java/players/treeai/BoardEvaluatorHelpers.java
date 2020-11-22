@@ -117,8 +117,11 @@ public class BoardEvaluatorHelpers {
 
     static double getPassedPawns(Board board, PieceColor perspective) {
         Map<PieceType, Integer> pieceComposition = BoardHelpers.getPieceComposition(board, perspective.invert());
-        boolean heavyOfficers = pieceComposition.get(PieceType.QUEEN) != 0 && pieceComposition.get(PieceType.ROOK) != 0;
-        boolean lightOfficers = pieceComposition.get(PieceType.BISHOP) != 0 && pieceComposition.get(PieceType.KNIGHT) != 0;
+//        System.out.println(pieceComposition);
+//        System.out.println(pieceComposition.get(PieceType.QUEEN) + ", " + pieceComposition.get(PieceType.ROOK));
+        boolean heavyOfficers = pieceComposition.get(PieceType.QUEEN) != 0 || pieceComposition.get(PieceType.ROOK) != 0;
+        boolean lightOfficers = pieceComposition.get(PieceType.BISHOP) != 0 || pieceComposition.get(PieceType.KNIGHT) != 0;
+//        System.out.println(heavyOfficers + ", " + lightOfficers);
 
         if (heavyOfficers || lightOfficers) return 0;
 
@@ -128,7 +131,7 @@ public class BoardEvaluatorHelpers {
             for (int x = 0; x < 8; x++) {
                 Piece piece = board.getPieceInSquareRelativeTo(perspective, x, y);
                 if (piece.getColor() == perspective && piece.getType() == PieceType.PAWN) {
-                    if (isFreePawn(board, perspective, x, y)) freePawns += 1;
+                    if (isFreePawn(board, perspective, x, y)) freePawns += y;
                 }
             }
         }
@@ -145,8 +148,9 @@ public class BoardEvaluatorHelpers {
 
     private static boolean isPathClear(Board board, PieceColor perspective, int x, int y) {
         for (int offsetX = -1; offsetX <= 1; offsetX++) {
-            if (x + offsetX < 0) continue;
+            if (x + offsetX < 0 || x + offsetX > 7) continue;
             for (int offsetY = 1; offsetY + y < 8; offsetY++) {
+                if (offsetY + y > 7 || offsetY + y < 0) continue;
                 if (board.getPieceInSquareRelativeTo(perspective, x + offsetX, y + offsetY).getColor() == perspective.invert()) return false;
            }
         }
@@ -160,7 +164,7 @@ public class BoardEvaluatorHelpers {
     }
 
     public static void main(String[] args) {
-        Board board = Board.fromFEN("8/6pp/8/5p2/P7/4P2k/7P/6K1 w - - 0 1");
+        Board board = Board.fromFEN("8/7p/8/P4pp1/8/5r1k/5P1P/4R1K1 b - - 0 6");
         System.out.println(board);
         System.out.println(getPassedPawns(board, PieceColor.WHITE));
     }

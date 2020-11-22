@@ -18,8 +18,8 @@ import java.util.Scanner;
 
 public class Main {
     public static void main (String[] args) {
-//        Board board = Board.getStartingPosition();
-        Board board = Board.fromFEN("8/6pp/8/5p2/8/Pr2Qq1k/5P1P/4R1K1 w - - 0 1");
+        Board board = Board.getStartingPosition();
+//        Board board = Board.fromFEN("r2q3r/1pp1ppk1/pn3np1/4N3/3P2Q1/8/PPP2P2/2K3RR w - - 0 1");
 //        BoardHelpers.executeSequenceOfMoves(board, List.of("e3b3", "f3b3", "e1e3", "b3e3"));
 //        board.useExpensiveDrawCalculation(false);
 
@@ -46,16 +46,16 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         int AIDepth = 4;
         int allocatedTime = 30000;
-        boolean useOpeningLibrary = false;
+        boolean useOpeningLibrary = true;
         label:
         while (true) {
-//            System.out.print("Ai plays as: ");
-//            String line = scanner.nextLine();
-            String line = "white";
+            System.out.print("Ai plays as: ");
+            String line = scanner.nextLine();
+//            String line = "white";
 //            String line = "black";
 
             BoardEvaluator whiteEvaluator = new BasicBoardEvaluator2(AIDepth, PieceColor.WHITE);
-            BoardEvaluator blackEvaluator = new BasicBoardEvaluator(AIDepth, PieceColor.BLACK);
+            BoardEvaluator blackEvaluator = new BasicBoardEvaluator2(AIDepth, PieceColor.BLACK);
             switch (line) {
                 case "white":
                     players = new CapableOfPlaying[]{
