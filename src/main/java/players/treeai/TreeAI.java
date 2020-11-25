@@ -10,7 +10,6 @@ import misc.TermColor;
 import org.apache.cayenne.util.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
 import runner.CapableOfPlaying;
 
-import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -40,10 +39,18 @@ public class TreeAI implements CapableOfPlaying {
 
     @Override
     public Move getMove() {
+        return getMovePair().getKey();
+    }
+
+    public double evalPosition () {
+        return getMovePair().getValue();
+    }
+
+    private Map.Entry<Move, Double> getMovePair () {
         var possibleOpeningMove = openings.getOpeningMove(board, color);
         if (possibleOpeningMove != null && useOpeningLibrary) {
             System.out.println("Found move from library! " + possibleOpeningMove.getShortAlgebraicNotation(board));
-            return possibleOpeningMove;
+            return Map.entry(possibleOpeningMove, 0.0);
         }
 
 
@@ -63,9 +70,11 @@ public class TreeAI implements CapableOfPlaying {
 
 //        BasicBoardEvaluator evaluator = new BasicBoardEvaluator(depth, color);
         try {
-            System.out.println(((BasicBoardEvaluator2) evaluator).getGameStage(board));
+            System.out.println(((CurrentBestEvaluator) evaluator).getGameStage(board));
         } catch (Exception e) {
-            System.out.println(((BasicBoardEvaluator) evaluator).getGameStage(board));
+            try {
+                System.out.println(((CandinateEvaluator) evaluator).getGameStage(board));
+            } catch (Exception ignored) {}
         }
         board.useExpensiveDrawCalculation(false);
         System.out.println(TermColor.ANSI_FAINT.getEscape());
@@ -137,7 +146,7 @@ public class TreeAI implements CapableOfPlaying {
         }).collect(Collectors.joining("\n")));
 
         threads.forEach(TreeAIWorker::_stop);
-        return top4.get(0).getKey();
+        return top4.get(0);
 
     }
 

@@ -8,7 +8,7 @@ import chess.piece.basepiece.Piece;
 import chess.piece.basepiece.PieceColor;
 import misc.Pair;
 
-public class NoMove implements Move {
+public class NoMove extends Move {
     public static final NoMove NO_MOVE = new NoMove();
 
     private NoMove () {}
@@ -41,6 +41,11 @@ public class NoMove implements Move {
     @Override
     public boolean isCapturingMove() {
         throw new ChessException("Not applicable for NoMove");
+    }
+
+    @Override
+    public boolean isSelfCapture() {
+        return false;
     }
 
     @Override

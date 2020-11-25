@@ -1,6 +1,8 @@
 package runner;
 
 import chess.board.Board;
+import chess.board.BoardHelpers;
+import chess.board.MaterialEvaluator;
 import misc.exceptions.StopException;
 import chess.move.Move;
 import chess.piece.basepiece.PieceColor;
@@ -15,6 +17,7 @@ public class Runner {
     private UI ui;
     private int moveCount;
     private List<Spectator> spectators;
+    
 
     public Runner(Board board, CapableOfPlaying[] players, UI ui, List<Spectator> spectators) {
         this.board = board;
@@ -25,7 +28,11 @@ public class Runner {
 
     }
 
-    public PieceColor play (PieceColor initialTurn) {
+    public PieceColor play(PieceColor initialTurn) {
+        return play(initialTurn, 100000000);
+    }
+
+    public PieceColor play (PieceColor initialTurn, int cutOff) {
         PieceColor turn = initialTurn;
         int moveCount = initialTurn == PieceColor.WHITE ? 1 : 2;
 
@@ -38,7 +45,13 @@ public class Runner {
         mainloop: while (true) {
 
             CapableOfPlaying currentPlayer = players[(moveCount + 1) % 2];
-            if (board.isCheckmate()) {
+            if (moveCount > cutOff) {
+                var e = new MaterialEvaluator();
+                if (e.evaluateBoard(board, 0) > 0) turn = turn.invert();
+                else if (e.evaluateBoard(board, 0) == 0) turn = PieceColor.NO_COLOR;
+                break;
+            }
+            if (board.isCheckmate() || BoardHelpers.hasTooLittleMaterial(board, moveCount)) {
                 System.out.println("=== === Checkmate! === ===");
                 System.out.println(board);
                 System.out.println(currentPlayer.getColor().invert() + " wins!");

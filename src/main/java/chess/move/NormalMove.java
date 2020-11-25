@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class NormalMove implements Move {
+public class NormalMove extends Move {
     final protected Position origin;
     final protected Position destination;
     final protected Piece pieceInOrigin;
@@ -165,6 +165,7 @@ public class NormalMove implements Move {
 
     }
 
+    @Override
     public boolean isSelfCapture () {
         return pieceInOrigin.getColor() == pieceInDestination.getColor();
     }

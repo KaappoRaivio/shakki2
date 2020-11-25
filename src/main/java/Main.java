@@ -1,10 +1,7 @@
 import chess.board.Board;
-import chess.board.BoardHelpers;
-import chess.move.Move;
 import chess.piece.basepiece.PieceColor;
 import players.Player;
-import players.treeai.BasicBoardEvaluator;
-import players.treeai.BasicBoardEvaluator2;
+import players.treeai.CurrentBestEvaluator;
 import players.treeai.BoardEvaluator;
 import players.treeai.TreeAI;
 import runner.CapableOfPlaying;
@@ -13,7 +10,6 @@ import runner.UI;
 import ui.TtyUI;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -54,8 +50,8 @@ public class Main {
 //            String line = "white";
 //            String line = "black";
 
-            BoardEvaluator whiteEvaluator = new BasicBoardEvaluator2(AIDepth, PieceColor.WHITE);
-            BoardEvaluator blackEvaluator = new BasicBoardEvaluator2(AIDepth, PieceColor.BLACK);
+            BoardEvaluator whiteEvaluator = new CurrentBestEvaluator(AIDepth, PieceColor.WHITE);
+            BoardEvaluator blackEvaluator = new CurrentBestEvaluator(AIDepth, PieceColor.BLACK);
             switch (line) {
                 case "white":
                     players = new CapableOfPlaying[]{

@@ -4,6 +4,10 @@ import chess.move.Move;
 import chess.piece.basepiece.Piece;
 import chess.piece.basepiece.PieceColor;
 import chess.piece.basepiece.PieceType;
+import players.treeai.BoardEvaluator;
+import players.treeai.BoardEvaluatorHelpers;
+import players.treeai.TreeAI;
+import runner.CapableOfPlaying;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -61,5 +65,17 @@ public class BoardHelpers {
     public static void main(String[] args) {
         Board board = Board.fromFEN("1k6/8/8/8/8/8/3B1N2/K7 w - - 0 1");
         System.out.println(hasInsufficientMaterial(board));
+    }
+
+    public static boolean hasTooLittleMaterial(Board board, int moveCount) {
+        return false;
+//        if (moveCount > 80) {
+//        return new MaterialEvaluator().evaluateBoard(board, 0) < -550;
+//        } else {
+//            return false;
+//        }
+//        TreeAI ai = new TreeAI("", board.getTurn(), board, 2, 4, false, new MaterialEvaluator());
+//        ai.updateValues(board, board.getTurn(), 0);
+//        return ai.evalPosition() < -550;
     }
 }

@@ -12,8 +12,8 @@ import misc.Pair;
 
 import java.io.Serializable;
 
-public interface Move extends Serializable {
-    static Move parseMove (String text, PieceColor color, Board board) {
+public abstract class Move implements Serializable {
+    public static Move parseMove(String text, PieceColor color, Board board) {
         if (text.equals("") || text.equals("NoMove")) {
             return NoMove.NO_MOVE;
         } else if (text.toUpperCase().equals("O-O")) {
@@ -37,24 +37,25 @@ public interface Move extends Serializable {
         }
     }
 
-    void   makeMove (Piece[][] buffer);
-    void unmakeMove (Piece[][] buffer);
+    public abstract void   makeMove(Piece[][] buffer);
+    public abstract void unmakeMove(Piece[][] buffer);
 
-    boolean resetsFiftyMoveRule ();
-    boolean affectsKingPosition ();
-    boolean capturesKing ();
-    boolean isCapturingMove ();
+    public abstract boolean resetsFiftyMoveRule();
+    public abstract boolean affectsKingPosition();
+    public abstract boolean capturesKing();
+    public abstract boolean isCapturingMove();
+    public abstract boolean isSelfCapture ();
 
-    Pair<PieceColor, Position> getNewKingPosition ();
+    public abstract Pair<PieceColor, Position> getNewKingPosition();
 
-    Position getOrigin ();
-    Position getDestination ();
-    PieceColor getColor ();
-    Piece getPiece();
+    public abstract Position getOrigin();
+    public abstract Position getDestination();
+    public abstract PieceColor getColor();
+    public abstract Piece getPiece();
 
-    int getIncrementalHash(int oldHash, BoardHasher hasher);
+    public abstract int getIncrementalHash(int oldHash, BoardHasher hasher);
 
-    String getShortAlgebraicNotation(Board board);
+    public abstract String getShortAlgebraicNotation(Board board);
 
     public static void main(String[] args) {
         Board board = Board.getStartingPosition();

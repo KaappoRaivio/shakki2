@@ -47,13 +47,12 @@ public class BoardEvaluatorHelpers {
         double totalValue = 0;
         for (Move move : ownMoves) {
             Position threatenedSquare = move.getDestination();
-            Piece protectivePiece = move.getPiece();
-            Piece protectedPiece = board.getPieceInSquare(move.getDestination());
+            Piece attackingPiece = move.getPiece();
+            Piece attackedPiece = board.getPieceInSquare(threatenedSquare);
 
-            if (protectivePiece.getType() == PieceType.PAWN && threatenedSquare.getX() == move.getOrigin().getX()) continue;
             if (move.isCapturingMove()) {
 //                totalValue += 1;
-                totalValue += protectedPiece.getValue(move.getDestination()) / protectivePiece.getValue(move.getOrigin());
+                totalValue += attackedPiece.getValue(threatenedSquare) / attackingPiece.getValue(move.getOrigin());
             }
         }
         return totalValue;
@@ -88,7 +87,7 @@ public class BoardEvaluatorHelpers {
         return getMaterialAmount(board, perspective) / getMaterialSum(board);
     }
 
-    static double getMaterialAmount(Board board, PieceColor perspective) {
+    public static double getMaterialAmount(Board board, PieceColor perspective) {
         double totalValue = 0;
         for (int y = 0; y < 8; y++) {
             for (int x = 0; x < 8; x++) {

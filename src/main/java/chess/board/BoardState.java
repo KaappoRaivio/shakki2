@@ -6,6 +6,8 @@ import chess.piece.basepiece.PieceColor;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class BoardState implements Serializable {
     private Position whiteKingPosition;
@@ -173,15 +175,27 @@ public class BoardState implements Serializable {
                 '}';
     }
 
-    public List<Move> getPossibleMoves (PieceColor color) {
+    public List<Move> getPossibleMoves(PieceColor color) {
+        return getPossibleMoves(color, false);
+    }
+
+    public List<Move> getPossibleMoves (PieceColor color, boolean includeSelfCapture) {
+        List<Move> temp;
         switch (color) {
             case BLACK:
-                return possibleMovesBlack;
+                temp = possibleMovesBlack;
+                break;
             case WHITE:
-                return possibleMovesWhite;
+                temp = possibleMovesWhite;
+                break;
             default:
-                return null;
+                throw new RuntimeException("No NO_COLOR!");
         }
+
+        if (temp == null) return null;
+
+        if (includeSelfCapture) return temp;
+        else return temp.stream().filter(move -> !move.isSelfCapture()).collect(Collectors.toList());
     }
 
     public void setPossibleMoves (PieceColor color, List<Move> moves) {

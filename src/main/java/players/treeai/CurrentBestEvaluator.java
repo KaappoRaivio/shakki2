@@ -8,11 +8,11 @@ import chess.piece.basepiece.PieceType;
 
 import java.util.List;
 
-public class BasicBoardEvaluator implements BoardEvaluator {
+public class CurrentBestEvaluator implements BoardEvaluator {
     private int depth;
     private PieceColor color;
 
-    public BasicBoardEvaluator(int depth, PieceColor color) {
+    public CurrentBestEvaluator(int depth, PieceColor color) {
         this.color = color;
         this.depth = depth;
     }
@@ -64,9 +64,10 @@ public class BasicBoardEvaluator implements BoardEvaluator {
     }
 
     private static double calculateEndgameEvaluation(Board board, PieceColor perspective, List<Move> possibleMoves) {
-        double totalValue = BoardEvaluatorHelpers.getMaterialAmount(board, perspective);
+        double totalValue = BoardEvaluatorHelpers.getMaterialPercentage(board, perspective) * 5000;
         totalValue += BoardEvaluatorHelpers.getAttackValue(board, possibleMoves) * 2;
         totalValue += BoardEvaluatorHelpers.getPawnAdvantage(board, perspective) * 2;
+        totalValue += BoardEvaluatorHelpers.getPassedPawns(board, perspective) * 900;
 
 //        double totalValue = Math.pow(getMaterialPercentage(board, perspective), 3) * 1000;
 //        totalValue += getProtectionValue(board, possibleMoves);
@@ -135,11 +136,16 @@ public class BasicBoardEvaluator implements BoardEvaluator {
         }
 
         if (BoardEvaluatorHelpers.hasCastled(board, perspective)) {
-            totalValue += 50;
+            totalValue += 100;
         }
 
 
         return totalValue;
     }
 
+
+    public static void main(String[] args) {
+        Board board = Board.fromFEN("8/6pp/8/5p2/8/P3P2k/7P/6K1 b - - 0 6");
+        System.out.println(new CurrentBestEvaluator(4, PieceColor.WHITE).evaluateBoard(board, 4));
+    }
 }

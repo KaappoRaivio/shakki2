@@ -7,7 +7,7 @@ import chess.piece.basepiece.Piece;
 import chess.piece.basepiece.PieceColor;
 import misc.Pair;
 
-public class CastlingMove implements Move {
+public class CastlingMove extends Move {
     final private CastlingType castlingType;
     final private PieceColor color;
     final private Position kingPosition;
@@ -87,6 +87,11 @@ public class CastlingMove implements Move {
 
     @Override
     public boolean isCapturingMove() {
+        return false;
+    }
+
+    @Override
+    public boolean isSelfCapture() {
         return false;
     }
 

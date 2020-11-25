@@ -1,9 +1,10 @@
 import chess.board.Board;
+import chess.board.MaterialEvaluator;
 import chess.piece.basepiece.PieceColor;
 import misc.ReadWriter;
-import players.RandomAI;
-import players.treeai.BasicBoardEvaluator;
-import players.treeai.BasicBoardEvaluator2;
+import org.apache.commons.lang3.ArrayUtils;
+import players.treeai.CandinateEvaluator;
+import players.treeai.CurrentBestEvaluator;
 import players.treeai.TreeAI;
 import runner.CapableOfPlaying;
 import runner.Runner;
@@ -24,36 +25,18 @@ public class Benchmark {
         String filename = "/home/kaappo/git/shakki2/src/main/java/result (" + new Date().toString() + ").txt";
         System.out.println(filename);
         int iteration = 0;
-        while (true) {
-            Board board = Board.getStartingPosition();
-            System.out.println("iteration " + iteration);
-            CapableOfPlaying[] players;
-            UI ui = new TtyUI();
-            if (!swap) {
-                players = new CapableOfPlaying[]{
-                        new TreeAI("experiment 2", PieceColor.WHITE, board, AIDepth, amountOfProcessors, useOpeningLibrary, new BasicBoardEvaluator2(AIDepth, PieceColor.WHITE)),
-                        new TreeAI("control", PieceColor.BLACK, board, AIDepth, amountOfProcessors, useOpeningLibrary, new BasicBoardEvaluator(AIDepth, PieceColor.BLACK)),
-                };
-//                players = new CapableOfPlaying[]{
-//                        new RandomAI(PieceColor.WHITE, "light", ui),
-//                        new RandomAI(PieceColor.BLACK, "dark", ui),
-//                };
-            }
-            else {
-                players = new CapableOfPlaying[]{
-                        new TreeAI("control", PieceColor.WHITE, board, AIDepth, amountOfProcessors, useOpeningLibrary, new BasicBoardEvaluator(AIDepth, PieceColor.WHITE)),
-                        new TreeAI("experiment 2", PieceColor.BLACK, board, AIDepth, amountOfProcessors, useOpeningLibrary, new BasicBoardEvaluator2(AIDepth, PieceColor.BLACK)),
-                };
-//                players = new CapableOfPlaying[]{
-//                        new RandomAI(PieceColor.WHITE, "white", ui),
-//                        new RandomAI(PieceColor.BLACK, "black", ui),
-//                };
-            }
+        Board board = Board.getStartingPosition();
 
-            swap = !swap;
+        while (true) {
+            board = Board.getStartingPosition();
+            CapableOfPlaying[] players = getPlayers(board, AIDepth, amountOfProcessors, useOpeningLibrary, swap);
+
+            System.out.println("iteration " + iteration);
+            UI ui = new TtyUI();
+
 
             Runner runner = new Runner(board, players, ui, Collections.emptyList());
-            PieceColor winner = runner.play(board.getTurn());
+            PieceColor winner = runner.play(board.getTurn(), 50);
 
             String name;
             if (winner == PieceColor.NO_COLOR) {
@@ -64,9 +47,24 @@ public class Benchmark {
             }
 
             System.out.println("winner " + name + ", " + board);
-            ReadWriter.appendFile(filename, name + " (" + winner + ") wins" + board.conventionalToString() + "\n" + board.getMoveHistoryPretty() + "\n\n\n");
+            ReadWriter.appendFile(filename, String.format("\n%s; %s; %s; %s", name, winner, board.toFEN(), board.getMoveHistoryPretty()));
             iteration++;
+            swap = !swap;
         }
 
+    }
+
+    private static CapableOfPlaying[] getPlayers (Board board, int AIDepth, int amountOfProcessors, boolean useOpeningLibrary, boolean swap) {
+        if (swap) {
+            return new CapableOfPlaying[]{
+                    new TreeAI("control", PieceColor.WHITE, board, AIDepth, amountOfProcessors, useOpeningLibrary, new MaterialEvaluator(AIDepth, PieceColor.WHITE)),
+                    new TreeAI("candinate", PieceColor.BLACK, board, AIDepth, amountOfProcessors, useOpeningLibrary, new CandinateEvaluator(AIDepth, PieceColor.BLACK)),
+            };
+        } else {
+            return new CapableOfPlaying[]{
+                    new TreeAI("candinate", PieceColor.WHITE, board, AIDepth, amountOfProcessors, useOpeningLibrary, new CandinateEvaluator(AIDepth, PieceColor.WHITE)),
+                    new TreeAI("control", PieceColor.BLACK, board, AIDepth, amountOfProcessors, useOpeningLibrary, new MaterialEvaluator(AIDepth, PieceColor.BLACK)),
+            };
+        }
     }
 }

@@ -197,45 +197,45 @@ public class TreeAIWorker extends Thread {
 
     private double quiesce (Board board, double alpha, double beta, int currentDepth, int limit) {
         double standingPat = evaluator.evaluateBoard(board, currentDepth);
-//        return standingPat;
+        return standingPat;
         
         
-        if (standingPat >= beta) {
-            return beta;
-        }
-        if (alpha < standingPat) {
-            alpha = standingPat;
-        }
-
-        if (limit <= 0) {
-            System.out.println("limit exceeded");
-            return standingPat;
-        }
-
-        double score;
-
-        for (Move move : board.getAllPossibleMoves()) {
-            if (!move.isCapturingMove()) {
-                continue;
-            } else {
-                board.executeMoveNoChecks(move);
-                boolean check = board.isCheck();
-                board.unMakeMove(1);
-                if (!check) continue;
-            }
-            board.makeMove(move);
-            score = -quiesce(board, -beta, -alpha, currentDepth, limit - 1);
-            board.unMakeMove(1);
-
-            if (score >= beta) {
-                return beta;
-            }
-            if (score > alpha) {
-                alpha = score;
-            }
-        }
-
-        return alpha;
+//        if (standingPat >= beta) {
+//            return beta;
+//        }
+//        if (alpha < standingPat) {
+//            alpha = standingPat;
+//        }
+//
+//        if (limit <= 0) {
+//            System.out.println("limit exceeded");
+//            return standingPat;
+//        }
+//
+//        double score;
+//
+//        for (Move move : board.getAllPossibleMoves()) {
+//            if (!move.isCapturingMove()) {
+//                continue;
+//            } else {
+//                board.executeMoveNoChecks(move);
+//                boolean check = board.isCheck();
+//                board.unMakeMove(1);
+//                if (!check) continue;
+//            }
+//            board.makeMove(move);
+//            score = -quiesce(board, -beta, -alpha, currentDepth, limit - 1);
+//            board.unMakeMove(1);
+//
+//            if (score >= beta) {
+//                return beta;
+//            }
+//            if (score > alpha) {
+//                alpha = score;
+//            }
+//        }
+//
+//        return alpha;
     }
 
 
@@ -252,7 +252,7 @@ public class TreeAIWorker extends Thread {
         Board board = Board.fromFEN("r3kb1r/1bpq1ppp/p3pn2/1p4B1/2pPP3/P1N5/1P3PPP/R2QKB1R w KQkq - 0 11");
 
         var a = board.getAllPossibleMoves();
-        sortMoves(a, board, 4, new BasicBoardEvaluator(3, PieceColor.WHITE));
+        sortMoves(a, board, 4, new CandinateEvaluator(3, PieceColor.WHITE));
         System.out.println(board);
         System.out.println(a);
     }

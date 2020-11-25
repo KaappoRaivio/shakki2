@@ -37,14 +37,16 @@ public class ReadWriter {
         try {
             FileOutputStream fileOut = new FileOutputStream(path);
 
-            PrintWriter writer = new PrintWriter(fileOut);
-            writer.write(text);
+            PrintWriter writer = new PrintWriter(fileOut, true);
+            writer.println(text);
             writer.close();
 
+//            fileOut.getFD().sync();
             fileOut.close();
 
             System.out.println("Saved " + text.getClass() + " to: " + path);
         } catch (IOException e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
 

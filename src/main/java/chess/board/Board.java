@@ -182,17 +182,21 @@ public class Board implements Serializable{
     }
 
     public List<Move> getAllPossibleMoves(PieceColor color) {
-        return getAllPossibleMoves(color, false);
+        return getAllPossibleMoves(color, false, false);
     }
 
-    public List<Move> getAllPossibleMoves (PieceColor color, boolean ignoreTurn) {
-        List<Move> possibleMoves = stateHistory.getCurrentState().getPossibleMoves(color);
+    public List<Move> getAllPossibleMoves(PieceColor color, boolean ignoreTurn) {
+        return getAllPossibleMoves(color, ignoreTurn, false);
+    }
+
+    public List<Move> getAllPossibleMoves (PieceColor color, boolean ignoreTurn, boolean includeSelfCapture) {
+        List<Move> possibleMoves = stateHistory.getCurrentState().getPossibleMoves(color, includeSelfCapture);
         if (possibleMoves != null) {
             return possibleMoves;
         } else {
             var moves = calculateAllPossibleMoves(color, ignoreTurn);
             stateHistory.getCurrentState().setPossibleMoves(color, moves);
-            return moves;
+            return getAllPossibleMoves(color, ignoreTurn);
         }
     }
 
@@ -206,7 +210,7 @@ public class Board implements Serializable{
                     continue;
                 }
 
-                Set<Move> possibleMoves = piece.getPossibleMoves(this, new Position(x, y), getLastMove());
+                Set<Move> possibleMoves = piece.getPossibleMoves(this, new Position(x, y), getLastMove(), true);
                 for (Move possibleMove : possibleMoves) {
                     if (isMoveLegal(possibleMove, false, ignoreTurn)) {
                         moves.add(possibleMove);
@@ -215,6 +219,7 @@ public class Board implements Serializable{
             }
         }
 
+//        return moves.stream().filter(move -> !move.isSelfCapture()).collect(Collectors.toList());
         return moves;
     }
 
