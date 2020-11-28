@@ -3,6 +3,7 @@ import chess.board.MaterialEvaluator;
 import chess.piece.basepiece.PieceColor;
 import misc.ReadWriter;
 import org.apache.commons.lang3.ArrayUtils;
+import org.checkerframework.checker.units.qual.Current;
 import players.treeai.CandinateEvaluator;
 import players.treeai.CurrentBestEvaluator;
 import players.treeai.TreeAI;
@@ -22,7 +23,8 @@ public class Benchmark {
         int amountOfProcessors = 4;
         boolean useOpeningLibrary = true;
 
-        String filename = "/home/kaappo/git/shakki2/src/main/java/result (" + new Date().toString() + ").txt";
+//        String filename = "/home/kaappo/git/shakki2/src/main/java/result (" + new Date().toString() + ").txt";
+        String filename = "/home/kaappo/git/shakki2/src/main/java/control vs candinate (with openings).txt";
         System.out.println(filename);
         int iteration = 0;
         Board board = Board.getStartingPosition();
@@ -57,13 +59,13 @@ public class Benchmark {
     private static CapableOfPlaying[] getPlayers (Board board, int AIDepth, int amountOfProcessors, boolean useOpeningLibrary, boolean swap) {
         if (swap) {
             return new CapableOfPlaying[]{
-                    new TreeAI("control", PieceColor.WHITE, board, AIDepth, amountOfProcessors, useOpeningLibrary, new MaterialEvaluator(AIDepth, PieceColor.WHITE)),
+                    new TreeAI("control", PieceColor.WHITE, board, AIDepth, amountOfProcessors, useOpeningLibrary, new CurrentBestEvaluator(AIDepth, PieceColor.WHITE)),
                     new TreeAI("candinate", PieceColor.BLACK, board, AIDepth, amountOfProcessors, useOpeningLibrary, new CandinateEvaluator(AIDepth, PieceColor.BLACK)),
             };
         } else {
             return new CapableOfPlaying[]{
                     new TreeAI("candinate", PieceColor.WHITE, board, AIDepth, amountOfProcessors, useOpeningLibrary, new CandinateEvaluator(AIDepth, PieceColor.WHITE)),
-                    new TreeAI("control", PieceColor.BLACK, board, AIDepth, amountOfProcessors, useOpeningLibrary, new MaterialEvaluator(AIDepth, PieceColor.BLACK)),
+                    new TreeAI("control", PieceColor.BLACK, board, AIDepth, amountOfProcessors, useOpeningLibrary, new CurrentBestEvaluator(AIDepth, PieceColor.BLACK)),
             };
         }
     }

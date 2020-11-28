@@ -42,10 +42,14 @@ public class Openings {
             }
         }
         List<Move> possibleMoves = new ArrayList<>();
+        System.out.println(perspective);
         for (var openingLine : openingLines) {
+//            System.out.println(openingLine);
             for (Move move : board.getAllPossibleMoves(perspective)) {
                 board.executeMoveNoChecks(move);
-                String queryString = (perspective == PieceColor.WHITE ? board.getStateHistory().getCurrentState().getMoveCount() / 2 + 1 + ". " : "") + board.getLastMove().toString();
+                String queryString = (perspective == PieceColor.WHITE ? board.getStateHistory().getCurrentState().getMoveCount() / 2 + ". " : "") + board.getLastMove().toString();
+//                System.out.println(openingLine);
+//                System.out.println(queryString);
                 if (openingLine.getSecond().startsWith(queryString)) {
                     possibleMoves.add(move);
                 }
@@ -64,14 +68,19 @@ public class Openings {
     public static void main(String[] args) {
         Openings openings = new Openings();
         Board board = Board.getStartingPosition();
+//        board.makeMove("e2e4");
+//        board.makeMove("e7e5");
+//        board.makeMove("g1f3");
+        System.out.println(board.getMoveHistoryPretty());
 
         while (true) {
             Move openingMove = openings.getOpeningMove(board, board.getTurn());
+//        System.out.println(openingMove);
             if (openingMove == null) break;
             board.makeMove(openingMove);
             System.out.println(board);
         }
-        System.out.println(board);
+//        System.out.println(board);
 //        System.out.println(board.getStateHistory().getCurrentState().getMoveCount());
 //        board.makeMove(Move.parseMove("e2e4", PieceColor.WHITE, board));
 //        List<Move> possibleOpenings = openings.getPossibleOpenings(board, PieceColor.BLACK);
