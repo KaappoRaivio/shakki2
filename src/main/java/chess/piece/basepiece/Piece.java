@@ -34,7 +34,13 @@ abstract public class Piece implements Serializable {
         return getPossibleMoves(board, position, lastMove, false);
     }
 
-    abstract public Set<Move> getPossibleMoves(Board board, Position position, Move lastMove, boolean includeSelfCapture);
+//    abstract public Set<Move> getPossibleMoves(Board board, Position position, Move lastMove, boolean includeSelfCapture, boolean barrier);
+
+    public Set<Move> getPossibleMoves(Board board, Position position, Move lastMove, boolean includeSelfCapture) {
+        return getPossibleMoves(board, position, lastMove, includeSelfCapture, null);
+    }
+
+    abstract public Set<Move> getPossibleMoves(Board board, Position position, Move lastMove, boolean includeSelfCapture, Position barrier);
 
 
 
@@ -100,10 +106,10 @@ abstract public class Piece implements Serializable {
         }
     }
 
-    private Set<Position> getStraightPath (Board board, Position position, int deltaX, int deltaY, boolean includeSelfCapture) {
-        return getStraightPath(board, position.getX(), position.getY(), deltaX, deltaY, includeSelfCapture);
+    private Set<Position> getStraightPath (Board board, Position position, int deltaX, int deltaY, boolean includeSelfCapture, Position barrier) {
+        return getStraightPath(board, position.getX(), position.getY(), deltaX, deltaY, includeSelfCapture, barrier);
     }
-    private Set<Position> getStraightPath (Board board, int x, int y, int deltaX, int deltaY, boolean includeSelfCapture) {
+    private Set<Position> getStraightPath (Board board, int x, int y, int deltaX, int deltaY, boolean includeSelfCapture, Position barrier) {
         Set<Position> moves = new HashSet<>();
 
         PieceColor ownColor = board.getPieceInSquare(x, y).getColor();
@@ -115,14 +121,14 @@ abstract public class Piece implements Serializable {
 
             PieceColor currentPieceColor = board.getPieceInSquare(x, y).getColor();
             if (includeSelfCapture) {
-                if (currentPieceColor != PieceColor.NO_COLOR) {
+                if (currentPieceColor != PieceColor.NO_COLOR || (barrier != null && x == barrier.getX() && y == barrier.getY())) {
                     moves.add(new Position(x, y));
                     break;
                 } else {
                     moves.add(new Position(x, y));
                 }
             } else {
-                if (currentPieceColor == ownColor) {
+                if (currentPieceColor == ownColor || (barrier != null && x == barrier.getX() && y == barrier.getY())) {
                     break;
                 } else if (currentPieceColor == ownColor.invert()) {
                     moves.add(new Position(x, y));
@@ -138,11 +144,11 @@ abstract public class Piece implements Serializable {
 
         return moves;
     }
-    protected List<Move> getStraightPathMoves(Board board, Position position, int deltaX, int deltaY, boolean includeSelfCapture) {
+    protected List<Move> getStraightPathMoves(Board board, Position position, int deltaX, int deltaY, boolean includeSelfCapture, Position barrier) {
 
         List<Move> moves = new ArrayList<>();
 
-        for (Position destination : getStraightPath(board, position, deltaX, deltaY, includeSelfCapture)) {
+        for (Position destination : getStraightPath(board, position, deltaX, deltaY, includeSelfCapture, barrier)) {
 //            moves.add(Move.parseMove(position.toString() + destination.toString(), board.getPieceInSquare(position).getColor(), board));
 
 

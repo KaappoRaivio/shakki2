@@ -13,6 +13,13 @@ import misc.Pair;
 import java.io.Serializable;
 
 public abstract class Move implements Serializable {
+    public static Move parseMove(String text, PieceColor color, Board board, boolean shortAlgebraicNotation) {
+        if (shortAlgebraicNotation) {
+            return MoveParser.parseMove(text, board);
+        } else {
+            return parseMove(text, color, board);
+        }
+    }
     public static Move parseMove(String text, PieceColor color, Board board) {
         if (text.equals("") || text.equals("NoMove")) {
             return NoMove.NO_MOVE;

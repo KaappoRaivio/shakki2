@@ -3,6 +3,7 @@ package players.treeai;
 import chess.board.Board;
 import chess.piece.basepiece.PieceColor;
 import org.junit.Test;
+import players.CandinateEvaluator;
 
 import java.util.ArrayList;
 import java.util.Arrays;

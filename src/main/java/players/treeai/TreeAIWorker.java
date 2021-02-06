@@ -7,6 +7,8 @@ import chess.move.Move;
 import chess.piece.basepiece.PieceColor;
 import misc.Pair;
 import org.apache.cayenne.util.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
+import players.BoardEvaluator;
+import players.CandinateEvaluator;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -57,6 +59,9 @@ public class TreeAIWorker extends Thread {
     @Override
     public void run() {
         for (Move move : moves) {
+//            if (move.toString().equals("a8=Q")) {
+//                System.out.println("debugger");
+//            }
             board.executeMoveNoChecks(move);
             double doubleListPair = deepEvaluateBoard(board, move);
             double value = -doubleListPair;
@@ -192,50 +197,51 @@ public class TreeAIWorker extends Thread {
     }
 
     private double quiesce(Board board, double alpha, double beta, int currentDepth) {
-        return quiesce(board, alpha, beta, currentDepth, 10);
+        return quiesce(board, alpha, beta, currentDepth, 20);
     }
 
     private double quiesce (Board board, double alpha, double beta, int currentDepth, int limit) {
         double standingPat = evaluator.evaluateBoard(board, currentDepth);
-        return standingPat;
+//        System.out.println("quiescing!");
+//        return standingPat;
         
         
-//        if (standingPat >= beta) {
-//            return beta;
-//        }
-//        if (alpha < standingPat) {
-//            alpha = standingPat;
-//        }
-//
-//        if (limit <= 0) {
-//            System.out.println("limit exceeded");
-//            return standingPat;
-//        }
-//
-//        double score;
-//
-//        for (Move move : board.getAllPossibleMoves()) {
-//            if (!move.isCapturingMove()) {
-//                continue;
-//            } else {
-//                board.executeMoveNoChecks(move);
-//                boolean check = board.isCheck();
-//                board.unMakeMove(1);
-//                if (!check) continue;
-//            }
-//            board.makeMove(move);
-//            score = -quiesce(board, -beta, -alpha, currentDepth, limit - 1);
-//            board.unMakeMove(1);
-//
-//            if (score >= beta) {
-//                return beta;
-//            }
-//            if (score > alpha) {
-//                alpha = score;
-//            }
-//        }
-//
-//        return alpha;
+        if (standingPat >= beta) {
+            return beta;
+        }
+        if (alpha < standingPat) {
+            alpha = standingPat;
+        }
+
+        if (limit <= 0) {
+            System.out.println("limit exceeded");
+            System.out.println(board);
+            System.out.println(board.getMoveHistoryPretty());
+            return standingPat;
+        }
+
+        double score;
+
+        for (Move move : board.getAllPossibleMoves()) {
+            if (!move.isCapturingMove()) {
+                board.executeMoveNoChecks(move);
+                boolean check = board.isCheck();
+                board.unMakeMove(1);
+                if (!check) continue;
+            }
+            board.makeMove(move);
+            score = -quiesce(board, -beta, -alpha, currentDepth, limit - 1);
+            board.unMakeMove(1);
+
+            if (score >= beta) {
+                return beta;
+            }
+            if (score > alpha) {
+                alpha = score;
+            }
+        }
+
+        return alpha;
     }
 
 

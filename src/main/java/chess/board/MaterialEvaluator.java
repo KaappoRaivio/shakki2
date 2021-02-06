@@ -1,8 +1,9 @@
 package chess.board;
 
 import chess.piece.basepiece.PieceColor;
-import players.treeai.BoardEvaluator;
-import players.treeai.BoardEvaluatorHelpers;
+import players.BoardEvaluator;
+import players.BoardEvaluatorHelpers;
+
 
 public class MaterialEvaluator implements BoardEvaluator {
     public MaterialEvaluator() {

@@ -28,6 +28,21 @@ public class EnPassantMove extends NormalMove {
     }
 
     @Override
+    public String getShortAlgebraicNotation(Board board) {
+        return super.getShortAlgebraicNotation(board);
+    }
+
+    @Override
+    public boolean isCapturingMove() {
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + " e.p.";
+    }
+
+    @Override
     public void unmakeMove (Piece[][] buffer) {
         super.unmakeMove(buffer);
 

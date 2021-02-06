@@ -1,11 +1,9 @@
 import chess.board.Board;
-import chess.board.MaterialEvaluator;
 import chess.piece.basepiece.PieceColor;
 import misc.ReadWriter;
-import org.apache.commons.lang3.ArrayUtils;
-import org.checkerframework.checker.units.qual.Current;
-import players.treeai.CandinateEvaluator;
-import players.treeai.CurrentBestEvaluator;
+
+import players.CandinateEvaluator;
+import players.CurrentBestEvaluator;
 import players.treeai.TreeAI;
 import runner.CapableOfPlaying;
 import runner.Runner;
@@ -13,7 +11,6 @@ import runner.UI;
 import ui.TtyUI;
 
 import java.util.Collections;
-import java.util.Date;
 
 public class Benchmark {
     public static void main(String... args) {
@@ -24,7 +21,7 @@ public class Benchmark {
         boolean useOpeningLibrary = true;
 
 //        String filename = "/home/kaappo/git/shakki2/src/main/java/result (" + new Date().toString() + ").txt";
-        String filename = "/home/kaappo/git/shakki2/src/main/java/control vs candinate (with openings).txt";
+        String filename = "/home/kaappo/git/shakki2/src/main/java/control vs candinate round 2.txt";
         System.out.println(filename);
         int iteration = 0;
         Board board = Board.getStartingPosition();

@@ -1,13 +1,8 @@
 package chess.board;
 
-import chess.move.Move;
-import chess.piece.basepiece.Piece;
 import chess.piece.basepiece.PieceColor;
 import chess.piece.basepiece.PieceType;
-import players.treeai.BoardEvaluator;
-import players.treeai.BoardEvaluatorHelpers;
-import players.treeai.TreeAI;
-import runner.CapableOfPlaying;
+
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -15,7 +10,7 @@ import java.util.stream.Collectors;
 public class BoardHelpers {
     public static void executeSequenceOfMoves (Board board, List<String> moves) {
         for (String move : moves) {
-            board.makeMove(Move.parseMove(move, board.getTurn(), board));
+            board.makeMove(move);
         }
     }
 

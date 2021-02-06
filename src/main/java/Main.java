@@ -1,8 +1,10 @@
 import chess.board.Board;
 import chess.piece.basepiece.PieceColor;
+import players.BoardEvaluator;
+import players.CandinateEvaluator;
 import players.Player;
-import players.treeai.CurrentBestEvaluator;
-import players.treeai.BoardEvaluator;
+
+import players.evaluators.StockfishEvaluator;
 import players.treeai.TreeAI;
 import runner.CapableOfPlaying;
 import runner.Runner;
@@ -15,6 +17,17 @@ import java.util.Scanner;
 public class Main {
     public static void main (String[] args) {
         Board board = Board.getStartingPosition();
+//        Board board = Board.fromFEN("4Q3/Pq4pk/5p1p/5P1K/6PP/8/8/8 w - - 0 1");
+//        board.makeMove("e8g6");
+//        System.out.println(board);
+//        BoardEvaluator blackEvaluator = new CandinateEvaluator(4, PieceColor.BLACK);
+//        System.out.println(blackEvaluator.evaluateBoard(board, 4));
+//        TreeAI ai = new TreeAI("ai", PieceColor.BLACK, board, 4, 8, false, blackEvaluator);
+//        System.out.println(ai.evalPosition());
+//        System.exit(0);
+
+
+//        board.makeMove("a7a8=B");
 //        Board board = Board.fromFEN("r2q3r/1pp1ppk1/pn3np1/4N3/3P2Q1/8/PPP2P2/2K3RR w - - 0 1");
 //        BoardHelpers.executeSequenceOfMoves(board, List.of("e3b3", "f3b3", "e1e3", "b3e3"));
 //        board.useExpensiveDrawCalculation(false);
@@ -40,18 +53,20 @@ public class Main {
 
         CapableOfPlaying[] players;
         Scanner scanner = new Scanner(System.in);
-        int AIDepth = 4;
+        int AIDepth = 0;
         int allocatedTime = 30000;
-        boolean useOpeningLibrary = true;
+        boolean useOpeningLibrary = false;
         label:
         while (true) {
             System.out.print("Ai plays as: ");
-            String line = scanner.nextLine();
+//            String line = scanner.nextLine();
+//            String line = board.getTurn().toString().toLowerCase();
+            String line = "both";
 //            String line = "white";
 //            String line = "black";
 
-            BoardEvaluator whiteEvaluator = new CurrentBestEvaluator(AIDepth, PieceColor.WHITE);
-            BoardEvaluator blackEvaluator = new CurrentBestEvaluator(AIDepth, PieceColor.BLACK);
+            BoardEvaluator whiteEvaluator = new CandinateEvaluator(AIDepth, PieceColor.WHITE);
+            BoardEvaluator blackEvaluator = new StockfishEvaluator();
             switch (line) {
                 case "white":
                     players = new CapableOfPlaying[]{

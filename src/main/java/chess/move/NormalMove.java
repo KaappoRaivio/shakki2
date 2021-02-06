@@ -120,16 +120,21 @@ public class NormalMove extends Move {
             String clarifierY = "";
             String clarifierX = "";
             Set<Position> brotherPiecePositions = getBrotherPiecePositions(board);
-            for (Position location : brotherPiecePositions) {
-                if (location.getX() == origin.getX()) {
+            for (Position position : brotherPiecePositions) {
+
+                if (position.getX() == origin.getX()) {
                     clarifierX = origin.toString().substring(1);
-                } else if (location.getY() == origin.getY()) {
+                }
+                if (position.getY() == origin.getY()) {
                     clarifierY = origin.toString().substring(0, 1);
-                } else {
+                }
+
+                if (clarifierX.equals("") && clarifierY.equals("")) {
                     clarifierX = origin.toString().substring(0, 1);
                 }
             }
-            builder.append(clarifierX.toLowerCase()).append(clarifierY.toLowerCase());
+
+            builder.append(clarifierY.toLowerCase()).append(clarifierX.toLowerCase());
         } else {
             if (isCapturingMove()) {
                 builder.append(origin.toString().substring(0, 1).toLowerCase());
@@ -153,15 +158,30 @@ public class NormalMove extends Move {
     }
 
     private Set<Position> getBrotherPiecePositions(Board board) {
-        Set<Move> possibleMoves = board
-                .getPieceInSquare(destination)
-                .getPossibleMoves(board, destination, board.getLastMove(), true);
-        return possibleMoves
-                .stream()
-                .filter(move -> board.getPieceInSquare(move.getDestination()).getColor() == color
-                            && board.getPieceInSquare(move.getDestination()).getType() == pieceInOrigin.getType())
-                .map(Move::getDestination)
-                .collect(Collectors.toSet());
+//        board.getPiece
+//
+//        if (toString().equals("Rb1")) {
+//            System.out.println("moi");
+//        }
+
+//        Set<Move> possibleMoves = board
+//                .getPieceInSquare(destination)
+//                .getPossibleMoves(board, destination, board.getLastMove(), true, origin);
+        board.unMakeMove(1);
+
+        Set<Move> possibleMoves = board.getAllPossibleMoves().stream().filter(move -> move.getDestination().equals(destination)
+                && move.getPiece().getType() == pieceInOrigin.getType() && !(move instanceof CastlingMove)).collect(Collectors.toSet());
+
+
+        board.executeMoveNoChecks(this);
+
+        return possibleMoves.stream().filter(move -> !move.getOrigin().equals(origin)).map(Move::getOrigin).collect(Collectors.toSet());
+//        return possibleMoves
+//                .stream()
+//                .filter(move -> board.getPieceInSquare(move.getDestination()).getColor() == color
+//                            && board.getPieceInSquare(move.getDestination()).getType() == pieceInOrigin.getType())
+//                .map(Move::getDestination)
+//                .collect(Collectors.toSet());
 
     }
 

@@ -40,4 +40,9 @@ public enum TermColor {
         this.escape = escape;
         this.backgroundEscape = backgroundEscape;
     }
+
+    @Override
+    public String toString() {
+        return getEscape();
+    }
 }

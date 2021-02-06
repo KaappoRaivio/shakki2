@@ -8,6 +8,9 @@ import chess.piece.basepiece.PieceColor;
 import misc.Splitter;
 import misc.TermColor;
 import org.apache.cayenne.util.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
+import players.BoardEvaluator;
+import players.CandinateEvaluator;
+import players.CurrentBestEvaluator;
 import runner.CapableOfPlaying;
 
 import java.util.*;

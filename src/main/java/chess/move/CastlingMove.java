@@ -133,14 +133,27 @@ public class CastlingMove extends Move {
 
     @Override
     public String getShortAlgebraicNotation(Board board) {
+        String shortAlgebraicNotation;
         switch (castlingType) {
             case QUEEN_SIDE:
-                return "O-O-O";
+                shortAlgebraicNotation = "O-O-O";
+                break;
             case KING_SIDE:
-                return "O-O";
+                shortAlgebraicNotation = "O-O";
+                break;
+            default:
+                throw new RuntimeException("");
         }
 
-        return "";
+        board.makeMove(this);
+        if (board.isCheckmate()) {
+            shortAlgebraicNotation += "#";
+        } else if (board.isCheck()) {
+            shortAlgebraicNotation += "+";
+        }
+        board.unMakeMove(1);
+
+        return shortAlgebraicNotation;
     }
 
     @Override

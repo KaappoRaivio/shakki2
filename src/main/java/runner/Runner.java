@@ -19,7 +19,7 @@ public class Runner {
     private List<Spectator> spectators;
     
 
-    public Runner(Board board, CapableOfPlaying[] players, UI ui, List<Spectator> spectators) {
+    public Runner (Board board, CapableOfPlaying[] players, UI ui, List<Spectator> spectators) {
         this.board = board;
         this.players = players;
         this.ui = ui;
@@ -28,7 +28,7 @@ public class Runner {
 
     }
 
-    public PieceColor play(PieceColor initialTurn) {
+    public PieceColor play (PieceColor initialTurn) {
         return play(initialTurn, 100000000);
     }
 

@@ -21,8 +21,8 @@ public class CastlingRook extends Rook {
     }
 
     @Override
-    public Set<Move> getPossibleMoves(Board board, Position position, Move lastMove, boolean includeSelfCapture) {
-        Set<Move> possibleMoves = super.getPossibleMoves(board, position, lastMove, includeSelfCapture);
+    public Set<Move> getPossibleMoves(Board board, Position position, Move lastMove, boolean includeSelfCapture, Position barrier) {
+        Set<Move> possibleMoves = super.getPossibleMoves(board, position, lastMove, includeSelfCapture, barrier);
 //        mergePairs(result, new Pair<>(possibleMoves.getFirst().stream().map(move -> {
 //                    NormalMove normalMove = ((NormalMove) move);
 //                    return new CastlingRookMove(normalMove.getOrigin(), normalMove.getDestination(), board); }).collect(Collectors.toSet()),

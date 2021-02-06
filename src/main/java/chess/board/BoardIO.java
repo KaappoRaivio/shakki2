@@ -1,6 +1,5 @@
 package chess.board;
 
-import chess.move.CastlingMove;
 import chess.move.NormalMove;
 import misc.Position;
 import misc.ReadWriter;
@@ -10,7 +9,7 @@ import chess.piece.*;
 import chess.piece.basepiece.Piece;
 import chess.piece.basepiece.PieceColor;
 import chess.piece.basepiece.PieceType;
-import players.treeai.BoardEvaluatorHelpers;
+
 
 import java.util.*;
 import java.util.regex.Pattern;

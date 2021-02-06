@@ -20,13 +20,13 @@ public class Rook extends Piece {
     }
 
     @Override
-    public Set<Move> getPossibleMoves(Board board, Position position, Move lastMove, boolean includeSelfCapture) {
+    public Set<Move> getPossibleMoves(Board board, Position position, Move lastMove, boolean includeSelfCapture, Position barrier) {
         Set<Move> moves = new HashSet<>();
         
-        moves.addAll(getStraightPathMoves(board, position, 0, 1, includeSelfCapture));
-        moves.addAll(getStraightPathMoves(board, position, 0, -1, includeSelfCapture));
-        moves.addAll(getStraightPathMoves(board, position, 1, 0, includeSelfCapture));
-        moves.addAll(getStraightPathMoves(board, position, -1, 0, includeSelfCapture));
+        moves.addAll(getStraightPathMoves(board, position, 0, 1, includeSelfCapture, barrier));
+        moves.addAll(getStraightPathMoves(board, position, 0, -1, includeSelfCapture, barrier));
+        moves.addAll(getStraightPathMoves(board, position, 1, 0, includeSelfCapture, barrier));
+        moves.addAll(getStraightPathMoves(board, position, -1, 0, includeSelfCapture, barrier));
 
         return moves;
     }

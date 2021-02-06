@@ -55,7 +55,18 @@ public class PromotionMove extends NormalMove {
 
     @Override
     public String getShortAlgebraicNotation(Board board) {
-        return super.getShortAlgebraicNotation(board) + "=" + MoveHashMap.moveHashMap.get(promoted.getType()).toUpperCase();
+        String shortAlgebraicNotation = super.getShortAlgebraicNotation(board).replaceAll("\\+", "").replaceAll("#", "");
+        shortAlgebraicNotation += "=" + MoveHashMap.moveHashMap.get(promoted.getType()).toUpperCase();
+
+        board.makeMove(this);
+        if (board.isCheckmate()) {
+            shortAlgebraicNotation += "#";
+        } else if (board.isCheck()) {
+            shortAlgebraicNotation += "+";
+        }
+        board.unMakeMove(1);
+
+        return shortAlgebraicNotation;
     }
 
     @Override

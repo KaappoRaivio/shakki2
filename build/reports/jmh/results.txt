@@ -1,0 +1,2 @@
+Benchmark                       Mode  Cnt      Score      Error  Units
+Main2.benchmarkMoveGeneration  thrpt   60  39435.269 ± 2186.198  ops/s

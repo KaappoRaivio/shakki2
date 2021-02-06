@@ -1,6 +1,10 @@
 plugins {
     id 'java'
+//    id "com.github.dkorotych.gradle-maven-exec" version "2.2.1"
+    id "me.champeau.gradle.jmh" version "0.4.5"
 }
+
+//apply plugin: 'java'
 
 group 'org.example'
 version '1.0-SNAPSHOT'
@@ -10,6 +14,22 @@ sourceCompatibility = 11
 repositories {
     mavenCentral()
 }
+//
+//sourceSets.main {
+//    java.srcDirs = ['src/main/java']
+//}
+//
+//sourceSets.test {
+//    java.srcDirs = ['src/test/java']
+//}
+//
+//sourceSets {
+//    jmh {
+//        java.srcDirs = ['src/jmh/java']
+//        resources.srcDirs = ['src/jmh/resources']
+//        compileClasspath += sourceSets.main.runtimeClasspath
+//    }
+//}
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
@@ -17,4 +37,20 @@ dependencies {
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.10'
     compile 'com.google.guava:guava:30.0-jre'
     compile group: 'org.apache.cayenne', name: 'cayenne-server', version: '4.1'
+
+
+//    jmhImplementation 'org.openjdk.jmh:jmh-core:1.27'
+//    jmhAnnotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess:1.27'
+    implementation files('libs/Stockfish-Java-2.0.2_2.jar')
 }
+
+//task jmh(type: JavaExec, dependsOn: jmhClasses) {
+//    main = 'org.openjdk.jmh.Main'
+//    classpath = sourceSets.jmh.compileClasspath + sourceSets.jmh.runtimeClasspath
+//
+//    // To enable the built-in stacktrace sampling profiler
+//    // args = ['-prof', 'stack']
+//}
+
+// to make sure benchmarks always get compiled
+//classes.finalizedBy(jmhClasses)

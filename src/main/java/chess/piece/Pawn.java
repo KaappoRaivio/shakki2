@@ -22,7 +22,7 @@ public class Pawn extends Piece {
     }
 
     @Override
-    public Set<Move> getPossibleMoves(Board board, Position position, Move lastMove, boolean includeSelfCapture) {
+    public Set<Move> getPossibleMoves(Board board, Position position, Move lastMove, boolean includeSelfCapture, Position barrier) {
         Set<Move> moves = new HashSet<>();
 
         moves.addAll(handleStraightAhead(board, position));
@@ -132,7 +132,7 @@ public class Pawn extends Piece {
         Position offset = position.offsetX(offsetX, false);
         if (offset.verify()) {
             Piece piece = board.getPieceInSquare(offset);
-            if (piece instanceof Pawn && isEnPassantPossible(lastMove) && piece.getColor() == color.invert()) {
+            if (piece instanceof Pawn && isEnPassantPossible(lastMove, position) && piece.getColor() == color.invert()) {
                 if (board.isSquareEmpty(position.offset(offsetX, getForwardDirection()))) {
                     EnPassantMove enPassantMove = new EnPassantMove(position, position.offset(offsetX, getForwardDirection()), board);
                     moves.add(enPassantMove);
@@ -155,10 +155,10 @@ public class Pawn extends Piece {
 //        }
 //    }
 
-    private static boolean isEnPassantPossible(Move lastMove) {
+    private static boolean isEnPassantPossible(Move lastMove, Position position) {
         if (lastMove instanceof NormalMove) {
             NormalMove move = (NormalMove) lastMove;
-            return Math.abs(move.getOrigin().getY() - move.getDestination().getY()) == 2 && lastMove.getPiece().getType() == PieceType.PAWN;
+            return Math.abs(move.getOrigin().getY() - move.getDestination().getY()) == 2 && lastMove.getPiece().getType() == PieceType.PAWN && Math.abs(lastMove.getOrigin().getX() - position.getX()) == 1;
 
         } else {
             return false;
